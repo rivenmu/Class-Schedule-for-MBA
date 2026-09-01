@@ -215,6 +215,36 @@ main.collapsed .sidebar-toggle{left:0}
 .cl-empty{text-align:center;color:var(--text3);padding:20px;font-size:13px}
 
 .slot-sep{border-top:1px dashed var(--border);margin:3px 0}
+
+.header-tools{display:flex;align-items:center;gap:10px}
+.header-tools .month-nav{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.08);border-radius:8px;padding:3px}
+.header-tools .month-nav button{background:transparent;border:none;color:#cbd5e1;cursor:pointer;font-size:16px;width:30px;height:30px;border-radius:6px}
+.header-tools .month-nav button:hover{background:rgba(255,255,255,.12)}
+.header-tools .month-nav button:disabled{opacity:.3}
+.header-tools .mn-label{color:#fff;font-size:13px;font-weight:600;min-width:90px;text-align:center}
+.header-tools .export-btn{padding:7px 12px;background:#1e293b;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;white-space:nowrap}
+.header-tools .export-btn:hover{background:#334155}
+#conflictInline summary{list-style:none}
+#conflictInline summary::-webkit-details-marker{display:none}
+#conflictInline summary::before{content:"+ ";color:var(--text3)}
+#conflictInline[open] summary::before{content:"- "}
+.ws-progress{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.ws-block{border:1px solid var(--border);border-radius:8px;padding:8px;background:#f8fafc}
+.ws-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.ws-main{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.ws-num{font-size:18px;font-weight:700}
+.ws-pct{font-size:12px;color:var(--text2)}
+.ws-bar{height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden;margin-bottom:4px}
+.ws-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#2563eb,#0891b2);transition:width .3s}
+.ws-cats{font-size:11px;color:var(--text2)}
+.ws-dual{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:var(--text2)}
+.ws-dual .ws-d{background:#fff;border:1px solid var(--border);border-radius:6px;padding:4px 6px;text-align:center}
+.si-main{flex:1;min-width:0}
+.si-sub{font-size:10px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.si-top{display:flex;align-items:center;gap:4px;min-width:0}
+.si-top .si-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel-item .si-type{flex-shrink:0}
 </style>
 </head>
 <body>
@@ -222,6 +252,15 @@ main.collapsed .sidebar-toggle{left:0}
 <header>
 <div class="header-inner">
 <h1>MBA 课程表 <span class="badge">可视化日历 v2</span></h1>
+<div class="header-tools">
+<div class="month-nav">
+<button id="prevMonth">&#8249;</button>
+<span class="mn-label" id="monthLabel">2026年9月</span>
+<button id="nextMonth">&#8250;</button>
+</div>
+<button class="export-btn" id="exportBtn">导出 PDF 课程表</button>
+<button class="export-btn" id="saveBtn" style="background:#0f766e">保存选课状态</button>
+</div>
 <nav class="tabs">
 <button class="tab active" data-sem="fall2026">2026秋季（我的）</button>
 <button class="tab" data-sem="spring2025">2025春季（参考）</button>
@@ -232,24 +271,14 @@ main.collapsed .sidebar-toggle{left:0}
 <main>
 <button class="sidebar-toggle" id="sidebarToggle" title="收起/展开侧栏">&#9664;</button>
 <aside class="sidebar" id="sidebar">
-<div class="month-nav">
-<button id="prevMonth">&#8249;</button>
-<span class="mn-label" id="monthLabel">2026年9月</span>
-<button id="nextMonth">&#8250;</button>
-</div>
-
-<button class="export-btn" id="exportBtn">导出 PDF 课程表</button>
-<button class="export-btn" id="saveBtn" style="background:#0f766e">保存选课状态</button>
-<div class="stats" id="stats"></div>
-
 <div class="panel" id="selectedPanel">
 <div class="panel-head">选课工作台</div>
 <div class="panel-body" id="selectedPanelBody" style="display:flex;flex-direction:column;gap:8px;padding:10px 12px">
 <div id="selectedBody"></div>
-<div id="conflictInline" style="border-top:1px solid var(--border);padding-top:6px">
-<div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">冲突课选择</div>
-<div id="conflictBody"></div>
-</div>
+<details id="conflictInline" style="border-top:1px solid var(--border);padding-top:6px">
+<summary style="font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;padding:2px 0">冲突课选择（已选可在此调整）</summary>
+<div id="conflictBody" style="margin-top:4px"></div>
+</details>
 <div style="border-top:1px solid var(--border);padding-top:6px">
 <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">类型筛选</div>
 <div class="filter-row" id="filterRow">
@@ -617,8 +646,9 @@ function renderConflictPanel(){
   var html="";
   for(var i=0;i<sem.conflicts.length;i++){
     var g=sem.conflicts[i];
+    var shortLabel=g.label.replace(/\s*（四选一）.*$/,"");
     html+='<div class="conflict-group">';
-    html+='<div class="cg-label">'+g.label+'</div>';
+    html+='<div class="cg-label">'+shortLabel+'</div>';
     html+='<div class="cg-options">';
     for(var j=0;j<g.courses.length;j++){
       var c=getCourseById(state.sem,g.courses[j]);
@@ -632,7 +662,7 @@ function renderConflictPanel(){
         '</div>';
     }
     html+='</div>';
-    if(sel) html+='<div class="cg-clear" data-gid="'+g.id+'">清除选择</div>';
+    html+='<div class="cg-clear" data-gid="'+g.id+'">都不选</div>';
     html+='</div>';
   }
   body.innerHTML=html;
@@ -710,48 +740,48 @@ function renderCatBar(label,val,target,color){
 }
 
 function renderSelectedPanel(){
-  var sem=state.sem;
-  var semData=SEMESTERS[sem];
-  var otherSem=sem==="fall2026"?"spring2025":"fall2026";
-  var TOT_C=26,TOT_M=2,TOT_E=17,TOT_ALL=45;
-
-  var cC=0,cM=0,cE=0;
-  semData.courses.forEach(function(c){
-    var cr=parseCredits(c.credits);
-    if(isCoreType(c.type)){cC+=cr;}
-    else if(isMandatoryType(c.type)){cM+=cr;}
-    else if(isElectiveType(c.type)&&state.electiveSel[sem][c.id]){cE+=cr;}
-  });
-
-  var oC=0,oM=0,oE=0;
-  SEMESTERS[otherSem].courses.forEach(function(c){
-    var cr=parseCredits(c.credits);
-    if(isCoreType(c.type)){oC+=cr;}
-    else if(isMandatoryType(c.type)){oM+=cr;}
-    else if(isElectiveType(c.type)&&state.electiveSel[otherSem][c.id]){oE+=cr;}
-  });
-
-  var tC=cC+oC, tM=cM+oM, tE=cE+oE, tAll=tC+tM+tE;
+  var sem=state.sem, otherSem=sem==="fall2026"?"spring2025":"fall2026";
+  var TOT_ALL=45;
+  function calc(sk){
+    var d=SEMESTERS[sk], core=0, man=0, eleSel=0, indep=0, cmax={};
+    d.courses.forEach(function(c){
+      var cr=parseCredits(c.credits);
+      if(isCoreType(c.type)) core+=cr;
+      else if(isMandatoryType(c.type)) man+=cr;
+      else if(isElectiveType(c.type)){
+        if(state.electiveSel[sk][c.id]) eleSel+=cr;
+        if(c.conflict){ if(!cmax[c.conflict]||cr>cmax[c.conflict]) cmax[c.conflict]=cr; }
+        else indep+=cr;
+      }
+    });
+    var gmax=0; for(var k in cmax) gmax+=cmax[k];
+    var total=core+man+indep+gmax;
+    return {core:core,man:man,eleSel:eleSel,total:total,selected:core+man+eleSel,eleMax:indep+gmax};
+  }
+  var cur=calc(sem), oth=calc(otherSem);
+  var allSel=cur.selected+oth.selected;
   var pctF=function(a,b){return Math.min(100,Math.round(a/b*100));};
+  var curPct=pctF(cur.selected,cur.total), allPct=pctF(allSel,TOT_ALL), othPct=pctF(oth.selected,oth.total);
 
-  var html='<div class="sel-overview">'
-    +'<div class="sel-overview-total">'
-    +'<div class="sp-top"><span>总学分（两学期）</span><span class="sp-num">'+tAll+' / '+TOT_ALL+' 分</span></div>'
-    +'<div class="sp-bar"><div class="sp-fill" style="width:'+pctF(tAll,TOT_ALL)+'%;background:'+(tAll>TOT_ALL?'linear-gradient(90deg,#dc2626,#ea580c)':'linear-gradient(90deg,#2563eb,#0891b2)')+'"></div></div>'
+  var html='<div class="ws-progress">'
+    +'<div class="ws-block">'
+    +'<div class="ws-title">本学期选课进度 · '+semLabel(sem)+'</div>'
+    +'<div class="ws-main"><span class="ws-num">'+cur.selected+' / '+cur.total+' 分</span><span class="ws-pct">'+curPct+'%</span></div>'
+    +'<div class="ws-bar"><div class="ws-fill" style="width:'+curPct+'%"></div></div>'
+    +'<div class="ws-cats">核心 '+cur.core+' · 必选 '+cur.man+' · 选修 '+cur.eleSel+' / '+cur.eleMax+'</div>'
     +'</div>'
-    +'<div class="sel-breakdown">'
-    +renderCatBar('核心课（含必修）',tC,TOT_C,'#2563eb')
-    +renderCatBar('必选课',tM,TOT_M,'#b45309')
-    +renderCatBar('选修课',tE,TOT_E,'#15803d')
+    +'<div class="ws-block">'
+    +'<div class="ws-title">总选课进度（两学期 · 目标 '+TOT_ALL+' 分）</div>'
+    +'<div class="ws-main"><span class="ws-num">'+allSel+' / '+TOT_ALL+' 分</span><span class="ws-pct">'+allPct+'%</span></div>'
+    +'<div class="ws-bar"><div class="ws-fill" style="width:'+allPct+'%;background:'+(allSel>TOT_ALL?'linear-gradient(90deg,#dc2626,#ea580c)':'linear-gradient(90deg,#2563eb,#0891b2)')+'"></div></div>'
+    +'<div class="ws-dual">'
+    +'<div class="ws-d"><strong>秋季</strong><br>'+cur.selected+'/'+cur.total+' 分 · '+curPct+'%</div>'
+    +'<div class="ws-d"><strong>春夏季</strong><br>'+oth.selected+'/'+oth.total+' 分 · '+othPct+'%</div>'
     +'</div>'
-    +'<div class="sel-summary">'
-    +'<span class="ss-item" style="font-weight:600">两学期合计：核心'+tC+' + 必选'+tM+' + 选修'+tE+' = '+tAll+'</span>'
-    +'<span class="ss-item">本'+semLabel(sem)+'：核心'+cC+' + 必选'+cM+' + 选修'+cE+' = '+(cC+cM+cE)+'</span>'
-    +'<span class="ss-item">另'+semLabel(otherSem)+'：核心'+oC+' + 必选'+oM+' + 选修'+oE+' = '+(oC+oM+oE)+'</span>'
-    +(tAll>TOT_ALL?'<span class="ss-item" style="color:#dc2626;background:#fef2f2;border-color:#fecaca">总学分超出'+(tAll-TOT_ALL)+'分</span>':'')
     +'</div>'
     +'</div>';
 
+  var semData=SEMESTERS[sem];
   var rowsHtml='';
   semData.courses.forEach(function(c){
     var isEle=isElectiveType(c.type);
@@ -764,10 +794,26 @@ function renderSelectedPanel(){
     var checkedAttr=isEle?(selected?'checked':''):'checked';
     var typeColor=typeShortColors[c.type]||"#64748b";
     var typeBgMap2={core:"#eff6ff",req:"#f0fdfa",ele:"#f0fdf4",man:"#fffbeb",sum:"#fff7ed"};
+    var subBits=[];
+    if(c.teacher&&c.teacher!=="待定") subBits.push(c.teacher);
+    if(c.room&&c.room!=="--") subBits.push(c.room);
+    for(var i=0;i<c.sessions.length;i++){
+      var s=c.sessions[i];
+      if(s.weekly){
+        var wds=["日","一","二","三","四","五","六"];
+        subBits.push("每周"+wds[s.weekly.dow]+" "+s.ts);
+      }else if(s.dates&&s.dates.length){
+        subBits.push(s.dates[0].slice(5).replace("-","/")+"起 "+s.ts);
+      }
+    }
+    if(c.note&&c.note.length<14) subBits.push(c.note);
+    var subHtml=subBits.length?'<div class="si-sub">'+subBits.join(" · ")+'</div>':'';
     rowsHtml+='<div class="'+cls+'">'
       +'<input type="checkbox" data-sem="'+sem+'" data-cid="'+c.id+'" '+checkboxAttr+' '+checkedAttr+'>'
-      +'<span class="si-type" style="color:'+typeColor+';background:'+(typeBgMap2[c.type]||'#f9fafb')+'">'+typeNamesFull[c.type]+'</span>'
-      +'<span class="si-name" title="'+c.name+'">'+c.name+'</span>'
+      +'<div class="si-main">'
+      +'<div class="si-top"><span class="si-type" style="color:'+typeColor+';background:'+(typeBgMap2[c.type]||'#f9fafb')+'">'+typeNamesFull[c.type]+'</span> <span class="si-name" title="'+c.name+'">'+c.name+'</span></div>'
+      +subHtml
+      +'</div>'
       +'<span class="si-credit">'+credits+'分</span>'
       +'</div>';
   });
@@ -861,7 +907,6 @@ function renderAll(){
   renderCalendar();
   renderConflictPanel();
   renderSelectedPanel();
-  renderStats();
   renderCourseList();
   renderUnscheduled();
   updateNavButtons();
