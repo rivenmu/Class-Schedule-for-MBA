@@ -277,6 +277,43 @@ main.collapsed .sidebar-toggle{left:0}
 /* focus */
 :focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
 button:focus-visible{outline-offset:1px}
+/* first-visit disclaimer — 档案纸质感首访声明 */
+.fv-overlay{position:fixed;inset:0;background:rgba(19,19,22,.48);backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:400;padding:20px}
+.fv-overlay.show{display:flex;animation:fvFade .22s ease}
+@keyframes fvFade{from{opacity:0}to{opacity:1}}
+.fv-modal{background:var(--surface);border:1px solid var(--line);border-radius:20px;max-width:580px;width:100%;max-height:86vh;overflow:hidden;box-shadow:0 24px 64px rgba(19,19,22,.18), 0 4px 16px rgba(19,19,22,.08);animation:fvPop .28s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column}
+@keyframes fvPop{from{transform:translateY(10px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.fv-head{padding:18px 20px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface) 0%, var(--surface-2) 100%);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.fv-head h2{font-family:"Instrument Serif",serif;font-size:19px;font-weight:400;letter-spacing:-.02em;line-height:1.2}
+.fv-head h2 em{font-style:italic;color:var(--indigo)}
+.fv-head p{font-size:12px;color:var(--ink-2);margin-top:4px;line-height:1.5}
+.fv-close{appearance:none;background:var(--surface);border:1px solid var(--line);width:30px;height:30px;border-radius:999px;display:grid;place-items:center;cursor:pointer;color:var(--ink-2);flex-shrink:0;transition:all .15s}
+.fv-close:hover{border-color:var(--ink-3);color:var(--ink);transform:rotate(90deg)}
+.fv-body{padding:16px 20px;overflow:auto;scrollbar-width:thin}
+.fv-body::-webkit-scrollbar{width:6px}
+.fv-body::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}
+.fv-notice{border:1px solid #F0D9A8;background:linear-gradient(180deg,#FFFBEB 0%, #FFF7E6 100%);border-radius:12px;padding:12px 14px;margin-bottom:14px;position:relative;overflow:hidden}
+.fv-notice::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ochre)}
+.fv-notice h3{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ochre);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.fv-notice p{font-size:12.5px;line-height:1.7;color:var(--ink);margin:0}
+.fv-notice p + p{margin-top:6px}
+.fv-notice strong{color:var(--ink);font-weight:700}
+.fv-guide{display:grid;gap:10px}
+.fv-step{display:flex;gap:10px;padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);transition:border-color .15s}
+.fv-step:hover{border-color:var(--line-strong)}
+.fv-step i{width:28px;height:28px;border-radius:999px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:13px;flex-shrink:0;font-style:normal;font-weight:700}
+.fv-step:nth-child(2) i{background:var(--indigo)}
+.fv-step:nth-child(3) i{background:var(--moss)}
+.fv-step h4{font-size:13px;font-weight:700;line-height:1.3}
+.fv-step p{font-size:12px;color:var(--ink-2);line-height:1.6;margin:2px 0 0}
+.fv-foot{padding:14px 20px 16px;border-top:1px solid var(--line);background:var(--surface-2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fv-foot .hint{font-size:11px;color:var(--ink-3);line-height:1.5}
+.fv-foot .hint a{color:var(--ink-2);text-decoration:underline;text-underline-offset:2px}
+.fv-foot .hint a:hover{color:var(--ink)}
+.fv-cta{appearance:none;border:1px solid var(--vermillion);background:var(--vermillion);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(232,74,48,.28);transition:all .16s;white-space:nowrap}
+.fv-cta:hover{background:#D63F27;border-color:#D63F27;transform:translateY(-1px);box-shadow:0 8px 22px rgba(232,74,48,.32)}
+.fv-cta:active{transform:translateY(0) scale(.98)}
+@media(max-width:480px){.fv-modal{border-radius:16px}.fv-head{padding:16px}.fv-body{padding:14px 16px}.fv-foot{padding:12px 16px}}
 /* helpers */
 .muted{color:var(--ink-2)}
 .mono{font-family:"JetBrains Mono",monospace}
@@ -375,6 +412,44 @@ button:focus-visible{outline-offset:1px}
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- 首次访问免责声明 + 使用指南（ponytail 极简实现：无依赖、与档案纸张风格一致） -->
+<div class="fv-overlay" id="fvOverlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="fvTitle">
+  <div class="fv-modal" role="document">
+    <div class="fv-head">
+      <div>
+        <h2 id="fvTitle">使用前 <em>请先阅读</em></h2>
+        <p>1 分钟了解本工具的边界与用法 · 来自 Riven-26全集班</p>
+      </div>
+      <button type="button" class="fv-close" id="fvClose" aria-label="关闭">×</button>
+    </div>
+    <div class="fv-body">
+      <div class="fv-notice">
+        <h3>⚠ 免责声明</h3>
+        <p>本课表为个人业余时间整理，仅供直观了解选课冲突与学分测算参考，不代表学校官方发布。手工整理与难免存在疏漏、更新延迟或显示误差。</p>
+        <p>特别提醒：<strong>2027 秋季学期课程为基于公开信息的预测编排</strong>，仅用于提前规划，最终安排请以经管学院/MBA 中心等官方课表为准。选课前请务必二次核对。</p>
+      </div>
+      <div class="fv-guide">
+        <div class="fv-step">
+          <i>1</i>
+          <div><h4>左侧选课，右上切学期</h4><p>在左侧 <b>课程勾选区</b> 按类型筛选并勾选课程；右上角 <b>2026 秋季学期 / 2027 春夏学期（预测）</b> 一键切换。</p></div>
+        </div>
+        <div class="fv-step">
+          <i>2</i>
+          <div><h4>进度实时在左上角</h4><p>顶部 <b>选课进度展示区</b> 实时显示 <b>本学期选课比例</b>、已选/应修学分（含必修），以及两学期汇总与目标学分。</p></div>
+        </div>
+        <div class="fv-step">
+          <i>3</i>
+          <div><h4>选完固化到本地</h4><p>确认方案后，点击右上角 <b>⤓ 保存选课下载 html</b>，将当前勾选状态固化为本地 HTML 文件，随时离线回看、转发给同学亦可。</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="fv-foot">
+      <span class="hint">仅首次打开显示 · <a href="#" id="fvResetLink">重置演示</a></span>
+      <button type="button" class="fv-cta" id="fvConfirm">我已阅读并知晓，开始使用 →</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ========== DATA ==========
@@ -1219,29 +1294,21 @@ function saveState() {
   var clone = document.documentElement.cloneNode(true);
   var prev = clone.querySelector('#saved-state');
   if(prev) prev.remove();
-  // 兼容旧版未带 id 的存档脚本
-  var legacy = clone.querySelector('script');
-  // 更精确地清理旧脚本（若存在）
-  var allScripts = clone.querySelectorAll('script');
-  for(var i=0;i<allScripts.length;i++){
-    if(allScripts[i].textContent.indexOf('window.__SAVED_STATE')!==-1 && allScripts[i].id!=='saved-state'){
-      allScripts[i].remove(); break;
-    }
-  }
   // 清空所有运行时动态容器，令导出文件加载时由 JS 依预设数据重新渲染，保证与原文件一致
   ;['calGrid','courseListBody','progressBody','checkBody','conflictBody','printContainer'].forEach(function(id){
     var el = clone.querySelector('#'+id);
     if(el) el.innerHTML = '';
   });
-  // 重置瞬态 UI
+  // 重置瞬态 UI（含首访声明遮罩，避免导出文件打开即被遮罩覆盖呈空白）
   var toast = clone.querySelector('#toast'); if(toast) toast.className = 'toast';
   var modal = clone.querySelector('#modalOverlay'); if(modal) modal.className = 'modal-overlay';
+  var fv = clone.querySelector('#fvOverlay'); if(fv){ fv.className = 'fv-overlay'; fv.setAttribute('aria-hidden','true'); }
   var sidebar = clone.querySelector('#sidebar'); if(sidebar) sidebar.classList.remove('open');
   var marrow = clone.querySelector('#mobileArrow'); if(marrow){ marrow.className='arrow'; marrow.textContent='▴'; }
+  var bodyClone = clone.querySelector('body'); if(bodyClone) bodyClone.style.overflow = '';
   var html = '<!DOCTYPE html>\n' + clone.outerHTML;
-  // 字符串兜底清理
+  // 字符串兜底清理（仅清理带 id 的存档脚本，避免误删主脚本）
   html = html.replace(/<script id="saved-state">[\s\S]*?<\/script>/, '');
-  html = html.replace(/<script>window\.__SAVED_STATE[\s\S]*?<\/script>/, '');
   var lower = html.toLowerCase();
   var idx = lower.lastIndexOf('</body>');
   if(idx !== -1){ html = html.slice(0, idx) + stateScript + html.slice(idx); }
@@ -1307,6 +1374,40 @@ if (window.__SAVED_STATE) {
   initElectiveDefaults();
 }
 renderAll();
+
+// ===== 首访声明：仅本次会话未确认时展示，关闭后本会话不再出现 =====
+(function(){
+  var KEY = 'mba-disclaimer-seen';
+  var overlay = document.getElementById('fvOverlay');
+  var btnConfirm = document.getElementById('fvConfirm');
+  var btnClose = document.getElementById('fvClose');
+  var linkReset = document.getElementById('fvResetLink');
+  if(!overlay) return;
+  function open(){ overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; if(btnConfirm) btnConfirm.focus(); }
+  function close(write){
+    overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); document.body.style.overflow='';
+    if(write){ try{ sessionStorage.setItem(KEY,'1'); }catch(e){} }
+  }
+  var seen = false;
+  try{ seen = sessionStorage.getItem(KEY)==='1'; }catch(e){}
+  if(!seen){ setTimeout(open, 300); }
+  if(btnConfirm) btnConfirm.addEventListener('click', function(){ close(true); });
+  if(btnClose) btnClose.addEventListener('click', function(){ close(true); });
+  if(linkReset) linkReset.addEventListener('click', function(e){
+    e.preventDefault();
+    try{ sessionStorage.removeItem(KEY); }catch(e){}
+    open();
+  });
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) close(true); });
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape' && overlay.classList.contains('show')){
+      e.stopPropagation();
+      close(true);
+    }
+  });
+  // 暴露给控制台便于测试：sessionStorage.removeItem('mba-disclaimer-seen')
+  window.resetDisclaimer = function(){ try{ sessionStorage.removeItem(KEY); }catch(e){} location.reload(); };
+})();
 </script>
 </body>
 </html>
