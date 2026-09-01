@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBA 课程表 - 可视化日历</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f1f5f9;--card:#fff;--border:#e2e8f0;--text:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --core:#2563eb;--core-bg:#eff6ff;--core-border:#93c5fd;
+  --req:#0f766e;--req-bg:#f0fdfa;--req-border:#5eead4;
+  --ele:#15803d;--ele-bg:#f0fdf4;--ele-border:#86efac;
+  --man:#b45309;--man-bg:#fffbeb;--man-border:#fcd34d;
+  --sum:#d97706;--sum-bg:#fff7ed;--sum-border:#fdba74;
+  --hol:#ef4444;--hol-bg:#fef2f2;
+  --sidebar-w:300px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.5;font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* Header */
+header{background:#0f172a;color:#fff;padding:14px 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.header-inner{max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+header h1{font-size:17px;font-weight:700;white-space:nowrap}
+header .badge{font-size:11px;color:#64748b;font-weight:400;margin-left:8px}
+.tabs{display:flex;gap:2px;background:rgba(255,255,255,.06);border-radius:8px;padding:3px}
+.tab{background:transparent;border:none;color:#94a3b8;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;white-space:nowrap}
+.tab:hover{color:#cbd5e1}
+.tab.active{background:#1e293b;color:#fff}
+
+/* Layout */
+main{display:flex;max-width:1600px;margin:0 auto;min-height:calc(100vh - 55px)}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;padding:16px;border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 55px);position:sticky;top:55px}
+.cal-area{flex:1;padding:16px;min-width:0}
+
+/* Month nav */
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:8px}
+.month-nav .mn-label{font-size:17px;font-weight:700;text-align:center;flex:1}
+.month-nav button{background:var(--card);border:1px solid var(--border);border-radius:8px;width:36px;height:36px;font-size:18px;cursor:pointer;color:var(--text2);transition:all .15s;display:flex;align-items:center;justify-content:center}
+.month-nav button:hover{background:#e2e8f0;border-color:var(--text3)}
+.month-nav button:disabled{opacity:.3;cursor:not-allowed}
+
+/* Conflict panel */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.panel-head{padding:10px 14px;font-size:13px;font-weight:600;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.panel-body{padding:10px 14px}
+.conflict-group{margin-bottom:12px}
+.conflict-group:last-child{margin-bottom:0}
+.cg-label{font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500}
+.cg-options{display:flex;flex-direction:column;gap:4px}
+.cg-opt{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid transparent;transition:all .12s}
+.cg-opt:hover{background:#f8fafc}
+.cg-opt.selected{border-color:var(--core);background:var(--core-bg);color:var(--core)}
+.cg-opt.unselected{opacity:.4;text-decoration:line-through}
+.cg-opt .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1.5px solid}
+.cg-opt .dot.core{border-color:var(--core);background:var(--core)}
+.cg-opt .dot.ele{border-color:var(--ele);background:var(--ele)}
+.cg-clear{font-size:11px;color:var(--text3);cursor:pointer;margin-top:4px;text-decoration:underline}
+.cg-clear:hover{color:var(--text2)}
+
+/* Filter */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap}
+.filter-btn{padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:12px;color:var(--text2);transition:all .12s}
+.filter-btn:hover{border-color:var(--text3)}
+.filter-btn.active{background:#1e293b;color:#fff;border-color:#1e293b}
+
+/* Legend */
+.legend{display:flex;flex-direction:column;gap:5px}
+.legend-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.legend-dot{width:10px;height:10px;border-radius:2px;border:1px solid}
+
+/* Unscheduled */
+.unsched{font-size:11px;color:var(--text3);padding:4px 0;line-height:1.6}
+.unsched div{padding:2px 0;border-bottom:1px dotted var(--border)}
+
+/* Calendar */
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
+.cal-wd{text-align:center;font-size:12px;font-weight:600;color:var(--text2);padding:6px 0}
+.cal-wd.weekend{color:var(--hol)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-cell{border:1px solid var(--border);border-radius:4px;min-height:140px;padding:4px;background:var(--card);display:flex;flex-direction:column;gap:3px;overflow:hidden;transition:border-color .15s}
+.cal-cell.other{background:#f8fafc;border-color:#f1f5f9}
+.cal-cell.today{border:2px solid var(--core)}
+.cal-cell.holiday{background:var(--hol-bg)}
+.cal-cell.has-conflict{border-color:#fbbf24;border-style:dashed}
+.cal-date{font-size:11px;font-weight:600;color:var(--text2);text-align:right;padding:0 3px;flex-shrink:0}
+.cal-date .hol-name{font-size:9px;color:var(--hol);font-weight:400}
+.cal-courses{display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex:1}
+.cal-courses::-webkit-scrollbar{width:3px}
+.cal-courses::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
+
+.cc{border-left:3px solid;border-radius:3px;padding:3px 6px;font-size:12px;cursor:pointer;transition:all .12s;line-height:1.35}
+.cc:hover{filter:brightness(.97);transform:translateX(1px)}
+.cc-core{border-color:var(--core);background:var(--core-bg);color:#1e40af}
+.cc-req{border-color:var(--req);background:var(--req-bg);color:#115e59}
+.cc-ele{border-color:var(--ele);background:var(--ele-bg);color:#166534}
+.cc-man{border-color:var(--man);background:var(--man-bg);color:#92400e}
+.cc-sum{border-color:var(--sum);background:var(--sum-bg);color:#9a3412}
+.cc-conflict{border-style:dashed;border-width:2px}
+.cc-name{font-weight:600;line-height:1.25;word-break:break-word}
+.cc-time{opacity:.65;font-size:10px}
+.cc-conflict-badge{display:inline-block;font-size:9px;background:#f59e0b;color:#fff;border-radius:2px;padding:0 4px;margin-left:3px;vertical-align:middle;white-space:nowrap}
+
+/* Empty day */
+.cal-empty{font-size:10px;color:var(--text3);text-align:center;padding:4px;opacity:.5}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:12px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;padding:0}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);padding:0 4px;line-height:1}
+.modal-body{padding:16px 20px}
+.modal-row{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9}
+.modal-row:last-child{border-bottom:none}
+.modal-row .mr-label{font-size:12px;color:var(--text3);width:70px;flex-shrink:0}
+.modal-row .mr-val{font-size:13px;color:var(--text);flex:1}
+.modal-dates{font-size:12px;color:var(--text2);margin-top:8px;line-height:1.8}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;z-index:300;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+
+/* Stats */
+.stats{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;flex:1;min-width:70px;text-align:center}
+.stat .sn{font-size:20px;font-weight:700;line-height:1}
+.stat .sl{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* Mobile */
+.mobile-toggle{display:none}
+@media(max-width:900px){
+  :root{--sidebar-w:100%}
+  main{flex-direction:column}
+  .sidebar{position:fixed;bottom:0;left:0;right:0;max-height:50vh;border-right:none;border-top:1px solid var(--border);z-index:90;transform:translateY(calc(100% - 44px));transition:transform .3s}
+  .sidebar.open{transform:translateY(0)}
+  .mobile-toggle{display:flex;position:fixed;bottom:0;left:0;right:0;background:#1e293b;color:#fff;padding:10px 16px;justify-content:center;align-items:center;gap:8px;z-index:95;font-size:13px;cursor:pointer}
+  .mobile-toggle .arrow{transition:transform .3s}
+  .mobile-toggle .arrow.up{transform:rotate(180deg)}
+  .cal-area{padding:8px}
+  .cal-cell{min-height:90px}
+  .cc{font-size:10px;padding:2px 4px}
+  .cc-time{display:none}
+}
+
+.sidebar-toggle{position:fixed;left:var(--sidebar-w);top:55px;z-index:95;background:#1e293b;color:#fff;border:none;border-radius:0 6px 6px 0;width:22px;height:48px;cursor:pointer;font-size:13px;transition:left .2s;display:flex;align-items:center;justify-content:center;box-shadow:2px 0 6px rgba(0,0,0,.1)}
+.sidebar-toggle:hover{background:#334155}
+main.collapsed .sidebar{display:none}
+main.collapsed .sidebar-toggle{left:0}
+.export-btn{width:100%;padding:9px;background:#1e293b;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:12px;font-weight:500;transition:background .15s}
+.export-btn:hover{background:#334155}
+@media print{
+  @page{size:A3 landscape;margin:10mm}
+  header,.sidebar,.cal-area,.mobile-toggle,.modal-overlay,.toast,.sidebar-toggle{display:none!important}
+  #printContainer{display:block!important}
+  .print-header{text-align:center;margin-bottom:14px}
+  .print-header h1{font-size:24px;font-weight:700}
+  .print-header p{font-size:13px;color:#475569;margin-top:4px}
+  .print-legend{margin-top:8px;font-size:12px}
+  .print-legend span{margin-right:12px}
+  .print-month{page-break-after:always}
+  .print-month:last-child{page-break-after:auto}
+  .print-month-title{font-size:18px;font-weight:700;margin:10px 0 6px}
+  .print-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
+  .print-cal-wd{text-align:center;font-size:13px;font-weight:600;color:#475569;padding:6px 0}
+  .print-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+  .print-cal-grid .cal-cell{min-height:120px!important;overflow:visible!important}
+  .print-cal-grid .cc{font-size:11px!important}
+  .print-cal-grid .cc-name{font-size:11px!important}
+  .print-cal-grid .cc-time{font-size:10px!important}
+}
+
+.sel-progress{margin-bottom:10px}
+.sel-progress .sp-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;align-items:baseline}
+.sel-progress .sp-num{font-weight:700;color:var(--core);font-size:14px}
+.sel-progress .sp-bar{height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden}
+.sel-progress .sp-fill{height:100%;background:linear-gradient(90deg,#2563eb,#0891b2);border-radius:5px;transition:width .3s}
+.sel-summary{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.sel-summary .ss-item{font-size:11px;padding:3px 8px;border-radius:4px;background:#f8fafc;border:1px solid var(--border);white-space:nowrap}
+.sel-overview{margin-bottom:10px}
+.sel-overview-total{margin-bottom:10px}
+.sel-overview-total .sp-bar{height:16px;border-radius:8px}
+.sel-breakdown{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.sel-cat{display:grid;grid-template-columns:110px 1fr 50px;align-items:center;gap:6px;font-size:11px}
+.sel-cat-label{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.sel-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sel-cat-bar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+.sel-cat-fill{height:100%;border-radius:4px;transition:width .3s}
+.sel-cat-num{text-align:right;font-weight:600;color:var(--text2);font-size:11px;white-space:nowrap}
+.sel-list{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
+.sel-list::-webkit-scrollbar{width:3px}
+.sel-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
+.sel-item{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:4px;font-size:12px;border:1px solid transparent}
+.sel-item:hover{background:#f8fafc}
+.sel-item.si-fixed{opacity:.6}
+.sel-item.si-conflict-pending{background:#fffbeb;border-color:#fde68a}
+.sel-item.si-conflict-selected{background:#eff6ff;border-color:#bfdbfe}
+.sel-item input[type="checkbox"]{accent-color:var(--ele);width:15px;height:15px;cursor:pointer;flex-shrink:0}
+.sel-item.si-fixed input{accent-color:var(--text3)}
+.sel-item .si-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel-item .si-credit{font-size:11px;color:var(--text2);font-weight:600;flex-shrink:0;white-space:nowrap}
+.sel-item .si-type{font-size:9px;padding:1px 4px;border-radius:3px;flex-shrink:0;white-space:nowrap}
+
+
+.cl-table{width:100%;border-collapse:collapse;font-size:13px}
+.cl-table th{text-align:left;padding:8px 10px;background:#f8fafc;border-bottom:2px solid var(--border);font-weight:600;color:var(--text2);font-size:12px;white-space:nowrap}
+.cl-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.cl-table tr:hover{background:#f8fafc}
+.cl-table .cl-name{font-weight:600}
+.cl-table .cl-code{font-family:monospace;font-size:11px;color:var(--text3)}
+.cl-table .cl-time{font-size:12px;line-height:1.5}
+.cl-table .cl-summary{background:#f8fafc;font-weight:600}
+.cl-table .cl-summary td{padding:6px 10px;font-size:12px;border-bottom:2px solid var(--border)}
+.cl-empty{text-align:center;color:var(--text3);padding:20px;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+<div class="header-inner">
+<h1>MBA 课程表 <span class="badge">可视化日历 v2</span></h1>
+<nav class="tabs">
+<button class="tab active" data-sem="fall2026">2026秋季（我的）</button>
+<button class="tab" data-sem="spring2025">2025春季（参考）</button>
+</nav>
+</div>
+</header>
+
+<main>
+<button class="sidebar-toggle" id="sidebarToggle" title="收起/展开侧栏">&#9664;</button>
+<aside class="sidebar" id="sidebar">
+<div class="month-nav">
+<button id="prevMonth">&#8249;</button>
+<span class="mn-label" id="monthLabel">2026年9月</span>
+<button id="nextMonth">&#8250;</button>
+</div>
+
+<button class="export-btn" id="exportBtn">导出 PDF 课程表</button>
+<button class="export-btn" id="saveBtn" style="background:#0f766e">保存选课状态</button>
+<div class="stats" id="stats"></div>
+
+<div class="panel" id="selectedPanel">
+<div class="panel-head">已选课程 / 学分统计</div>
+<div class="panel-body" id="selectedBody"></div>
+</div>
+
+<div class="panel" id="conflictPanel" style="display:none">
+<div class="panel-head">冲突课选择（二选一/多选一）</div>
+<div class="panel-body" id="conflictBody"></div>
+</div>
+
+<div class="panel">
+<div class="panel-head">课程类型筛选</div>
+<div class="panel-body">
+<div class="filter-row" id="filterRow">
+<button class="filter-btn active" data-filter="all">全部</button>
+<button class="filter-btn" data-filter="core">核心课</button>
+<button class="filter-btn" data-filter="req">必修课</button>
+<button class="filter-btn" data-filter="ele">选修课</button>
+<button class="filter-btn" data-filter="man">必选课</button>
+<button class="filter-btn" data-filter="sum">暑期课</button>
+</div>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-head">图例</div>
+<div class="panel-body">
+<div class="legend">
+<div class="legend-row"><div class="legend-dot" style="border-color:var(--core);background:var(--core-bg)"></div>核心课</div>
+<div class="legend-row"><div class="legend-dot" style="border-color:var(--req);background:var(--req-bg)"></div>必修课</div>
+<div class="legend-row"><div class="legend-dot" style="border-color:var(--ele);background:var(--ele-bg)"></div>选修课</div>
+<div class="legend-row"><div class="legend-dot" style="border-color:var(--man);background:var(--man-bg)"></div>必选课</div>
+<div class="legend-row"><div class="legend-dot" style="border-color:var(--sum);background:var(--sum-bg)"></div>暑期课</div>
+<div class="legend-row"><div class="legend-dot" style="border-color:#f59e0b;background:#fef3c7"></div>冲突课（虚线边框）</div>
+<div class="legend-row"><div class="legend-dot" style="border-color:var(--hol);background:var(--hol-bg)"></div>法定假日（停课）</div>
+</div>
+</div>
+</div>
+
+<div class="panel" id="unschedPanel" style="display:none">
+<div class="panel-head">未排定日期的课程</div>
+<div class="panel-body">
+<div class="unsched" id="unschedList"></div>
+</div>
+</div>
+</aside>
+
+<div class="cal-area">
+<div class="cal-weekdays">
+<div class="cal-wd">周一</div>
+<div class="cal-wd">周二</div>
+<div class="cal-wd">周三</div>
+<div class="cal-wd">周四</div>
+<div class="cal-wd">周五</div>
+<div class="cal-wd weekend">周六</div>
+<div class="cal-wd weekend">周日</div>
+</div>
+<div class="cal-grid" id="calGrid"></div>
+<div class="panel" id="courseListPanel" style="margin-top:16px">
+<div class="panel-head">已选课程列表</div>
+<div class="panel-body" id="courseListBody"></div>
+</div>
+</div>
+</main>
+
+<div class="mobile-toggle" id="mobileToggle">
+<span>面板</span>
+<span class="arrow" id="mobileArrow">&#9650;</span>
+</div>
+
+<div id="printContainer" style="display:none"></div>
+<div class="modal-overlay" id="modalOverlay">
+<div class="modal" id="modalContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== DATA ==========
+const SEMESTERS = {
+  fall2026: {
+    name: "2026-2027 秋季学期",
+    courses: [
+      {id:"f01",code:"M1005Z-F",name:"会计学",type:"core",credits:"2/32",teacher:"肖建华",room:"S102",
+       sessions:[{dates:["2026-09-10","2026-09-12","2026-10-15","2026-10-17","2026-10-29","2026-10-31","2026-11-12","2026-11-14"],ts:"08:30",te:"12:00"}]},
+      {id:"f02",code:"M1001Z-F",name:"商务英语A",type:"core",credits:"2/32",teacher:"李兰欣等",room:"N108/N306/N308",
+       sessions:[{dates:["2026-09-10","2026-09-12","2026-10-15","2026-10-17","2026-10-29","2026-10-31","2026-11-12","2026-11-14"],ts:"13:30",te:"17:00"}]},
+      {id:"f03",code:"M1007Z-F",name:"战略管理",type:"core",credits:"2/32",teacher:"乔晗",room:"S102",
+       sessions:[{dates:["2026-09-11","2026-09-13","2026-10-16","2026-10-18","2026-10-30","2026-11-01","2026-11-13","2026-11-15"],ts:"08:30",te:"12:00"}]},
+      {id:"f04",code:"M1003Z-F",name:"组织行为学",type:"core",credits:"2/32",teacher:"朱秀梅",room:"S102",
+       sessions:[{dates:["2026-09-11","2026-09-13","2026-10-16","2026-10-18","2026-10-30","2026-11-01","2026-11-13","2026-11-15"],ts:"13:30",te:"17:00"}]},
+      {id:"f05",code:"M3057Z",name:"广告市场原理及实践",type:"ele",credits:"2/32",teacher:"张茜",room:"S102",note:"限选70人",
+       sessions:[{dates:["2026-11-26","2026-11-28","2026-12-10","2026-12-12","2026-12-24","2026-12-26","2027-01-07","2027-01-09"],ts:"08:30",te:"12:00"}]},
+      {id:"f06",code:"M1004Z-F",name:"数据模型与决策",type:"core",credits:"2/32",teacher:"李秀婷",room:"S102",
+       sessions:[{dates:["2026-11-26","2026-11-28","2026-12-10","2026-12-12","2026-12-24","2026-12-26","2027-01-07","2027-01-09"],ts:"13:30",te:"17:00"}]},
+      {id:"f07",code:"MB001Z-M",name:"自然辩证法概论",type:"req",credits:"1/36",teacher:"孟建伟",room:"S102",
+       sessions:[
+         {dates:["2026-11-14"],ts:"18:30",te:"21:50"},
+         {dates:["2026-11-27","2026-11-29","2026-12-11","2026-12-13","2026-12-25","2026-12-27","2027-01-08","2027-01-10"],ts:"08:30",te:"12:00"}
+       ]},
+      {id:"f08",code:"M1006Z-F",name:"管理经济学",type:"core",credits:"2/32",teacher:"许健",room:"S102",
+       sessions:[{dates:["2026-11-27","2026-11-29","2026-12-11","2026-12-13","2026-12-25","2026-12-27","2027-01-08","2027-01-10"],ts:"13:30",te:"17:00"}]},
+      {id:"f09",code:"M3023Z",name:"天使投资",type:"ele",credits:"1/16",teacher:"龙文",room:"S106",note:"线上同步，北京线上<=1次",conflict:"A",
+       sessions:[{weekly:{dow:2,start:"2026-09-08",end:"2026-10-13",except:["2026-10-06"]},ts:"19:20",te:"21:50"}]},
+      {id:"f10",code:"M3054Z",name:"国际企业管理",type:"ele",credits:"1/16",teacher:"吕萍",room:"S102",note:"线上同步，北京线上<=1次",conflict:"A",
+       sessions:[{weekly:{dow:2,start:"2026-09-08",end:"2026-10-13",except:["2026-10-06"]},ts:"19:20",te:"21:50"}]},
+      {id:"f11",code:"M3061Z",name:"人力资源管理",type:"ele",credits:"2/32",teacher:"张银昆",room:"S106",note:"线上同步，北京线上<=3次",conflict:"C",
+       sessions:[{weekly:{dow:3,start:"2026-09-09",end:"2026-12-02",except:["2026-09-30","2026-10-07"]},ts:"19:20",te:"21:50"}]},
+      {id:"f12",code:"M3059Z",name:"风险与私募股权投资",type:"ele",credits:"2/32",teacher:"张矢的",room:"S102",note:"限选40人",conflict:"C",
+       sessions:[{weekly:{dow:3,start:"2026-09-09",end:"2026-12-02",except:["2026-09-30","2026-10-07"]},ts:"19:20",te:"21:50"}]},
+      {id:"f13",code:"M3055Z",name:"项目管理",type:"ele",credits:"2/32",teacher:"张玲玲",room:"S102",note:"线上同步，北京线上<=3次",conflict:"E",
+       sessions:[{weekly:{dow:4,start:"2026-09-10",end:"2026-12-03",except:["2026-09-24","2026-10-01"]},ts:"19:20",te:"21:50"}]},
+      {id:"f14",code:"M3039Z",name:"人工智能程序设计(Python)",type:"ele",credits:"2/32",teacher:"顾立平",room:"S106",note:"线上同步，北京线上<=3次",conflict:"E",
+       sessions:[{weekly:{dow:4,start:"2026-09-10",end:"2026-12-03",except:["2026-09-24","2026-10-01"]},ts:"19:20",te:"21:50"}]},
+      {id:"f15",code:"M3043Z",name:"领域大数据系列讲座",type:"ele",credits:"2/32",teacher:"待定",room:"S101",note:"周五晚，具体以通知为准",
+       sessions:[]},
+      {id:"f16",code:"M3058Z",name:"企业并购与重组实务",type:"ele",credits:"2/32",teacher:"栾大龙",room:"S102",note:"线上同步，北京线上<=3次",conflict:"B",
+       sessions:[{weekly:{dow:2,start:"2026-10-27",end:"2027-01-05",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"f17",code:"M3088Z",name:"计量经济学",type:"ele",credits:"2/32",teacher:"许健",room:"S106",note:"线上同步，北京线上<=3次",conflict:"B",
+       sessions:[{weekly:{dow:2,start:"2026-10-27",end:"2027-01-05",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"f18",code:"M3029Z",name:"企业知识产权管理",type:"ele",credits:"1/16",teacher:"战飞扬",room:"S106",note:"线上同步，北京线上<=1次",conflict:"D",
+       sessions:[{weekly:{dow:3,start:"2026-12-16",end:"2027-01-13",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"f19",code:"M3012Z",name:"时间序列分析",type:"ele",credits:"1/16",teacher:"胡毅",room:"S104",note:"线上同步，北京线上<=1次",conflict:"D",
+       sessions:[{weekly:{dow:3,start:"2026-12-16",end:"2027-01-13",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"f20",code:"M3042Z",name:"数据挖掘与商务智能",type:"ele",credits:"1/16",teacher:"牛凌峰",room:"S106",note:"线上同步，北京线上<=1次",conflict:"F",
+       sessions:[{weekly:{dow:4,start:"2026-12-10",end:"2027-01-14",except:["2026-12-31"]},ts:"19:20",te:"21:50"}]},
+      {id:"f21",code:"M3063Z",name:"公司合规管理",type:"ele",credits:"1/16",teacher:"赵云珂",room:"S102",note:"民营企业实控人全周期合规风控",conflict:"F",
+       sessions:[{weekly:{dow:4,start:"2026-12-10",end:"2027-01-14",except:["2026-12-31"]},ts:"19:20",te:"21:50"}]}
+    ],
+    conflicts: [
+      {id:"A",label:"周二晚 9/8-10/13",courses:["f09","f10"]},
+      {id:"B",label:"周二晚 10/27-1/5",courses:["f16","f17"]},
+      {id:"C",label:"周三晚 9/9-12/2",courses:["f11","f12"]},
+      {id:"D",label:"周三晚 12/16-1/13",courses:["f18","f19"]},
+      {id:"E",label:"周四晚 9/10-12/3",courses:["f13","f14"]},
+      {id:"F",label:"周四晚 12/10-1/14",courses:["f20","f21"]}
+    ],
+    holidays: {
+      "2026-09-25":"中秋节","2026-09-26":"中秋节","2026-09-27":"中秋节",
+      "2026-10-01":"国庆节","2026-10-02":"国庆节","2026-10-03":"国庆节","2026-10-04":"国庆节","2026-10-05":"国庆节","2026-10-06":"国庆节","2026-10-07":"国庆节",
+      "2027-01-01":"元旦","2027-01-02":"元旦","2027-01-03":"元旦"
+    },
+    rangeStart: {y:2026,m:8}, rangeEnd: {y:2027,m:0}
+  },
+
+  spring2025: {
+    name: "2025-2026 春季学期",
+    courses: [
+      {id:"s01",code:"MB001Z-02",name:"新时代中国特色社会主义理论与实践",type:"req",credits:"2/36",teacher:"待定",room:"S301",
+       sessions:[{dates:["2026-03-12","2026-03-14","2026-03-26","2026-03-28","2026-04-09","2026-04-11","2026-04-23","2026-04-25"],ts:"08:30",te:"12:00"}]},
+      {id:"s02",code:"M1002Z-F",name:"商务英语B",type:"core",credits:"2/32",teacher:"李兰欣",room:"N110/N308/N406",
+       sessions:[{dates:["2026-03-12","2026-03-14","2026-03-26","2026-03-28","2026-04-09","2026-04-11","2026-04-23","2026-04-25"],ts:"13:30",te:"17:00"}]},
+      {id:"s03",code:"M3037Z",name:"商业模式",type:"ele",credits:"2/32",teacher:"乔晗",room:"S102",
+       sessions:[{dates:["2026-03-13","2026-03-15","2026-03-27","2026-03-29","2026-04-10","2026-04-12","2026-04-24","2026-04-26"],ts:"08:30",te:"12:00"}]},
+      {id:"s04",code:"M1011Z-F",name:"公司理财",type:"core",credits:"2/32",teacher:"高金山",room:"S102",
+       sessions:[{dates:["2026-03-13","2026-03-15","2026-03-27","2026-03-29","2026-04-10","2026-04-12","2026-04-24","2026-04-26"],ts:"13:30",te:"17:00"}]},
+      {id:"s05",code:"M5001Z-F",name:"企业经营模拟",type:"man",credits:"2/32",teacher:"卢涛",room:"S104",note:"需自备笔记本电脑",
+       sessions:[{dates:["2026-03-14","2026-03-28","2026-04-11","2026-04-25","2026-05-23","2026-06-06","2026-06-27","2026-07-11"],ts:"18:30",te:"21:50"}]},
+      {id:"s06",code:"M1008Z-F",name:"管理信息系统",type:"core",credits:"2/32",teacher:"彭赓",room:"S102",
+       sessions:[{dates:["2026-05-21","2026-05-23","2026-06-04","2026-06-06","2026-06-25","2026-06-27","2026-07-09","2026-07-11"],ts:"08:30",te:"12:00"}]},
+      {id:"s07",code:"M1010Z-F",name:"市场营销",type:"core",credits:"2/32",teacher:"张莎",room:"S102",
+       sessions:[{dates:["2026-05-21","2026-05-23","2026-06-04","2026-06-06","2026-06-25","2026-06-27","2026-07-09","2026-07-11"],ts:"13:30",te:"17:00"}]},
+      {id:"s08",code:"M1009Z-F",name:"运营管理",type:"core",credits:"2/32",teacher:"龚其国",room:"S102",
+       sessions:[{dates:["2026-05-22","2026-05-24","2026-06-05","2026-06-07","2026-06-26","2026-06-28","2026-07-10","2026-07-12"],ts:"08:30",te:"12:00"}]},
+      {id:"s09",code:"M3073Z",name:"领导力与团队管理",type:"ele",credits:"2/32",teacher:"杨周",room:"S102",
+       sessions:[{dates:["2026-05-22","2026-05-24","2026-06-05","2026-06-07","2026-06-26","2026-06-28","2026-07-10","2026-07-12"],ts:"13:30",te:"17:00"}]},
+      {id:"s10",code:"PB002Z-4",name:"学术道德与学术写作规范",type:"req",credits:"1/20",teacher:"慕课",room:"--",note:"在线课程 3/26-5/21",
+       sessions:[]},
+      {id:"s11",code:"M3072Z",name:"体育赛事理论与实践",type:"ele",credits:"2/32",teacher:"待定",room:"--",note:"需参加沙赛",
+       sessions:[]},
+      {id:"s12",code:"M3019Y",name:"投资学",type:"ele",credits:"2/32",teacher:"杨海珍",room:"玉泉路教一.1",note:"限选60人",conflict:"G",
+       sessions:[{weekly:{dow:2,start:"2026-03-10",end:"2026-05-26",except:["2026-05-05"]},ts:"19:20",te:"21:50"}]},
+      {id:"s13",code:"M3035Z",name:"互联网产品设计实务",type:"ele",credits:"1/16",teacher:"杨堃",room:"S102",note:"线上同步",conflict:"G",
+       sessions:[{weekly:{dow:2,start:"2026-03-10",end:"2026-04-07",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"s14",code:"M3011Z",name:"信息检索与利用技巧",type:"ele",credits:"1/16",teacher:"李玲",room:"S104",note:"线上同步",conflict:"G",
+       sessions:[{weekly:{dow:2,start:"2026-03-10",end:"2026-04-07",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"s15",code:"M3060Z",name:"创新型人力资源开发与管理",type:"ele",credits:"1/16",teacher:"李虹",room:"N308",note:"限选60人",conflict:"G",
+       sessions:[{weekly:{dow:2,start:"2026-03-10",end:"2026-04-07",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"s16",code:"M3025Z",name:"技术创业",type:"ele",credits:"2/32",teacher:"董志",room:"S104",note:"线上同步",conflict:"H",
+       sessions:[{weekly:{dow:3,start:"2026-03-11",end:"2026-05-20",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"s17",code:"M3064Z",name:"投入产出技术及其应用",type:"ele",credits:"2/32",teacher:"佟仁城",room:"S102",conflict:"H",
+       sessions:[{weekly:{dow:3,start:"2026-03-11",end:"2026-05-20",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"s18",code:"M3086Z",name:"数字经济发展与治理论坛",type:"ele",credits:"2/32",teacher:"待定",room:"S101",note:"具体以通知为准",
+       sessions:[]},
+      {id:"s19",code:"M3001Z",name:"杰出科学家系列讲座",type:"ele",credits:"2/32",teacher:"待定",room:"S101",note:"具体以通知为准",
+       sessions:[]},
+      {id:"s20",code:"M3056Y",name:"知识管理",type:"ele",credits:"1/16",teacher:"张玲玲",room:"玉泉路教一.1",note:"线上同步",
+       sessions:[{weekly:{dow:2,start:"2026-06-09",end:"2026-07-07",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"s21",code:"M3014Z",name:"金融中的优化与模拟方法",type:"ele",credits:"2/32",teacher:"邓智斌",room:"S102",note:"线上同步",conflict:"I",
+       sessions:[{weekly:{dow:2,start:"2026-04-21",end:"2026-07-07",except:["2026-05-05"]},ts:"19:20",te:"21:50"}]},
+      {id:"s22",code:"M3079Z",name:"宏观经济学",type:"ele",credits:"2/32",teacher:"许健",room:"S106",note:"线上同步",conflict:"I",
+       sessions:[{weekly:{dow:2,start:"2026-04-21",end:"2026-07-07",except:["2026-05-05"]},ts:"19:20",te:"21:50"}]},
+      {id:"s23",code:"M3063Z",name:"公司合规管理",type:"ele",credits:"1/16",teacher:"战飞扬",room:"S102",note:"线上同步",conflict:"J",
+       sessions:[{weekly:{dow:3,start:"2026-06-03",end:"2026-07-01",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"s24",code:"M3034Z",name:"创新发展",type:"ele",credits:"1/16",teacher:"贾敬敦",room:"S104",note:"线上同步",conflict:"J",
+       sessions:[{weekly:{dow:3,start:"2026-06-03",end:"2026-07-01",except:[]},ts:"19:20",te:"21:50"}]},
+      {id:"s25",code:"M3006Z",name:"虚拟经济概论",type:"sum",credits:"2/32",teacher:"郭琨",room:"S104",
+       sessions:[
+         {dates:["2026-07-25","2026-07-26","2026-08-01","2026-08-02"],ts:"08:30",te:"12:00"},
+         {dates:["2026-07-25","2026-07-26","2026-08-01","2026-08-02"],ts:"13:30",te:"17:00"}
+       ]},
+      {id:"s26",code:"M3092Z",name:"大模型技术与应用",type:"sum",credits:"1/16",teacher:"杨佑玮",room:"全线上",note:"线上授课",
+       sessions:[
+         {dates:["2026-08-08","2026-08-09"],ts:"08:30",te:"12:00"},
+         {dates:["2026-08-08","2026-08-09"],ts:"13:30",te:"17:00"}
+       ]},
+      {id:"s27",code:"M3009Z",name:"经济预测",type:"sum",credits:"1/16",teacher:"待定",room:"S104",
+       sessions:[{dates:["2026-07-25","2026-08-01","2026-08-15","2026-08-22"],ts:"18:30",te:"21:50"}]},
+      {id:"s28",code:"M3010Z",name:"金融工程",type:"sum",credits:"2/32",teacher:"房勇",room:"S104",
+       sessions:[
+         {dates:["2026-08-15","2026-08-16","2026-08-22","2026-08-23"],ts:"08:30",te:"12:00"},
+         {dates:["2026-08-15","2026-08-16","2026-08-22","2026-08-23"],ts:"13:30",te:"17:00"}
+       ]}
+    ],
+    conflicts: [
+      {id:"G",label:"周二晚 3/10-4/7（四选一）",courses:["s12","s13","s14","s15"]},
+      {id:"H",label:"周三晚 3/11-5/20",courses:["s16","s17"]},
+      {id:"I",label:"周二晚 4/21-7/7",courses:["s21","s22"]},
+      {id:"J",label:"周三晚 6/3-7/1",courses:["s23","s24"]}
+    ],
+    holidays: {
+      "2026-04-04":"清明节","2026-04-05":"清明节","2026-04-06":"清明节",
+      "2026-05-01":"劳动节","2026-05-02":"劳动节","2026-05-03":"劳动节","2026-05-04":"劳动节","2026-05-05":"劳动节","2026-05-09":"劳动节调休","2026-05-10":"劳动节调休",
+      "2026-06-19":"端午节","2026-06-20":"端午节","2026-06-21":"端午节"
+    },
+    rangeStart: {y:2026,m:2}, rangeEnd: {y:2026,m:7}
+  }
+};
+
+// ========== STATE ==========
+var state = {
+  sem: "fall2026",
+  year: 2026,
+  month: 8,
+  selections: {},
+  filter: "all",
+  electiveSel: {fall2026:{},spring2025:{}},
+  TARGET_CREDITS: 17
+};
+
+// ========== UTILS ==========
+function fmtDate(y,m,d){return y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0")}
+function parseISO(s){var p=s.split("-");return{y:+p[0],m:+p[1]-1,d:+p[2]}}
+function expandWeekly(p){
+  var res=[],start=new Date(p.start+"T00:00:00"),end=new Date(p.end+"T00:00:00");
+  var exc=new Set(p.except||[]);
+  var cur=new Date(start);
+  while(cur<=end){
+    if(cur.getDay()===p.dow&&!exc.has(fmtDate(cur.getFullYear(),cur.getMonth(),cur.getDate()))){
+      res.push(fmtDate(cur.getFullYear(),cur.getMonth(),cur.getDate()));
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+  return res;
+}
+function getSessionDates(session){
+  if(session.dates) return session.dates;
+  if(session.weekly) return expandWeekly(session.weekly);
+  return [];
+}
+function getCourseById(sem,id){
+  var courses=SEMESTERS[sem].courses;
+  for(var i=0;i<courses.length;i++){if(courses[i].id===id) return courses[i];}
+  return null;
+}
+function isCourseVisible(course){
+  if(course.conflict){
+    var sel=state.selections[course.conflict];
+    if(sel&&sel!==course.id) return false;
+  }
+  if(isElectiveType(course.type) && !state.electiveSel[state.sem][course.id]) return false;
+  if(state.filter!=="all"&&course.type!==state.filter) return false;
+  return true;
+}
+var todayStr=fmtDate(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
+
+// ========== RENDER ==========
+function getConflictBadge(c){
+  if(!c.conflict) return '';
+  var sem=SEMESTERS[state.sem];
+  for(var i=0;i<sem.conflicts.length;i++){if(sem.conflicts[i].id===c.conflict){var n=sem.conflicts[i].courses.length;break;}}
+  if(typeof n==="undefined") return '';
+  var labels={2:'二选一',3:'三选一',4:'四选一'};
+  return '<span class="cc-conflict-badge">'+(labels[n]||'多选一')+'</span>';
+}
+
+function getCoursesForDate(dateStr){
+  var sem=SEMESTERS[state.sem];
+  var results=[];
+  for(var i=0;i<sem.courses.length;i++){
+    var c=sem.courses[i];
+    if(!isCourseVisible(c)) continue;
+    for(var j=0;j<c.sessions.length;j++){
+      var dates=getSessionDates(c.sessions[j]);
+      if(dates.indexOf(dateStr)>=0){
+        results.push({course:c,session:c.sessions[j]});
+        break;
+      }
+    }
+  }
+  results.sort(function(a,b){return a.session.ts.localeCompare(b.session.ts)});
+  return results;
+}
+
+function renderCalendar(){
+  var y=state.year,m=state.month;
+  var sem=SEMESTERS[state.sem];
+  document.getElementById("monthLabel").textContent=y+"年"+(m+1)+"月";
+
+  var firstDay=new Date(y,m,1);
+  var firstDOW=firstDay.getDay(); // 0=Sun
+  var mondayOffset=firstDOW===0?6:firstDOW-1;
+  var daysInMonth=new Date(y,m+1,0).getDate();
+  var grid=document.getElementById("calGrid");
+  grid.innerHTML="";
+
+  // Build cells
+  var totalCells=Math.ceil((mondayOffset+daysInMonth)/7)*7;
+  for(var i=0;i<totalCells;i++){
+    var dayNum=i-mondayOffset+1;
+    var cell=document.createElement("div");
+    cell.className="cal-cell";
+    if(dayNum<1||dayNum>daysInMonth){
+      cell.className+=" other";
+      cell.innerHTML='<div class="cal-date">&nbsp;</div>';
+    }else{
+      var ds=fmtDate(y,m,dayNum);
+      var isToday=ds===todayStr;
+      var holName=sem.holidays[ds];
+      if(isToday) cell.className+=" today";
+      if(holName) cell.className+=" holiday";
+
+      var dateHtml='<div class="cal-date">'+dayNum;
+      if(holName) dateHtml+=' <span class="hol-name">'+holName+'</span>';
+      dateHtml+='</div>';
+
+      var courses=getCoursesForDate(ds);
+      var hasConflict=false;
+      var coursesHtml='<div class="cal-courses">';
+      if(holName&&!courses.length){
+        coursesHtml+='<div class="cal-empty">'+holName+'停课</div>';
+      }else if(courses.length){
+        for(var k=0;k<courses.length;k++){
+          var item=courses[k];
+          var c=item.course;
+          var cls="cc cc-"+c.type;
+          if(c.conflict&&!state.selections[c.conflict]) cls+=" cc-conflict";
+          if(c.conflict) hasConflict=true;
+          var badge=getConflictBadge(c);
+          coursesHtml+='<div class="'+cls+'" data-cid="'+c.id+'">'+
+            '<div class="cc-name">'+c.name+badge+'</div>'+
+            '<div class="cc-time">'+item.session.ts+"-"+item.session.te+" "+c.room+'</div>'+
+            '</div>';
+        }
+      }
+      coursesHtml+='</div>';
+      if(hasConflict) cell.className+=" has-conflict";
+      cell.innerHTML=dateHtml+coursesHtml;
+    }
+    grid.appendChild(cell);
+  }
+
+  // Bind course click
+  var cards=grid.querySelectorAll(".cc");
+  for(var ci=0;ci<cards.length;ci++){
+    cards[ci].onclick=function(){
+      var cid=this.getAttribute("data-cid");
+      var c=getCourseById(state.sem,cid);
+      if(c) showModal(c);
+    };
+  }
+}
+
+function renderConflictPanel(){
+  var sem=SEMESTERS[state.sem];
+  var panel=document.getElementById("conflictPanel");
+  var body=document.getElementById("conflictBody");
+  if(!sem.conflicts.length){panel.style.display="none";return;}
+  panel.style.display="block";
+  var html="";
+  for(var i=0;i<sem.conflicts.length;i++){
+    var g=sem.conflicts[i];
+    html+='<div class="conflict-group">';
+    html+='<div class="cg-label">'+g.label+'</div>';
+    html+='<div class="cg-options">';
+    for(var j=0;j<g.courses.length;j++){
+      var c=getCourseById(state.sem,g.courses[j]);
+      var sel=state.selections[g.id];
+      var cls="cg-opt";
+      if(sel===c.id) cls+=" selected";
+      else if(sel) cls+=" unselected";
+      html+='<div class="'+cls+'" data-gid="'+g.id+'" data-cid="'+c.id+'">'+
+        '<div class="dot '+c.type+'"></div>'+
+        '<span>'+c.name+' ('+c.credits+'学分)</span>'+
+        '</div>';
+    }
+    html+='</div>';
+    if(sel) html+='<div class="cg-clear" data-gid="'+g.id+'">清除选择</div>';
+    html+='</div>';
+  }
+  body.innerHTML=html;
+
+  var opts=body.querySelectorAll(".cg-opt");
+  for(var oi=0;oi<opts.length;oi++){
+    opts[oi].onclick=function(){
+      var gid=this.getAttribute("data-gid");
+      var cid=this.getAttribute("data-cid");
+      state.selections[gid]=cid;
+      syncConflictToElective(gid,cid);
+      renderAll();
+      var c=getCourseById(state.sem,cid);
+      showToast("已选择: "+c.name);
+    };
+  }
+  var clears=body.querySelectorAll(".cg-clear");
+  for(var cli=0;cli<clears.length;cli++){
+    clears[cli].onclick=function(){
+      var gid=this.getAttribute("data-gid");
+      delete state.selections[gid];
+      syncConflictToElective(gid,null);
+      renderAll();
+    };
+  }
+}
+
+function renderStats(){
+  var sem=SEMESTERS[state.sem];
+  var total=sem.courses.length;
+  var withDates=0;
+  var selectedCount=Object.keys(state.selections).length;
+  for(var i=0;i<sem.courses.length;i++){
+    for(var j=0;j<sem.courses[i].sessions.length;j++){
+      if(getSessionDates(sem.courses[i].sessions[j]).length>0){withDates++;break;}
+    }
+  }
+  var html='<div class="stat"><div class="sn">'+total+'</div><div class="sl">总课程</div></div>';
+  html+='<div class="stat"><div class="sn">'+withDates+'</div><div class="sl">已排日期</div></div>';
+  html+='<div class="stat"><div class="sn">'+selectedCount+'</div><div class="sl">已选冲突</div></div>';
+  html+='<div class="stat"><div class="sn">'+(sem.conflicts.length)+'</div><div class="sl">冲突组</div></div>';
+  document.getElementById("stats").innerHTML=html;
+}
+
+function renderUnscheduled(){
+  var sem=SEMESTERS[state.sem];
+  var list=[];
+  for(var i=0;i<sem.courses.length;i++){
+    var c=sem.courses[i];
+    var hasDates=false;
+    for(var j=0;j<c.sessions.length;j++){
+      if(getSessionDates(c.sessions[j]).length>0){hasDates=true;break;}
+    }
+    if(!hasDates) list.push(c);
+  }
+  var panel=document.getElementById("unschedPanel");
+  var el=document.getElementById("unschedList");
+  if(!list.length){panel.style.display="none";return;}
+  panel.style.display="block";
+  var html="";
+  for(var k=0;k<list.length;k++){
+    html+='<div><strong>'+list[k].name+'</strong> ('+list[k].code+") "+(list[k].note||"")+'</div>';
+  }
+  el.innerHTML=html;
+}
+
+function renderCatBar(label,val,target,color){
+  var p=Math.min(100,Math.round(val/target*100));
+  var over=val>target;
+  return '<div class="sel-cat">'
+    +'<div class="sel-cat-label"><span class="sel-cat-dot" style="background:'+color+'"></span>'+label+'</div>'
+    +'<div class="sel-cat-bar"><div class="sel-cat-fill" style="width:'+p+'%;background:'+(over?'#dc2626':color)+'"></div></div>'
+    +'<div class="sel-cat-num">'+val+'/'+target+(over?' <span style="color:#dc2626">+'+(val-target)+'</span>':'')+'</div>'
+    +'</div>';
+}
+
+function renderSelectedPanel(){
+  var sem=state.sem;
+  var semData=SEMESTERS[sem];
+  var otherSem=sem==="fall2026"?"spring2025":"fall2026";
+  var TOT_C=26,TOT_M=2,TOT_E=17,TOT_ALL=45;
+
+  var cC=0,cM=0,cE=0;
+  semData.courses.forEach(function(c){
+    var cr=parseCredits(c.credits);
+    if(isCoreType(c.type)){cC+=cr;}
+    else if(isMandatoryType(c.type)){cM+=cr;}
+    else if(isElectiveType(c.type)&&state.electiveSel[sem][c.id]){cE+=cr;}
+  });
+
+  var oC=0,oM=0,oE=0;
+  SEMESTERS[otherSem].courses.forEach(function(c){
+    var cr=parseCredits(c.credits);
+    if(isCoreType(c.type)){oC+=cr;}
+    else if(isMandatoryType(c.type)){oM+=cr;}
+    else if(isElectiveType(c.type)&&state.electiveSel[otherSem][c.id]){oE+=cr;}
+  });
+
+  var tC=cC+oC, tM=cM+oM, tE=cE+oE, tAll=tC+tM+tE;
+  var pctF=function(a,b){return Math.min(100,Math.round(a/b*100));};
+
+  var html='<div class="sel-overview">'
+    +'<div class="sel-overview-total">'
+    +'<div class="sp-top"><span>总学分（两学期）</span><span class="sp-num">'+tAll+' / '+TOT_ALL+' 分</span></div>'
+    +'<div class="sp-bar"><div class="sp-fill" style="width:'+pctF(tAll,TOT_ALL)+'%;background:'+(tAll>TOT_ALL?'linear-gradient(90deg,#dc2626,#ea580c)':'linear-gradient(90deg,#2563eb,#0891b2)')+'"></div></div>'
+    +'</div>'
+    +'<div class="sel-breakdown">'
+    +renderCatBar('核心课（含必修）',tC,TOT_C,'#2563eb')
+    +renderCatBar('必选课',tM,TOT_M,'#b45309')
+    +renderCatBar('选修课',tE,TOT_E,'#15803d')
+    +'</div>'
+    +'<div class="sel-summary">'
+    +'<span class="ss-item" style="font-weight:600">两学期合计：核心'+tC+' + 必选'+tM+' + 选修'+tE+' = '+tAll+'</span>'
+    +'<span class="ss-item">本'+semLabel(sem)+'：核心'+cC+' + 必选'+cM+' + 选修'+cE+' = '+(cC+cM+cE)+'</span>'
+    +'<span class="ss-item">另'+semLabel(otherSem)+'：核心'+oC+' + 必选'+oM+' + 选修'+oE+' = '+(oC+oM+oE)+'</span>'
+    +(tAll>TOT_ALL?'<span class="ss-item" style="color:#dc2626;background:#fef2f2;border-color:#fecaca">总学分超出'+(tAll-TOT_ALL)+'分</span>':'')
+    +'</div>'
+    +'</div>';
+
+  var rowsHtml='';
+  semData.courses.forEach(function(c){
+    var isEle=isElectiveType(c.type);
+    var selected=state.electiveSel[sem][c.id];
+    var credits=parseCredits(c.credits);
+    var cls="sel-item";
+    if(!isEle) cls+=" si-fixed";
+    if(c.conflict) cls+=selected?" si-conflict-selected":" si-conflict-pending";
+    var checkboxAttr=isEle?'':'disabled checked';
+    var checkedAttr=isEle?(selected?'checked':''):'checked';
+    var typeColor=typeShortColors[c.type]||"#64748b";
+    var typeBgMap2={core:"#eff6ff",req:"#f0fdfa",ele:"#f0fdf4",man:"#fffbeb",sum:"#fff7ed"};
+    rowsHtml+='<div class="'+cls+'">'
+      +'<input type="checkbox" data-sem="'+sem+'" data-cid="'+c.id+'" '+checkboxAttr+' '+checkedAttr+'>'
+      +'<span class="si-type" style="color:'+typeColor+';background:'+(typeBgMap2[c.type]||'#f9fafb')+'">'+typeNamesFull[c.type]+'</span>'
+      +'<span class="si-name" title="'+c.name+'">'+c.name+'</span>'
+      +'<span class="si-credit">'+credits+'分</span>'
+      +'</div>';
+  });
+  html+='<div class="sel-list">'+rowsHtml+'</div>';
+
+  var el=document.getElementById("selectedBody");
+  if(el) el.innerHTML=html;
+
+  var cbs=el?el.querySelectorAll('input[type="checkbox"]'):[];
+  for(var ci2=0;ci2<cbs.length;ci2++){
+    (function(cb){
+      cb.onchange=function(){
+        if(cb.disabled) return;
+        var sem2=cb.getAttribute("data-sem");
+        var cid2=cb.getAttribute("data-cid");
+        var course=getCourseById(sem2,cid2);
+        state.electiveSel[sem2][cid2]=cb.checked;
+        if(course&&course.conflict){
+          if(cb.checked){
+            state.selections[course.conflict]=cid2;
+            syncConflictToElective(course.conflict,cid2);
+          } else {
+            if(state.selections[course.conflict]===cid2){
+              delete state.selections[course.conflict];
+            }
+            syncConflictToElective(course.conflict,null);
+          }
+        }
+        renderAll();
+      };
+    })(cbs[ci2]);
+  }
+}
+
+function renderCourseList(){
+  var sem=state.sem;
+  var semData=SEMESTERS[sem];
+  var rows=[], eleCredits=0, totalCredits=0;
+  var typeBgMap2={core:"#eff6ff",req:"#f0fdfa",ele:"#f0fdf4",man:"#fffbeb",sum:"#fff7ed"};
+  semData.courses.forEach(function(c){
+    var isEle=isElectiveType(c.type);
+    var selected = isEle ? state.electiveSel[sem][c.id] : true;
+    if(!selected) return;
+    var credits=parseCredits(c.credits);
+    totalCredits+=credits;
+    if(isEle) eleCredits+=credits;
+    var typeColor=typeShortColors[c.type]||"#64748b";
+    var allDates=[];
+    for(var i=0;i<c.sessions.length;i++){
+      var ds=getSessionDates(c.sessions[i]);
+      for(var j=0;j<ds.length;j++){
+        var p=ds[j].split("-"); allDates.push(p[1]+"/"+p[2]+" "+c.sessions[i].ts+"-"+c.sessions[i].te);
+      }
+    }
+    var timeStr=allDates.length?allDates.join("、"):(c.note||"待定");
+    rows.push({code:c.code,name:c.name,type:c.type,typeName:typeNamesFull[c.type],credits:credits,teacher:c.teacher,room:c.room,time:timeStr,typeColor:typeColor,typeBg:typeBgMap2[c.type]||"#f9fafb"});
+  });
+  // Sort by type order: core > req > man > ele > sum
+  var typeOrder={core:0,req:1,man:2,ele:3,sum:4};
+  rows.sort(function(a,b){return typeOrder[a.type]!==typeOrder[b.type]?typeOrder[a.type]-typeOrder[b.type]:a.code.localeCompare(b.code);});
+  var html="";
+  if(rows.length===0){
+    html='<div class="cl-empty">暂未选择任何课程</div>';
+  }else{
+    html+='<div style="overflow-x:auto"><table class="cl-table"><thead><tr><th>编码</th><th>课程名称</th><th>类型</th><th>学分</th><th>教师</th><th>教室</th><th>上课时间</th></tr></thead><tbody>';
+    var lastType="";
+    for(var k=0;k<rows.length;k++){
+      var r=rows[k];
+      if(r.type!==lastType&&lastType!==""){
+        html+='<tr class="cl-summary"><td colspan="7"></td></tr>';
+      }
+      lastType=r.type;
+      html+='<tr><td class="cl-code">'+r.code+'</td><td class="cl-name">'+r.name+'</td><td><span class="type-tag '+r.type+'" style="background:'+r.typeBg+'">'+r.typeName+'</span></td><td>'+r.credits+'分</td><td>'+r.teacher+'</td><td>'+r.room+'</td><td class="cl-time">'+r.time+'</td></tr>';
+    }
+    html+='<tr class="cl-summary"><td colspan="3" style="text-align:right">选修学分</td><td>'+eleCredits+' / '+state.TARGET_CREDITS+'</td><td colspan="3" style="text-align:right;color:var(--text2)">已选总学分：'+totalCredits+' 分</td></tr>';
+    html+='</tbody></table></div>';
+  }
+  var el=document.getElementById("courseListBody");
+  if(el) el.innerHTML=html;
+}
+
+function renderAll(){
+  renderCalendar();
+  renderConflictPanel();
+  renderSelectedPanel();
+  renderStats();
+  renderCourseList();
+  renderUnscheduled();
+  updateNavButtons();
+}
+
+function updateNavButtons(){
+  var sem=SEMESTERS[state.sem];
+  var prev=document.getElementById("prevMonth");
+  var next=document.getElementById("nextMonth");
+  var cur={y:state.year,m:state.month};
+  prev.disabled=cur.y<sem.rangeStart.y||(cur.y===sem.rangeStart.y&&cur.m<=sem.rangeStart.m);
+  next.disabled=cur.y>sem.rangeEnd.y||(cur.y===sem.rangeEnd.y&&cur.m>=sem.rangeEnd.m);
+}
+
+// ========== MODAL ==========
+function showModal(c){
+  var overlay=document.getElementById("modalOverlay");
+  var modal=document.getElementById("modalContent");
+  var typeNames={core:"核心课",req:"必修课",ele:"选修课",man:"必选课",sum:"暑期课"};
+  var html='<div class="modal-head"><h3>'+c.name+'</h3>';
+  html+='<button class="modal-close" id="modalClose">&times;</button></div>';
+  html+='<div class="modal-body">';
+  html+='<div class="modal-row"><div class="mr-label">编码</div><div class="mr-val">'+c.code+'</div></div>';
+  html+='<div class="modal-row"><div class="mr-label">类型</div><div class="mr-val">'+typeNames[c.type]+'</div></div>';
+  html+='<div class="modal-row"><div class="mr-label">学分</div><div class="mr-val">'+c.credits+'</div></div>';
+  html+='<div class="modal-row"><div class="mr-label">教师</div><div class="mr-val">'+c.teacher+'</div></div>';
+  html+='<div class="modal-row"><div class="mr-label">教室</div><div class="mr-val">'+c.room+'</div></div>';
+  var allDates=[];
+  for(var i=0;i<c.sessions.length;i++){
+    var ds=getSessionDates(c.sessions[i]);
+    for(var j=0;j<ds.length;j++){
+      allDates.push(ds[j]+" "+c.sessions[i].ts+"-"+c.sessions[i].te);
+    }
+  }
+  if(allDates.length){
+    html+='<div class="modal-row"><div class="mr-label">上课时间</div><div class="mr-val modal-dates">';
+    for(var k=0;k<allDates.length;k++){
+      var p=parseISO(allDates[k].split(" ")[0]);
+      html+=p.m+1+"/"+p.d+"("+["日","一","二","三","四","五","六"][new Date(allDates[k].split(" ")[0]+"T00:00:00").getDay()]+") "+allDates[k].split(" ")[1]+"<br>";
+    }
+    html+='</div></div>';
+  }
+  if(c.note) html+='<div class="modal-row"><div class="mr-label">备注</div><div class="mr-val">'+c.note+'</div></div>';
+  if(c.conflict){
+    var cg=null;
+    var sem=SEMESTERS[state.sem];
+    for(var ci=0;ci<sem.conflicts.length;ci++){if(sem.conflicts[ci].id===c.conflict){cg=sem.conflicts[ci];break;}}
+    if(cg){
+      html+='<div class="modal-row"><div class="mr-label">冲突组</div><div class="mr-val">此课程与以下课程时间冲突，只能选一门：<br>';
+      for(var ck=0;ck<cg.courses.length;ck++){
+        var oc=getCourseById(state.sem,cg.courses[ck]);
+        if(oc.id!==c.id) html+="  - "+oc.name+"<br>";
+      }
+      html+='</div></div>';
+    }
+  }
+  html+='</div>';
+  modal.innerHTML=html;
+  overlay.className="modal-overlay show";
+  document.getElementById("modalClose").onclick=function(){overlay.className="modal-overlay";};
+  overlay.onclick=function(e){if(e.target===overlay)overlay.className="modal-overlay";};
+}
+
+// ========== TOAST ==========
+var toastTimer;
+function showToast(msg){
+  var t=document.getElementById("toast");
+  t.textContent=msg;
+  t.className="toast show";
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.className="toast";},2000);
+}
+
+// ========== EVENTS ==========
+document.getElementById("prevMonth").onclick=function(){
+  state.month--;
+  if(state.month<0){state.month=11;state.year--;}
+  renderAll();
+};
+document.getElementById("nextMonth").onclick=function(){
+  state.month++;
+  if(state.month>11){state.month=0;state.year++;}
+  renderAll();
+};
+document.querySelectorAll(".tab").forEach(function(tab){
+  tab.onclick=function(){
+    document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
+    tab.classList.add("active");
+    state.sem=tab.getAttribute("data-sem");
+    var sem=SEMESTERS[state.sem];
+    state.year=sem.rangeStart.y;
+    state.month=sem.rangeStart.m;
+    renderAll();
+  };
+});
+document.querySelectorAll(".filter-btn").forEach(function(btn){
+  btn.onclick=function(){
+    document.querySelectorAll(".filter-btn").forEach(function(b){b.classList.remove("active");});
+    btn.classList.add("active");
+    state.filter=btn.getAttribute("data-filter");
+    renderCalendar();
+  };
+});
+
+// Mobile sidebar toggle
+var sidebar=document.getElementById("sidebar");
+var mtoggle=document.getElementById("mobileToggle");
+var marrow=document.getElementById("mobileArrow");
+mtoggle.onclick=function(){
+  sidebar.classList.toggle("open");
+  if(sidebar.classList.contains("open")){marrow.className="arrow up";}
+  else{marrow.className="arrow";}
+};
+
+// Keyboard nav
+document.onkeydown=function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+  if(e.key==="ArrowLeft"&&!document.getElementById("prevMonth").disabled){
+    document.getElementById("prevMonth").click();
+  }else if(e.key==="ArrowRight"&&!document.getElementById("nextMonth").disabled){
+    document.getElementById("nextMonth").click();
+  }else if(e.key==="Escape"){
+    document.getElementById("modalOverlay").className="modal-overlay";
+  }
+};
+
+
+// ========== SIDEBAR TOGGLE ==========
+document.getElementById("sidebarToggle").onclick = function() {
+  var m = document.querySelector("main");
+  m.classList.toggle("collapsed");
+  this.innerHTML = m.classList.contains("collapsed") ? "&#9654;" : "&#9664;";
+};
+
+// ========== EXPORT PDF ==========
+function exportPDF() {
+  var sem = SEMESTERS[state.sem];
+  var container = document.getElementById("printContainer");
+  var typeColors = {core:"#2563eb",req:"#0f766e",ele:"#15803d",man:"#b45309",sum:"#d97706"};
+  var typeBgs = {core:"#eff6ff",req:"#f0fdfa",ele:"#f0fdf4",man:"#fffbeb",sum:"#fff7ed"};
+  var monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+  var savedFilter = state.filter;
+  state.filter = "all";
+
+  var html = '<div class="print-header">';
+  html += '<h1>' + sem.name + ' 课程表</h1>';
+  html += '<p>导出日期: ' + new Date().toLocaleDateString("zh-CN") + '</p>';
+  var sels = [];
+  for (var gid in state.selections) {
+    var sc = getCourseById(state.sem, state.selections[gid]);
+    if (sc) sels.push(sc.name);
+  }
+  if (sels.length) html += '<p>已选冲突课: ' + sels.join("\u3001") + '</p>';
+  html += '<div class="print-legend"><span style="color:#2563eb">核心课</span><span style="color:#0f766e">必修课</span><span style="color:#15803d">选修课</span><span style="color:#b45309">必选课</span><span style="color:#d97706">暑期课</span><span style="color:#ef4444">假日停课</span></div>';
+  html += '</div>';
+
+  var y = sem.rangeStart.y, m = sem.rangeStart.m;
+  while (y < sem.rangeEnd.y || (y === sem.rangeEnd.y && m <= sem.rangeEnd.m)) {
+    html += genPrintMonth(y, m, sem, typeColors, typeBgs, monthNames);
+    m++;
+    if (m > 11) { m = 0; y++; }
+  }
+
+  container.innerHTML = html;
+  window.print();
+  state.filter = savedFilter;
+}
+
+function genPrintMonth(y, m, sem, typeColors, typeBgs, monthNames) {
+  var wds = ["周一","周二","周三","周四","周五","周六","周日"];
+  var html = '<div class="print-month">';
+  html += '<div class="print-month-title">' + y + '年' + monthNames[m] + '</div>';
+  html += '<div class="print-cal-weekdays">';
+  for (var i = 0; i < 7; i++) {
+    var wdCls = (i >= 5) ? "print-cal-wd weekend" : "print-cal-wd";
+    html += '<div class="' + wdCls + '">' + wds[i] + '</div>';
+  }
+  html += '</div>';
+  html += '<div class="print-cal-grid">';
+  var firstDay = new Date(y, m, 1);
+  var firstDOW = firstDay.getDay();
+  var mondayOffset = firstDOW === 0 ? 6 : firstDOW - 1;
+  var daysInMonth = new Date(y, m + 1, 0).getDate();
+  var totalCells = Math.ceil((mondayOffset + daysInMonth) / 7) * 7;
+  for (var i = 0; i < totalCells; i++) {
+    var dayNum = i - mondayOffset + 1;
+    if (dayNum < 1 || dayNum > daysInMonth) {
+      html += '<div class="cal-cell other"></div>';
+    } else {
+      var ds = fmtDate(y, m, dayNum);
+      var holName = sem.holidays[ds];
+      var courses = getCoursesForDate(ds);
+      var cellCls = "cal-cell";
+      if (holName) cellCls += " holiday";
+      html += '<div class="' + cellCls + '">';
+      html += '<div class="cal-date">' + dayNum;
+      if (holName) html += ' <span class="hol-name">' + holName + '</span>';
+      html += '</div>';
+      html += '<div class="cal-courses">';
+      if (holName && !courses.length) {
+        html += '<div class="cal-empty">' + holName + '停课</div>';
+      } else if (courses.length) {
+        for (var k = 0; k < courses.length; k++) {
+          var c = courses[k].course;
+          var s = courses[k].session;
+          var cls = "cc cc-" + c.type;
+          if (c.conflict && !state.selections[c.conflict]) cls += " cc-conflict";
+          var badge = getConflictBadge(c);
+          html += '<div class="' + cls + '">';
+          html += '<div class="cc-name">' + c.name + badge + '</div>';
+          html += '<div class="cc-time">' + s.ts + '-' + s.te + ' ' + c.room + '</div>';
+          html += '</div>';
+        }
+      }
+      html += '</div></div>';
+    }
+  }
+  html += '</div></div>';
+  return html;
+}
+
+
+
+// ========== SAVE STATE ==========
+function saveState() {
+  var stateData = {
+    sem: state.sem,
+    year: state.year,
+    month: state.month,
+    selections: state.selections,
+    electiveSel: state.electiveSel,
+    filter: state.filter
+  };
+  var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  var stateJson = JSON.stringify(stateData);
+  var stateScript = '\n<script>window.__SAVED_STATE=' + stateJson + ';<' + '/script>\n';
+  html = html.replace('</body>', stateScript + '</body>');
+  var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  var d = new Date();
+  a.download = 'MBA课程表_' + d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2) + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('选课状态已保存');
+}
+
+document.getElementById("exportBtn").onclick = exportPDF;
+document.getElementById("saveBtn").onclick = saveState;
+
+
+function isCoreType(t){return t==="core"||t==="req";}
+function isMandatoryType(t){return t==="man";}
+function isElectiveType(t){return t==="ele"||t==="sum";}
+function parseCredits(str){var n=parseInt(str);return isNaN(n)?0:n;}
+function semLabel(s){return s==="fall2026"?"秋季":"春季";}
+var typeNamesFull={core:"核心",req:"必修",ele:"选修",man:"必选",sum:"暑期"};
+var typeShortColors={core:"#2563eb",req:"#0f766e",ele:"#15803d",man:"#b45309",sum:"#d97706"};
+
+function syncConflictToElective(gid,cid){
+  var cg=null;
+  var sem=SEMESTERS[state.sem];
+  for(var k=0;k<sem.conflicts.length;k++){if(sem.conflicts[k].id===gid){cg=sem.conflicts[k];break;}}
+  if(!cg)return;
+  for(var k=0;k<cg.courses.length;k++){
+    var cid2=cg.courses[k];
+    state.electiveSel[state.sem][cid2]=(cid!==null&&cid2===cid);
+  }
+}
+
+function initElectiveDefaults(){
+  ["fall2026","spring2025"].forEach(function(semKey){
+    state.electiveSel[semKey]={};
+    SEMESTERS[semKey].courses.forEach(function(c){
+      state.electiveSel[semKey][c.id]=false;
+    });
+  });
+}
+
+
+// Init
+if (window.__SAVED_STATE) {
+  var s = window.__SAVED_STATE;
+  state.sem = s.sem;
+  state.year = s.year;
+  state.month = s.month;
+  state.selections = s.selections || {};
+  state.electiveSel = s.electiveSel || {fall2026:{},spring2025:{}};
+  state.filter = s.filter || "all";
+  if (s.sem === "spring2025") {
+    var tabs = document.querySelectorAll(".tab");
+    if (tabs.length >= 2) { tabs[0].classList.remove("active"); tabs[1].classList.add("active"); }
+  }
+} else {
+  initElectiveDefaults();
+}
+renderAll();
+</script>
+</body>
+</html>
