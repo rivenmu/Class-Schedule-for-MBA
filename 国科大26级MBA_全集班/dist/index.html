@@ -764,7 +764,7 @@ function renderSelectedPanel(){
 
   var progressHtml='<div class="ws-progress">'
     +'<div class="ws-block">'
-    +'<div class="ws-title">本学期选课进度 · '+semLabel(sem)+'</div>'
+    +'<div class="ws-title">本学期选课比例 · '+semLabel(sem)+'</div>'
     +'<div class="ws-main"><span class="ws-num">'+cur.selected+' <small>/ '+cur.total+' 学分</small></span><span class="ws-pct">'+curPct+'%</span></div>'
     +'<div class="ws-bar"><div class="ws-fill" style="width:'+curPct+'%"></div></div>'
     +'<div class="ws-cats"><span><i style="background:var(--indigo)"></i>核心 '+cur.core+'</span><span><i style="background:var(--ochre)"></i>必选 '+cur.man+'</span><span><i style="background:var(--moss)"></i>选修 '+cur.eleSel+' / '+cur.eleMax+'</span></div>'
@@ -1213,10 +1213,34 @@ function saveState() {
     electiveSel: state.electiveSel,
     filter: state.filter
   };
-  var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
   var stateJson = JSON.stringify(stateData);
-  var stateScript = '\n<script>window.__SAVED_STATE=' + stateJson + ';<' + '/script>\n';
-  // 修复：outerHTML 内已包含字符串 '</body>'（saveState 源码本身），直接 replace 会命中脚本内的第一个而非真正的闭合标签，导致导出后 JS 泄露为乱码文本。改为定位最后一个 </body>；同时清理旧的已保存状态避免叠加
+  var stateScript = '\n<script id="saved-state">window.__SAVED_STATE=' + stateJson + ';</' + 'script>\n';
+  // 克隆文档，避免将当前已渲染的动态内容（含弹窗/Toast 显隐态）固化到导出文件，确保导出后与原文件交互/展示完全一致，仅数据预设不同
+  var clone = document.documentElement.cloneNode(true);
+  var prev = clone.querySelector('#saved-state');
+  if(prev) prev.remove();
+  // 兼容旧版未带 id 的存档脚本
+  var legacy = clone.querySelector('script');
+  // 更精确地清理旧脚本（若存在）
+  var allScripts = clone.querySelectorAll('script');
+  for(var i=0;i<allScripts.length;i++){
+    if(allScripts[i].textContent.indexOf('window.__SAVED_STATE')!==-1 && allScripts[i].id!=='saved-state'){
+      allScripts[i].remove(); break;
+    }
+  }
+  // 清空所有运行时动态容器，令导出文件加载时由 JS 依预设数据重新渲染，保证与原文件一致
+  ;['calGrid','courseListBody','progressBody','checkBody','conflictBody','printContainer'].forEach(function(id){
+    var el = clone.querySelector('#'+id);
+    if(el) el.innerHTML = '';
+  });
+  // 重置瞬态 UI
+  var toast = clone.querySelector('#toast'); if(toast) toast.className = 'toast';
+  var modal = clone.querySelector('#modalOverlay'); if(modal) modal.className = 'modal-overlay';
+  var sidebar = clone.querySelector('#sidebar'); if(sidebar) sidebar.classList.remove('open');
+  var marrow = clone.querySelector('#mobileArrow'); if(marrow){ marrow.className='arrow'; marrow.textContent='▴'; }
+  var html = '<!DOCTYPE html>\n' + clone.outerHTML;
+  // 字符串兜底清理
+  html = html.replace(/<script id="saved-state">[\s\S]*?<\/script>/, '');
   html = html.replace(/<script>window\.__SAVED_STATE[\s\S]*?<\/script>/, '');
   var lower = html.toLowerCase();
   var idx = lower.lastIndexOf('</body>');
