@@ -314,82 +314,6 @@ button:focus-visible{outline-offset:1px}
 .fv-cta:hover{background:#D63F27;border-color:#D63F27;transform:translateY(-1px);box-shadow:0 8px 22px rgba(232,74,48,.32)}
 .fv-cta:active{transform:translateY(0) scale(.98)}
 @media(max-width:480px){.fv-modal{border-radius:16px}.fv-head{padding:16px}.fv-body{padding:14px 16px}.fv-foot{padding:12px 16px}}
-/* === mobile-first: day list + course cards === */
-.day-list{display:none}
-.cl-table-wrap{display:block}
-.cl-cards{display:none}
-@media(max-width:720px){
-  header{padding:10px 12px calc(10px + env(safe-area-inset-top))}
-  .brand{gap:8px;align-items:center}
-  .brand h1{font-size:16.5px;line-height:1.25;letter-spacing:0}
-  .brand .badge{font-size:9px;padding:2px 6px}
-  .header-tools{width:100%;flex-direction:column;align-items:stretch;gap:7px}
-  .sem-switch{justify-content:space-between}
-  .sem-switch .tab{flex:1;justify-content:center;padding:9px 6px;font-size:12px;min-height:38px;display:inline-flex;align-items:center}
-  .header-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
-  .ht-btn{justify-content:center;padding:10px 8px;font-size:12.5px;min-height:40px}
-
-  .cal-card-head{flex-direction:column;align-items:stretch;gap:8px}
-  .cal-month-nav{justify-content:space-between}
-  .cal-nav-btn{width:40px;height:40px}
-  .cal-legend{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
-  .legend-pill{flex-shrink:0;padding:5px 8px}
-
-  .cal-body{padding:10px 8px}
-  .cal-weekdays{display:none}
-  .day-list{display:flex;flex-direction:column;gap:8px}
-  .cal-grid{display:none}
-
-  .dl-day{display:flex;gap:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
-  .dl-day.is-today{border-color:var(--indigo);box-shadow:0 0 0 2px var(--indigo-soft)}
-  .dl-day.is-holiday{background:var(--surface)}
-  .dl-date-col{width:62px;flex-shrink:0;background:var(--surface-2);border-right:1px solid var(--line);padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-  .dl-day.is-today .dl-date-col{background:var(--indigo-soft)}
-  .dl-day.is-weekend .dl-date-num{color:var(--hol)}
-  .dl-date-num{font-family:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;font-size:20px;font-weight:700;line-height:1;color:var(--ink)}
-  .dl-date-wd{font-size:10px;color:var(--ink-3);font-weight:600}
-  .dl-hol{font-size:9px;color:var(--hol);background:#fff;border:1px solid #F3C9C3;padding:1px 5px;border-radius:999px;white-space:nowrap;max-width:56px;overflow:hidden;text-overflow:ellipsis}
-  .dl-hol.is-today{background:var(--indigo);color:#fff;border-color:var(--indigo)}
-  .dl-body{flex:1;min-width:0;padding:9px 10px;display:flex;flex-direction:column;gap:6px;justify-content:center}
-  .day-list .cc{width:100%;padding:6px 8px}
-  .day-list .cc-time{display:block}
-  .cal-empty{margin:0}
-
-  .sidebar{max-height:82vh}
-  .sidebar::before{content:"";display:block;width:44px;height:5px;border-radius:999px;background:var(--line-strong);margin:2px auto 6px;flex-shrink:0}
-  .sidebar.open .panel-head{position:sticky;top:0;z-index:2}
-
-  .sel-item{min-height:54px;padding:12px 12px;gap:11px}
-  .sel-item input[type="checkbox"]{width:22px;height:22px;border-radius:6px}
-  .sel-item input[type="checkbox"]:checked::after{font-size:13px}
-  .si-name{font-size:13.5px}
-  .si-type{font-size:10.5px;padding:3px 7px}
-  .filter-row{gap:8px}
-  .filter-btn{padding:9px 13px;font-size:12.5px}
-  .cg-opt{min-height:40px;padding:9px 12px;font-size:12.5px}
-  .cg-clear{min-height:40px;display:inline-flex;align-items:center}
-  .conflict-group{grid-template-columns:1fr;gap:7px;padding:10px}
-  .cg-label{font-size:11px}
-  .cg-options{display:flex;flex-wrap:wrap;gap:7px}
-
-  .cl-table-wrap{display:none}
-  .cl-cards{display:flex;flex-direction:column;gap:10px;padding:10px}
-  .cl-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 3px rgba(19,19,22,.04)}
-  .cl-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .cl-card-name{font-size:14.5px;font-weight:700;line-height:1.35}
-  .cl-card-code{font-family:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;font-size:10.5px;color:var(--ink-3);word-break:break-all;line-height:1.4}
-  .cl-card-meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--ink-2)}
-  .cl-card-time{font-size:12px;line-height:1.55;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
-  .cl-card-credit{font-family:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;font-size:11px;font-weight:700;color:var(--moss);background:var(--moss-soft);border:1px solid #BFE0D2;padding:3px 8px;border-radius:999px;white-space:nowrap}
-  .cl-summary-card{margin:0 2px 4px;border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:10px 12px;font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-
-  .modal-overlay{padding:0;align-items:flex-end}
-  .modal{max-width:100%;width:100%;max-height:92vh;border-radius:16px 16px 0 0;border-bottom:none}
-  .modal-body{padding:14px 16px calc(18px + env(safe-area-inset-bottom))}
-  .modal-head{padding:14px 16px calc(12px + env(safe-area-inset-top))}
-
-  .sel-list{max-height:calc(82vh - 210px);overscroll-behavior:contain}
-}
 /* helpers */
 .muted{color:var(--ink-2)}
 .mono{font-family:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
@@ -467,7 +391,6 @@ button:focus-visible{outline-offset:1px}
 <div class="cal-wd weekend">周日</div>
 </div>
 <div class="cal-grid" id="calGrid"></div>
-<div class="day-list" id="dayList" aria-label="day list"></div>
 </div>
 </div>
 <div class="panel" id="courseListPanel">
@@ -828,71 +751,6 @@ function renderCalendar(){
   }
 }
 
-function renderDayList(){
-  var y=state.year,m=state.month;
-  var sem=SEMESTERS[state.sem];
-  var wrap=document.getElementById("dayList");
-  if(!wrap) return;
-  var daysInMonth=new Date(y,m+1,0).getDate();
-  var html="";
-  var wds=["\u65e5","\u4e00","\u4e8c","\u4e09","\u56db","\u4e94","\u516d"];
-  for(var day=1; day<=daysInMonth; day++){
-    var ds=fmtDate(y,m,day);
-    var dow=new Date(y,m,day).getDay();
-    var isToday=ds===todayStr;
-    var holName=sem.holidays[ds];
-    var courses=getCoursesForDate(ds);
-    var cls="dl-day";
-    if(isToday) cls+=" is-today";
-    if(dow===0||dow===6) cls+=" is-weekend";
-    html+='\x3cdiv class="'+cls+'"\x3e';
-    html+='\x3cdiv class="dl-date-col"\x3e';
-    if(isToday){
-      html+='\x3cspan class="dl-hol is-today"\x3e\u4eca\u5929\x3c/span\x3e';
-    } else if(holName){
-      html+='\x3cspan class="dl-hol" title="'+holName+'"\x3e'+holName+'\x3c/span\x3e';
-    } else {
-      html+='\x3cspan class="dl-date-wd"\x3e\u5468'+wds[dow]+'\x3c/span\x3e';
-    }
-    html+='\x3cspan class="dl-date-num"\x3e'+day+'\x3c/span\x3e';
-    html+='\x3c/div\x3e';
-    html+='\x3cdiv class="dl-body"\x3e';
-    if(holName && !courses.length){
-      html+='\x3cdiv class="cal-empty"\x3e'+holName+' \u00b7 \u505c\u8bfe\x3c/div\x3e';
-    } else if(courses.length){
-      courses.sort(function(a,b){return a.session.ts.localeCompare(b.session.ts);});
-      var lastSlot="";
-      for(var k=0;k<courses.length;k++){
-        var item=courses[k];
-        var cs=item.session.ts;
-        var slot=cs<"12:00"?"M":cs<"18:00"?"A":"E";
-        if(k>0 && slot!==lastSlot) html+='\x3cdiv class="slot-sep"\x3e\x3c/div\x3e';
-        lastSlot=slot;
-        var c=item.course;
-        var ccls="cc cc-"+c.type;
-        if(c.conflict && !state.selections[c.conflict]) ccls+=" cc-conflict";
-        var badge=getConflictBadge(c);
-        html+='\x3cdiv class="'+ccls+'" data-cid="'+c.id+'"\x3e';
-        html+='\x3cdiv class="cc-name"\x3e'+c.name+badge+'\x3c/div\x3e';
-        html+='\x3cdiv class="cc-time"\x3e'+item.session.ts+'\u2013'+item.session.te+' \u00b7 '+c.room+'\x3c/div\x3e';
-        html+='\x3c/div\x3e';
-      }
-    } else {
-      html+='\x3cdiv class="cal-empty"\x3e\u65e0\u8bfe\u7a0b\x3c/div\x3e';
-    }
-    html+='\x3c/div\x3e\x3c/div\x3e';
-  }
-  wrap.innerHTML=html;
-  var cards=wrap.querySelectorAll(".cc");
-  for(var ci=0;ci<cards.length;ci++){
-    cards[ci].onclick=function(){
-      var cid=this.getAttribute("data-cid");
-      var c=getCourseById(state.sem,cid);
-      if(c) showModal(c);
-    };
-  }
-}
-
 function renderConflictPanel(){
   var sem=SEMESTERS[state.sem];
   var body=document.getElementById("conflictBody");
@@ -1198,35 +1056,14 @@ function renderCourseList(){
     html+='<tr class="cl-summary"><td colspan="3" style="text-align:right">选修已选</td><td><b>'+eleCredits+'</b> / '+state.TARGET_CREDITS+'</td><td colspan="3" style="text-align:right;color:var(--ink-2)">已选总学分 · '+totalCredits+' 分</td></tr>';
     html+='</tbody></table></div>';
   }
-  var cardsHtml="";
-  if(rows.length===0){
-    cardsHtml='\x3cdiv class="cl-empty"\x3e\u8fd8\u6ca1\u6709\u52fe\u9009\u8bfe\u7a0b \u00b7 \u5728\u5de6\u4fa7\u52fe\u9009\u540e\u8fd9\u91cc\u4f1a\u751f\u6210\u6e05\u5355\x3c/div\x3e';
-  }else{
-    cardsHtml='\x3cdiv class="cl-summary-card"\x3e\x3cspan\x3e\u672c\u5b66\u671f\u5df2\u9009 '+rows.length+' \u95e8 \u00b7 '+totalCredits+' \u5b66\u5206\x3c/span\x3e\x3cspan\x3e\u9009\u4fee '+eleCredits+' / '+state.TARGET_CREDITS+'\x3c/span\x3e\x3c/div\x3e';
-    for(var k=0;k<rows.length;k++){
-      var r=rows[k];
-      cardsHtml+='\x3cdiv class="cl-card"\x3e';
-      cardsHtml+='\x3cdiv class="cl-card-top"\x3e\x3cdiv class="cl-card-name"\x3e'+r.name+'\x3c/div\x3e\x3cspan class="cl-card-credit"\x3e'+r.credits+' \u5b66\u5206\x3c/span\x3e\x3c/div\x3e';
-      cardsHtml+='\x3cdiv class="cl-card-code"\x3e'+r.code+'\x3c/div\x3e';
-      cardsHtml+='\x3cdiv class="cl-card-meta"\x3e';
-      cardsHtml+='\x3cspan class="si-type" style="background:'+(typeBgMap[r.type]||"#F6F3EE")+';color:'+({core:"var(--indigo)",req:"var(--moss)",ele:"var(--moss)",man:"var(--ochre)",sum:"var(--plum)"}[r.type]||"#6B6B70")+'"\x3e'+r.typeName+'\x3c/span\x3e';
-      cardsHtml+='\x3cspan\x3e\u00b7 '+r.teacher+'\x3c/span\x3e';
-      cardsHtml+='\x3cspan\x3e\u00b7 '+r.room+'\x3c/span\x3e';
-      cardsHtml+='\x3c/div\x3e';
-      cardsHtml+='\x3cdiv class="cl-card-time"\x3e'+r.time+'\x3c/div\x3e';
-      cardsHtml+='\x3c/div\x3e';
-    }
-  }
   var el=document.getElementById("courseListBody");
-  if(el) el.innerHTML='\x3cdiv class="cl-table-wrap"\x3e'+html+'\x3c/div\x3e'+'\x3cdiv class="cl-cards"\x3e'+cardsHtml+'\x3c/div\x3e';
+  if(el) el.innerHTML=html;
   var meta=document.getElementById("courseListMeta");
-  if(meta) meta.textContent=rows.length?rows.length+" \u95e8 \u00b7 "+totalCredits+" \u5b66\u5206":"\u7a7a";
+  if(meta) meta.textContent=rows.length?rows.length+" 门 · "+totalCredits+" 学分":"空";
 }
-
 
 function renderAll(){
   renderCalendar();
-  renderDayList();
   renderConflictPanel();
   renderSelectedPanel();
   renderCourseList();
@@ -1489,12 +1326,7 @@ function saveState() {
   a.download = 'MBA课程表_' + d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2) + '.html';
   a.click();
   URL.revokeObjectURL(url);
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-  if(isIOS){
-    showToast('已生成 · 若未触发下载，请用分享菜单「存储到文件」');
-  } else {
-    showToast('已保存 · 文件已下载');
-  }
+  showToast('已保存 · 文件已下载');
 }
 
 document.getElementById("exportBtn").onclick = exportPDF;
