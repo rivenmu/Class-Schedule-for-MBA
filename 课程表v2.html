@@ -247,22 +247,20 @@ main.collapsed .sidebar-toggle{left:0}
 <div class="panel-body" id="selectedBody"></div>
 </div>
 
-<div class="panel" id="conflictPanel" style="display:none">
-<div class="panel-head">冲突课选择（二选一/多选一）</div>
-<div class="panel-body" id="conflictBody"></div>
+<div id="conflictInline" style="margin-top:10px;border-top:1px solid var(--border);padding-top:6px">
+<div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">冲突课选择</div>
+<div id="conflictBody"></div>
 </div>
 
-<div class="panel">
-<div class="panel-head">课程类型筛选</div>
-<div class="panel-body">
+<div style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px">
+<div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">类型筛选</div>
 <div class="filter-row" id="filterRow">
 <button class="filter-btn active" data-filter="all">全部</button>
-<button class="filter-btn" data-filter="core">核心课</button>
-<button class="filter-btn" data-filter="req">必修课</button>
-<button class="filter-btn" data-filter="ele">选修课</button>
-<button class="filter-btn" data-filter="man">必选课</button>
-<button class="filter-btn" data-filter="sum">暑期课</button>
-</div>
+<button class="filter-btn" data-filter="core">核心</button>
+<button class="filter-btn" data-filter="req">必修</button>
+<button class="filter-btn" data-filter="ele">选修</button>
+<button class="filter-btn" data-filter="man">必选</button>
+<button class="filter-btn" data-filter="sum">暑期</button>
 </div>
 </div>
 
@@ -278,7 +276,7 @@ main.collapsed .sidebar-toggle{left:0}
 </aside>
 
 <div class="cal-area">
-<div class="legend" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:12px;color:var(--text2)"><div class="legend-row"><div class="legend-dot" style="border-color:var(--core);background:var(--core-bg)"></div>核心课（含必修）</div><div class="legend-row"><div class="legend-dot" style="border-color:var(--man);background:var(--man-bg)"></div>必选课</div><div class="legend-row"><div class="legend-dot" style="border-color:var(--ele);background:var(--ele-bg)"></div>选修课</div><div class="legend-row"><div class="legend-dot" style="border-color:var(--sum);background:var(--sum-bg)"></div>暑期课</div><div class="legend-row"><div class="legend-dot" style="border-color:#f59e0b;background:#fef3c7"></div>冲突课（虚线）</div></div>
+<div class="legend" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:12px;color:var(--text2)"><div class="legend-row"><div class="legend-dot" style="border-color:var(--core);background:var(--core-bg)"></div>核心课（含必修）</div><div class="legend-row"><div class="legend-dot" style="border-color:var(--man);background:var(--man-bg)"></div>必选课</div><div class="legend-row"><div class="legend-dot" style="border-color:var(--ele);background:var(--ele-bg)"></div>选修课</div><div class="legend-row"><div class="legend-dot" style="border-color:var(--sum);background:var(--sum-bg)"></div>暑期课</div></div>
 <div class="cal-weekdays">
 <div class="cal-wd">周一</div>
 <div class="cal-wd">周二</div>
@@ -612,7 +610,7 @@ function renderCalendar(){
 
 function renderConflictPanel(){
   var sem=SEMESTERS[state.sem];
-  var panel=document.getElementById("conflictPanel");
+  var panel=document.getElementById("conflictInline");
   var body=document.getElementById("conflictBody");
   if(!sem.conflicts.length){panel.style.display="none";return;}
   panel.style.display="block";
