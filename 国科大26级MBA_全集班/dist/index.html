@@ -817,10 +817,11 @@ function renderSelectedPanel(){
   var sem=state.sem, otherSem=sem==="fall2026"?"spring2025":"fall2026";
   var TOT_ALL=45;
   function calc(sk){
-    var d=SEMESTERS[sk], core=0, man=0, eleSel=0, indep=0, cmax={};
+    var d=SEMESTERS[sk], core=0, req=0, man=0, eleSel=0, indep=0, cmax={};
     d.courses.forEach(function(c){
       var cr=parseCredits(c.credits);
-      if(isCoreType(c.type)) core+=cr;
+      if(c.type==="core") core+=cr;
+      else if(c.type==="req") req+=cr;
       else if(isMandatoryType(c.type)) man+=cr;
       else if(isElectiveType(c.type)){
         if(state.electiveSel[sk][c.id]) eleSel+=cr;
@@ -829,8 +830,8 @@ function renderSelectedPanel(){
       }
     });
     var gmax=0; for(var k in cmax) gmax+=cmax[k];
-    var total=core+man+indep+gmax;
-    return {core:core,man:man,eleSel:eleSel,total:total,selected:core+man+eleSel,eleMax:indep+gmax};
+    var total=core+req+man+indep+gmax;
+    return {core:core,req:req,man:man,eleSel:eleSel,total:total,selected:core+req+man+eleSel,eleMax:indep+gmax};
   }
   var cur=calc(sem), oth=calc(otherSem);
   var allSel=cur.selected+oth.selected;
@@ -842,7 +843,7 @@ function renderSelectedPanel(){
     +'<div class="ws-title">本学期选课比例 · '+semLabel(sem)+'</div>'
     +'<div class="ws-main"><span class="ws-num">'+cur.selected+' <small>/ '+cur.total+' 学分</small></span><span class="ws-pct">'+curPct+'%</span></div>'
     +'<div class="ws-bar"><div class="ws-fill" style="width:'+curPct+'%"></div></div>'
-    +'<div class="ws-cats"><span><i style="background:var(--indigo)"></i>核心 '+cur.core+'</span><span><i style="background:var(--ochre)"></i>必选 '+cur.man+'</span><span><i style="background:var(--moss)"></i>选修 '+cur.eleSel+' / '+cur.eleMax+'</span></div>'
+    +'<div class="ws-cats"><span><i style="background:var(--indigo)"></i>核心 '+cur.core+'</span><span><i style="background:var(--plum)"></i>必修 '+cur.req+'</span><span><i style="background:var(--ochre)"></i>必选 '+cur.man+'</span><span><i style="background:var(--moss)"></i>选修 '+cur.eleSel+' / '+cur.eleMax+'</span></div>'
     +'</div>'
     +'<div class="ws-block">'
     +'<div class="ws-title">总选课进度 · 两学期目标 '+TOT_ALL+' 学分</div>'
