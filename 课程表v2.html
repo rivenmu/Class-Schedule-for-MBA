@@ -384,7 +384,7 @@ const SEMESTERS = {
     courses: [
       {id:"f01",code:"M1005Z-F",name:"会计学",type:"core",credits:"2/32",teacher:"肖建华",room:"S102",
        sessions:[{dates:["2026-09-10","2026-09-12","2026-10-15","2026-10-17","2026-10-29","2026-10-31","2026-11-12","2026-11-14"],ts:"08:30",te:"12:00"}]},
-      {id:"f02",code:"M1001Z-F",name:"商务英语A",type:"core",credits:"2/32",teacher:"李兰欣等",room:"N108/N306/N308",
+      {id:"f02",code:"M1001Z-F-1 / M1001Z-F-2 / M1001Z-F-3",name:"商务英语A",type:"core",credits:"2/32",teacher:"李兰欣等",room:"N108/N306/N308",
        sessions:[{dates:["2026-09-10","2026-09-12","2026-10-15","2026-10-17","2026-10-29","2026-10-31","2026-11-12","2026-11-14"],ts:"13:30",te:"17:00"}]},
       {id:"f03",code:"M1007Z-F",name:"战略管理",type:"core",credits:"2/32",teacher:"乔晗",room:"S102",
        sessions:[{dates:["2026-09-11","2026-09-13","2026-10-16","2026-10-18","2026-10-30","2026-11-01","2026-11-13","2026-11-15"],ts:"08:30",te:"12:00"}]},
@@ -842,20 +842,19 @@ function renderSelectedPanel(){
   var checkEl=document.getElementById("checkBody");
   if(checkEl) checkEl.innerHTML=filterHtml;
 
-  // 关键修复：用快照 + 双帧恢复同时保住 window 与侧栏滚动，避免 <label> 重绘导致的跳顶/刷新感
+  // 关键修复：用快照 + 双帧恢复同时保住 window / 侧栏 / 课程列表滚动，避免重绘导致的跳顶
   var sidebarEl = document.getElementById('sidebar');
-  function restoreScroll(keepY, keepSide){
-    // 同步恢复
-    try{ window.scrollTo({top: keepY, behavior: 'instant'}); }catch(e){ window.scrollTo(0, keepY); }
-    if(sidebarEl) sidebarEl.scrollTop = keepSide;
-    // 下两帧再恢复一次，抵消浏览器对新 DOM 的自动滚动
-    requestAnimationFrame(function(){
+  function restoreScroll(keepY, keepSide, keepList){
+    var apply = function(){
       try{ window.scrollTo({top: keepY, behavior: 'instant'}); }catch(e){ window.scrollTo(0, keepY); }
       if(sidebarEl) sidebarEl.scrollTop = keepSide;
-      requestAnimationFrame(function(){
-        try{ window.scrollTo({top: keepY, behavior: 'instant'}); }catch(e){ window.scrollTo(0, keepY); }
-        if(sidebarEl) sidebarEl.scrollTop = keepSide;
-      });
+      var nl = document.querySelector('#checkBody .sel-list');
+      if(nl) nl.scrollTop = keepList;
+    };
+    apply();
+    requestAnimationFrame(function(){
+      apply();
+      requestAnimationFrame(function(){ apply(); });
     });
   }
   function handleCourseToggle(cid2, nextChecked){
@@ -863,6 +862,8 @@ function renderSelectedPanel(){
     var course = getCourseById(sem2, cid2);
     var keepY = window.scrollY;
     var keepSide = sidebarEl ? sidebarEl.scrollTop : 0;
+    var listEl = document.querySelector('#checkBody .sel-list');
+    var keepList = listEl ? listEl.scrollTop : 0;
     // 阻止 label/checkbox 默认的滚动行为，状态由我们统一驱动
     state.electiveSel[sem2][cid2]=nextChecked;
     if(course&&course.conflict){
@@ -892,7 +893,7 @@ function renderSelectedPanel(){
       }
     }
     renderAll();
-    restoreScroll(keepY, keepSide);
+    restoreScroll(keepY, keepSide, keepList);
     if(jumped){
       setTimeout(function(){
         var cards=document.querySelectorAll('.cc[data-cid="'+cid2+'"]');
