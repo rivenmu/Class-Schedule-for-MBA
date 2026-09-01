@@ -213,6 +213,8 @@ main.collapsed .sidebar-toggle{left:0}
 .cl-table .cl-summary{background:#f8fafc;font-weight:600}
 .cl-table .cl-summary td{padding:6px 10px;font-size:12px;border-bottom:2px solid var(--border)}
 .cl-empty{text-align:center;color:var(--text3);padding:20px;font-size:13px}
+
+.slot-sep{border-top:1px dashed var(--border);margin:3px 0}
 </style>
 </head>
 <body>
@@ -264,19 +266,7 @@ main.collapsed .sidebar-toggle{left:0}
 </div>
 </div>
 
-<div class="panel">
-<div class="panel-head">图例</div>
-<div class="panel-body">
-<div class="legend">
-<div class="legend-row"><div class="legend-dot" style="border-color:var(--core);background:var(--core-bg)"></div>核心课</div>
-<div class="legend-row"><div class="legend-dot" style="border-color:var(--req);background:var(--req-bg)"></div>必修课</div>
-<div class="legend-row"><div class="legend-dot" style="border-color:var(--ele);background:var(--ele-bg)"></div>选修课</div>
-<div class="legend-row"><div class="legend-dot" style="border-color:var(--man);background:var(--man-bg)"></div>必选课</div>
-<div class="legend-row"><div class="legend-dot" style="border-color:var(--sum);background:var(--sum-bg)"></div>暑期课</div>
-<div class="legend-row"><div class="legend-dot" style="border-color:#f59e0b;background:#fef3c7"></div>冲突课（虚线边框）</div>
-<div class="legend-row"><div class="legend-dot" style="border-color:var(--hol);background:var(--hol-bg)"></div>法定假日（停课）</div>
-</div>
-</div>
+
 </div>
 
 <div class="panel" id="unschedPanel" style="display:none">
@@ -288,6 +278,7 @@ main.collapsed .sidebar-toggle{left:0}
 </aside>
 
 <div class="cal-area">
+<div class="legend" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:12px;color:var(--text2)"><div class="legend-row"><div class="legend-dot" style="border-color:var(--core);background:var(--core-bg)"></div>核心课（含必修）</div><div class="legend-row"><div class="legend-dot" style="border-color:var(--man);background:var(--man-bg)"></div>必选课</div><div class="legend-row"><div class="legend-dot" style="border-color:var(--ele);background:var(--ele-bg)"></div>选修课</div><div class="legend-row"><div class="legend-dot" style="border-color:var(--sum);background:var(--sum-bg)"></div>暑期课</div><div class="legend-row"><div class="legend-dot" style="border-color:#f59e0b;background:#fef3c7"></div>冲突课（虚线）</div></div>
 <div class="cal-weekdays">
 <div class="cal-wd">周一</div>
 <div class="cal-wd">周二</div>
@@ -386,7 +377,7 @@ const SEMESTERS = {
   },
 
   spring2025: {
-    name: "2025-2026 春季学期",
+    name: "2025-2026 春夏季学期",
     courses: [
       {id:"s01",code:"MB001Z-02",name:"新时代中国特色社会主义理论与实践",type:"req",credits:"2/36",teacher:"待定",room:"S301",
        sessions:[{dates:["2026-03-12","2026-03-14","2026-03-26","2026-03-28","2026-04-09","2026-04-11","2026-04-23","2026-04-25"],ts:"08:30",te:"12:00"}]},
@@ -582,8 +573,14 @@ function renderCalendar(){
       if(holName&&!courses.length){
         coursesHtml+='<div class="cal-empty">'+holName+'停课</div>';
       }else if(courses.length){
+        courses.sort(function(a,b){return a.session.ts.localeCompare(b.session.ts);});
+        var lastSlot='';
         for(var k=0;k<courses.length;k++){
           var item=courses[k];
+          var cs=item.session.ts;
+          var slot=cs<"12:00"?"M":cs<"18:00"?"A":"E";
+          if(k>0&&slot!==lastSlot) coursesHtml+='<div class="slot-sep"></div>';
+          lastSlot=slot;
           var c=item.course;
           var cls="cc cc-"+c.type;
           if(c.conflict&&!state.selections[c.conflict]) cls+=" cc-conflict";
@@ -820,14 +817,22 @@ function renderCourseList(){
     totalCredits+=credits;
     if(isEle) eleCredits+=credits;
     var typeColor=typeShortColors[c.type]||"#64748b";
-    var allDates=[];
+    var timeParts=[];
     for(var i=0;i<c.sessions.length;i++){
-      var ds=getSessionDates(c.sessions[i]);
-      for(var j=0;j<ds.length;j++){
-        var p=ds[j].split("-"); allDates.push(p[1]+"/"+p[2]+" "+c.sessions[i].ts+"-"+c.sessions[i].te);
+      var s=c.sessions[i];
+      if(s.weekly){
+        var wds=["日","一","二","三","四","五","六"];
+        var st=s.weekly.start.slice(5).replace("-","/");
+        var en=s.weekly.end.slice(5).replace("-","/");
+        var exc=s.weekly.except&&s.weekly.except.length?"(停"+s.weekly.except.length+"次)":"";
+        timeParts.push("每周"+wds[s.weekly.dow]+" "+s.ts+"-"+s.te+" "+st+"-"+en+exc);
+      }else if(s.dates&&s.dates.length){
+        var f=s.dates[0].slice(5).replace("-","/");
+        var l=s.dates[s.dates.length-1].slice(5).replace("-","/");
+        timeParts.push(f+"~"+l+" "+s.ts+"-"+s.te);
       }
     }
-    var timeStr=allDates.length?allDates.join("、"):(c.note||"待定");
+    var timeStr=timeParts.length?timeParts.join("；"):(c.note||"待定");
     rows.push({code:c.code,name:c.name,type:c.type,typeName:typeNamesFull[c.type],credits:credits,teacher:c.teacher,room:c.room,time:timeStr,typeColor:typeColor,typeBg:typeBgMap2[c.type]||"#f9fafb"});
   });
   // Sort by type order: core > req > man > ele > sum
