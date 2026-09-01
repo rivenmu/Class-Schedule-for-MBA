@@ -1216,7 +1216,12 @@ function saveState() {
   var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
   var stateJson = JSON.stringify(stateData);
   var stateScript = '\n<script>window.__SAVED_STATE=' + stateJson + ';<' + '/script>\n';
-  html = html.replace('</body>', stateScript + '</body>');
+  // 修复：outerHTML 内已包含字符串 '</body>'（saveState 源码本身），直接 replace 会命中脚本内的第一个而非真正的闭合标签，导致导出后 JS 泄露为乱码文本。改为定位最后一个 </body>；同时清理旧的已保存状态避免叠加
+  html = html.replace(/<script>window\.__SAVED_STATE[\s\S]*?<\/script>/, '');
+  var lower = html.toLowerCase();
+  var idx = lower.lastIndexOf('</body>');
+  if(idx !== -1){ html = html.slice(0, idx) + stateScript + html.slice(idx); }
+  else { html = html + stateScript; }
   var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');

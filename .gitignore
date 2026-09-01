@@ -13,7 +13,7 @@ Thumbs.db
 .omo/
 .codegraph/
 node_modules/
-dist/
+# dist/  # 保留 国科大26级MBA_全集班/dist/ 为发布产物，需跟踪
 *.log
 
 # Temp
