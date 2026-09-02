@@ -264,9 +264,9 @@ main{max-width:1600px;margin:0 auto;display:flex;min-height:calc(100vh - 62px);g
 @media print{
   @page{size:A3 landscape;margin:12mm}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  html,body{background:var(--paper)!important}
+  html,body{background:var(--paper)!important;margin:0!important;padding:0!important}
   header,.sidebar,.cal-area,.mobile-toggle,.modal-overlay,.toast,.sidebar-toggle,.fv-overlay,.reset-overlay,footer{display:none!important}
-  #printContainer{display:block!important;max-width:1600px;margin:0 auto;background:var(--paper);color:var(--ink)}
+  #printContainer{display:block!important;max-width:1600px;margin:0 auto;background:var(--paper);color:var(--ink);padding-top:0!important}
   .print-header{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 20px 14px;margin-bottom:10px;box-shadow:none;break-after:avoid;page-break-after:avoid;break-inside:avoid;page-break-inside:avoid}
   .print-header-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
   .print-header h1{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:22px;font-weight:400;letter-spacing:-.02em;line-height:1;color:var(--ink);margin:0}
@@ -277,15 +277,15 @@ main{max-width:1600px;margin:0 auto;display:flex;min-height:calc(100vh - 62px);g
   .print-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
   .print-legend .legend-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:11px;font-weight:600;white-space:nowrap}
   .print-legend .legend-pill i{width:10px;height:10px;border-radius:3px;border:1px solid rgba(0,0,0,.08);flex-shrink:0}
-  .print-month{break-inside:avoid;page-break-inside:avoid;break-after:auto;page-break-after:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:none}
+  .print-month{break-inside:auto;page-break-inside:auto;break-after:auto;page-break-after:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:none}
   .print-month:first-of-type{break-before:avoid;page-break-before:avoid}
   .print-month:last-child{break-after:auto;page-break-after:auto}
-  .print-month-title{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:16px;font-weight:400;letter-spacing:-.02em;padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface) 0%, var(--surface-2) 100%);margin:0}
-  .print-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:8px 12px 0;background:var(--surface)}
+  .print-month-title{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:14px;font-weight:400;letter-spacing:-.02em;padding:7px 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface) 0%, var(--surface-2) 100%);margin:0}
+  .print-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:6px 10px 0;background:var(--surface)}
   .print-cal-wd{text-align:center;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding:6px 0}
   .print-cal-wd.weekend{color:var(--hol)}
-  .print-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:8px 12px 12px;background:var(--surface)}
-  .print-cal-grid .cal-cell{min-height:118px!important;padding:6px 6px 7px!important;border-radius:12px!important;overflow:hidden!important;background:var(--surface)!important;border:1px solid var(--line)!important}
+  .print-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:6px 10px 8px;background:var(--surface)}
+  .print-cal-grid .cal-cell{min-height:82px!important;padding:4px 4px 5px!important;border-radius:10px!important;overflow:hidden!important;background:var(--surface)!important;border:1px solid var(--line)!important}
   .print-cal-grid .cal-cell.other{background:var(--paper)!important;border-color:transparent!important;opacity:.55}
   .print-cal-grid .cal-cell.today{border-color:var(--indigo)!important;box-shadow:0 0 0 2px var(--indigo-soft)!important}
   .print-cal-grid .cal-cell.holiday{background:var(--hol-soft)!important;border-color:#F3C9C3!important}
