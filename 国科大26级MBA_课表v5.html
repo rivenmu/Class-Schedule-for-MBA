@@ -1150,7 +1150,7 @@ function renderCalendar(){
       var courses=getCoursesForDate(ds);
       var hasConflict=false;
       var allEvening=courses.length>0&&courses.every(function(x){return x.session.ts>="18:00";});
-      var coursesHtml='<div class="cal-courses"'+((allEvening&&!holName)?' style="margin-top:auto"' : '')+'>';
+      var coursesHtml='<div class="cal-courses"'+((allEvening&&!holName)?' style="margin-top:auto;flex:0 0 auto"' : '')+'>';
       if(holName&&!courses.length){
         coursesHtml+='<div class="cal-empty">'+holName+' · 停课</div>';
       }else if(courses.length){
