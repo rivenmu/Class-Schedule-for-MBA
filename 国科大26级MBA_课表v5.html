@@ -40,7 +40,7 @@
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 html{scroll-behavior:smooth}
-body{font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased;min-height:100vh}
 /* header */
 header{position:sticky;top:0;z-index:100;background:rgba(246,243,238,.85);backdrop-filter:blur(12px) saturate(1.1);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 20px 14px 24px}
 .header-inner{max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -265,8 +265,8 @@ main{max-width:1600px;margin:0 auto;display:flex;min-height:calc(100vh - 62px);g
   @page{size:A3 landscape;margin:12mm}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   html,body{background:var(--paper)!important;margin:0!important;padding:0!important}
-  header,.sidebar,.cal-area,.mobile-toggle,.modal-overlay,.toast,.sidebar-toggle,.fv-overlay,.reset-overlay,footer{display:none!important}
-  #printContainer{display:block!important;max-width:1600px;margin:0 auto;background:var(--paper);color:var(--ink);padding-top:0!important}
+  header,footer,.sidebar,.cal-area,.mobile-toggle,.modal-overlay,.toast,.sidebar-toggle,.fv-overlay,.reset-overlay{display:none!important}
+  #printContainer{display:block!important;max-width:1600px;margin:0 auto;background:var(--paper);color:var(--ink);padding:0!important}
   .print-header{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 20px 14px;margin-bottom:10px;box-shadow:none;break-after:avoid;page-break-after:avoid;break-inside:avoid;page-break-inside:avoid}
   .print-header-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
   .print-header h1{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:22px;font-weight:400;letter-spacing:-.02em;line-height:1;color:var(--ink);margin:0}
@@ -277,8 +277,8 @@ main{max-width:1600px;margin:0 auto;display:flex;min-height:calc(100vh - 62px);g
   .print-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
   .print-legend .legend-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:11px;font-weight:600;white-space:nowrap}
   .print-legend .legend-pill i{width:10px;height:10px;border-radius:3px;border:1px solid rgba(0,0,0,.08);flex-shrink:0}
-  .print-cover{break-after:always;page-break-after:always;display:flex;align-items:center;justify-content:center;min-height:62vh;padding:24px 20px;background:var(--paper);margin-bottom:0}
-  .print-cover-inner{text-align:center;max-width:520px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px 24px 22px;box-shadow:var(--shadow-card)}
+  .print-cover{break-after:always;page-break-after:always;display:flex;align-items:center;justify-content:center;min-height:88vh;padding:32px 20px;background:var(--paper);margin:0;box-sizing:border-box}
+  .print-cover-inner{text-align:center;max-width:520px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:32px 24px 24px;box-shadow:var(--shadow-card)}
   .print-cover-badge{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);border:1px solid var(--line);padding:3px 8px;border-radius:999px;background:var(--surface-2);margin-bottom:10px}
   .print-cover h1{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:26px;font-weight:400;letter-spacing:-.02em;line-height:1.1;color:var(--ink);margin:0}
   .print-cover h1 i{font-style:italic;color:var(--indigo)}
@@ -290,12 +290,12 @@ main{max-width:1600px;margin:0 auto;display:flex;min-height:calc(100vh - 62px);g
   .print-month{break-inside:avoid;page-break-inside:avoid;break-after:auto;page-break-after:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:none}
   .print-month:first-of-type{break-before:avoid;page-break-before:avoid}
   .print-month:last-child{break-after:auto;page-break-after:auto}
-  .print-month-title{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:14px;font-weight:400;letter-spacing:-.02em;padding:7px 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface) 0%, var(--surface-2) 100%);margin:0}
-  .print-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:6px 10px 0;background:var(--surface)}
+  .print-month-title{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:14px;font-weight:400;letter-spacing:-.02em;padding:9px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface) 0%, var(--surface-2) 100%);margin:0}
+  .print-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:8px 12px 0;background:var(--surface)}
   .print-cal-wd{text-align:center;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding:6px 0}
   .print-cal-wd.weekend{color:var(--hol)}
-  .print-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:6px 10px 8px;background:var(--surface)}
-  .print-cal-grid .cal-cell{min-height:82px!important;padding:4px 4px 5px!important;border-radius:10px!important;overflow:hidden!important;background:var(--surface)!important;border:1px solid var(--line)!important}
+  .print-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:8px 12px 10px;background:var(--surface)}
+  .print-cal-grid .cal-cell{min-height:102px!important;padding:5px 6px 6px!important;border-radius:10px!important;overflow:hidden!important;background:var(--surface)!important;border:1px solid var(--line)!important}
   .print-cal-grid .cal-cell.other{background:var(--paper)!important;border-color:transparent!important;opacity:.55}
   .print-cal-grid .cal-cell.today{border-color:var(--indigo)!important;box-shadow:0 0 0 2px var(--indigo-soft)!important}
   .print-cal-grid .cal-cell.holiday{background:var(--hol-soft)!important;border-color:#F3C9C3!important}
