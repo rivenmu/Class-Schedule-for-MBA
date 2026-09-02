@@ -1735,17 +1735,7 @@ function exportPDF() {
   var typeBgs = {core:"#EDF0F7",req:"#E6F4EE",ele:"#E6F4EE",man:"#FFF7E6",sum:"#F5EEF7"};
   var monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
   var className = CLASSES[state.classId] ? CLASSES[state.classId].name : "";
-  var html = '<div class="print-header">';
-  html += '<div class="print-header-top"><h1>国科大26级MBA <i>'+className+'</i> — '+sem.name+'</h1><div class="print-sub"><b>'+new Date().toLocaleDateString("zh-CN")+' 导出</b><br>'+className+' · '+sem.name+'</div></div>';
-  var sels = [];
-  for (var gid in state.selections) {
-    var sc = getCourseById(state.sem, state.selections[gid]);
-    if (sc) sels.push(sc.name);
-  }
-  if (sels.length) html += '<p>已选冲突课：'+sels.join("、")+'</p>';
-  else html += '<p>未选择冲突课 · 核心/必修已自动计入</p>';
-  html += '<div class="print-legend"><span class="legend-pill"><i style="background:var(--indigo-soft);border-color:#C7D2E8"></i>核心</span><span class="legend-pill"><i style="background:var(--moss-soft);border-color:#BFE0D2"></i>必修</span><span class="legend-pill"><i style="background:var(--ochre-soft);border-color:#F0D9A8"></i>必选</span><span class="legend-pill"><i style="background:#F0F7F4;border-color:#BFE0D2"></i>选修</span><span class="legend-pill"><i style="background:var(--plum-soft);border-color:#E2D0E8"></i>暑期选修</span></div>';
-  html += '</div>';
+  var html = '';
 
   var y = sem.rangeStart.y, m = sem.rangeStart.m;
   while (y < sem.rangeEnd.y || (y === sem.rangeEnd.y && m <= sem.rangeEnd.m)) {
@@ -1753,6 +1743,8 @@ function exportPDF() {
     m++;
     if (m > 11) { m = 0; y++; }
   }
+  // 图例（每份 PDF 顶部一次，替代原首页封面）
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;margin:8px 0 10px;padding:8px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px"><span class="legend-pill"><i style="background:var(--indigo-soft);border-color:#C7D2E8"></i>核心</span><span class="legend-pill"><i style="background:var(--moss-soft);border-color:#BFE0D2"></i>必修</span><span class="legend-pill"><i style="background:var(--ochre-soft);border-color:#F0D9A8"></i>必选</span><span class="legend-pill"><i style="background:#F0F7F4;border-color:#BFE0D2"></i>选修</span><span class="legend-pill"><i style="background:var(--plum-soft);border-color:#E2D0E8"></i>暑期选修</span></div>';
   // 已选课程清单（与页面下方清单一致，字体充盈表格）
   var rows = [];
   for(var i=0;i<sem.courses.length;i++){
