@@ -538,10 +538,10 @@ button:focus-visible{outline-offset:1px}
 </div>
 <div class="cal-legend" aria-label="图例">
 <span class="legend-pill"><i style="background:var(--indigo-soft);border-color:#C7D2E8"></i>核心</span>
-<span class="legend-pill"><i style="background:var(--moss-soft);border-color:#BFE0D2"></i>选修</span>
+<span class="legend-pill"><i style="background:var(--moss-soft);border-color:#BFE0D2"></i>必修</span>
+<span class="legend-pill"><i style="background:#F0F7F4;border-color:#BFE0D2"></i>选修</span>
 <span class="legend-pill"><i style="background:var(--ochre-soft);border-color:#F0D9A8"></i>必选</span>
-<span class="legend-pill"><i style="background:var(--plum-soft);border-color:#E2D0E8"></i>暑期</span>
-<span class="legend-pill"><i style="background:var(--hol-soft);border-color:#F3C9C3"></i>假日</span>
+<span class="legend-pill"><i style="background:var(--plum-soft);border-color:#E2D0E8"></i>暑期选修</span>
 </div>
 <button type="button" class="sidebar-toggle" id="sidebarToggle" title="收起侧栏" aria-label="收起侧栏"><span class="st-icon">‹</span><span class="st-label">收起侧栏</span></button>
 </div>
@@ -1299,21 +1299,27 @@ function renderSelectedPanel(){
   var sem=state.sem, otherSem=sem==="fall2026"?"spring2025":"fall2026";
   var TOT_ALL=45;
   function calc(sk){
-    var d=SEMESTERS[sk], core=0, req=0, man=0, eleSel=0, indep=0, cmax={};
+    var d=SEMESTERS[sk], core=0, req=0, man=0, eleSel=0, sumSel=0, indepEle=0, indepSum=0, cmaxEle={}, cmaxSum={};
     d.courses.forEach(function(c){
       var cr=parseCredits(c.credits);
       if(c.type==="core") core+=cr;
       else if(c.type==="req") req+=cr;
-      else if(isMandatoryType(c.type)) man+=cr;
-      else if(isElectiveType(c.type)){
+      else if(c.type==="man") man+=cr;
+      else if(c.type==="ele"){
         if(state.electiveSel[sk][c.id]) eleSel+=cr;
-        if(c.conflict){ if(!cmax[c.conflict]||cr>cmax[c.conflict]) cmax[c.conflict]=cr; }
-        else indep+=cr;
+        if(c.conflict){ if(!cmaxEle[c.conflict]||cr>cmaxEle[c.conflict]) cmaxEle[c.conflict]=cr; }
+        else indepEle+=cr;
+      } else if(c.type==="sum"){
+        if(state.electiveSel[sk][c.id]) sumSel+=cr;
+        if(c.conflict){ if(!cmaxSum[c.conflict]||cr>cmaxSum[c.conflict]) cmaxSum[c.conflict]=cr; }
+        else indepSum+=cr;
       }
     });
-    var gmax=0; for(var k in cmax) gmax+=cmax[k];
-    var total=core+req+man+indep+gmax;
-    return {core:core,req:req,man:man,eleSel:eleSel,total:total,selected:core+req+man+eleSel,eleMax:indep+gmax};
+    var gmaxEle=0; for(var k in cmaxEle) gmaxEle+=cmaxEle[k];
+    var gmaxSum=0; for(var k in cmaxSum) gmaxSum+=cmaxSum[k];
+    var total=core+req+man+indepEle+gmaxEle+indepSum+gmaxSum;
+    var eleMax=indepEle+gmaxEle, sumMax=indepSum+gmaxSum;
+    return {core:core,req:req,man:man,eleSel:eleSel,sumSel:sumSel,total:total,selected:core+req+man+eleSel+sumSel,eleMax:eleMax,sumMax:sumMax};
   }
   var cur=calc(sem), oth=calc(otherSem);
   var allSel=cur.selected+oth.selected;
@@ -1325,7 +1331,7 @@ function renderSelectedPanel(){
     +'<div class="ws-title">本学期选课比例 · '+semLabel(sem)+'</div>'
     +'<div class="ws-main"><span class="ws-num">'+cur.selected+' <small>/ '+cur.total+' 学分</small></span><span class="ws-pct">'+curPct+'%</span></div>'
     +'<div class="ws-bar"><div class="ws-fill" style="width:'+curPct+'%"></div></div>'
-    +'<div class="ws-cats"><span><i style="background:var(--indigo)"></i>核心 '+cur.core+'</span><span><i style="background:var(--plum)"></i>必修 '+cur.req+'</span><span><i style="background:var(--ochre)"></i>必选 '+cur.man+'</span><span><i style="background:var(--moss)"></i>选修 '+cur.eleSel+' / '+cur.eleMax+'</span></div>'
+    +'<div class="ws-cats"><span><i style="background:var(--indigo)"></i>核心 '+cur.core+'</span><span><i style="background:var(--moss)"></i>必修 '+cur.req+'</span><span><i style="background:#F0F7F4;border-color:#BFE0D2"></i>选修 '+cur.eleSel+' / '+cur.eleMax+'</span><span><i style="background:var(--ochre)"></i>必选 '+cur.man+'</span><span><i style="background:var(--plum)"></i>暑期选修 '+cur.sumSel+' / '+cur.sumMax+'</span></div>'
     +'</div>'
     +'<div class="ws-block">'
     +'<div class="ws-title">总选课进度 · 两学期目标 '+TOT_ALL+' 学分</div>'
@@ -1393,7 +1399,7 @@ function renderSelectedPanel(){
     +'<button type="button" class="filter-btn '+(state.filter==="req"?"active":"")+'" data-filter="req">必修</button>'
     +'<button type="button" class="filter-btn '+(state.filter==="ele"?"active":"")+'" data-filter="ele">选修</button>'
     +'<button type="button" class="filter-btn '+(state.filter==="man"?"active":"")+'" data-filter="man">必选</button>'
-    +'<button type="button" class="filter-btn '+(state.filter==="sum"?"active":"")+'" data-filter="sum">暑期</button>'
+    +'<button type="button" class="filter-btn '+(state.filter==="sum"?"active":"")+'" data-filter="sum">暑期选修</button>'
     +'</div></div>'
     +'<div class="sel-list">'+rowsHtml+'</div>';
 
@@ -1716,7 +1722,7 @@ function exportPDF() {
   }
   if (sels.length) html += '<p>已选冲突课：'+sels.join("、")+'</p>';
   else html += '<p>未选择冲突课 · 核心/必修已自动计入</p>';
-  html += '<div class="print-legend"><span class="legend-pill"><i style="background:var(--indigo-soft);border-color:#C7D2E8"></i>核心</span><span class="legend-pill"><i style="background:var(--moss-soft);border-color:#BFE0D2"></i>选修</span><span class="legend-pill"><i style="background:var(--ochre-soft);border-color:#F0D9A8"></i>必选</span><span class="legend-pill"><i style="background:var(--plum-soft);border-color:#E2D0E8"></i>暑期</span><span class="legend-pill"><i style="background:var(--hol-soft);border-color:#F3C9C3"></i>假日</span></div>';
+  html += '<div class="print-legend"><span class="legend-pill"><i style="background:var(--indigo-soft);border-color:#C7D2E8"></i>核心</span><span class="legend-pill"><i style="background:var(--moss-soft);border-color:#BFE0D2"></i>必修</span><span class="legend-pill"><i style="background:#F0F7F4;border-color:#BFE0D2"></i>选修</span><span class="legend-pill"><i style="background:var(--ochre-soft);border-color:#F0D9A8"></i>必选</span><span class="legend-pill"><i style="background:var(--plum-soft);border-color:#E2D0E8"></i>暑期选修</span></div>';
   html += '</div>';
 
   var y = sem.rangeStart.y, m = sem.rangeStart.m;
@@ -1886,7 +1892,7 @@ function isMandatoryType(t){return t==="man";}
 function isElectiveType(t){return t==="ele"||t==="sum";}
 function parseCredits(str){var n=parseInt(str);return isNaN(n)?0:n;}
 function semLabel(s){return s==="fall2026"?"秋季":"春夏";}
-var typeNamesFull={core:"核心",req:"必修",ele:"选修",man:"必选",sum:"暑期"};
+var typeNamesFull={core:"核心",req:"必修",ele:"选修",man:"必选",sum:"暑期选修"};
 var typeShortColors={core:"#2F4A7A",req:"#1B6B4A",ele:"#1B6B4A",man:"#B7791F",sum:"#6B4B7A"};
 
 function syncConflictToElective(gid,cid){
