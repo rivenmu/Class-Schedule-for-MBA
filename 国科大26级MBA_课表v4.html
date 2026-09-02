@@ -69,6 +69,25 @@ header{position:sticky;top:0;z-index:100;background:rgba(246,243,238,.85);backdr
 .ht-btn.ht-save{background:var(--vermillion);color:#fff;border-color:var(--vermillion);box-shadow:0 2px 10px rgba(232,74,48,.28)}
 .ht-btn.ht-save:hover{background:#D63F27;border-color:#D63F27;transform:translateY(-1px);box-shadow:0 6px 18px rgba(232,74,48,.32)}
 .ht-btn:active{transform:translateY(0) scale(.98)}
+.ht-btn.ht-reset{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.ht-btn.ht-reset:hover{background:#FFF7F7;border-color:#E8A0A0;color:var(--hol);transform:translateY(-1px);box-shadow:0 4px 12px rgba(192,57,43,.12)}
+/* reset dialog */
+.reset-overlay{position:fixed;inset:0;background:rgba(19,19,22,.48);backdrop-filter:blur(8px) saturate(1.05);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:350;padding:20px}
+.reset-overlay.show{display:flex;animation:fadeIn .18s ease}
+.reset-modal{background:var(--surface);border:1px solid var(--line);border-radius:16px;max-width:420px;width:100%;padding:20px 20px 16px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:pop .22s cubic-bezier(.22,1,.36,1)}
+.reset-modal h3{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.reset-modal h3 i{width:28px;height:28px;border-radius:999px;background:var(--hol-soft);color:var(--hol);display:grid;place-items:center;font-size:14px;font-style:normal;border:1px solid #F3C9C3}
+.reset-modal p{font-size:12.5px;color:var(--ink-2);line-height:1.6;margin-bottom:10px}
+.reset-count{font-family:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;font-size:30px;font-weight:700;text-align:center;margin:10px 0 6px;color:var(--hol);letter-spacing:-.02em}
+.reset-count small{font-size:11px;color:var(--ink-3);font-weight:600;margin-left:4px}
+.reset-hint{font-size:11px;color:var(--ink-3);text-align:center;margin-bottom:12px}
+.reset-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+.reset-actions button{padding:9px 16px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;transition:all .16s;min-height:38px}
+.reset-confirm{background:var(--hol);color:#fff;border:1px solid var(--hol);box-shadow:0 2px 10px rgba(192,57,43,.22)}
+.reset-confirm:hover:not(:disabled){background:#A93226;border-color:#A93226;transform:translateY(-1px);box-shadow:0 4px 14px rgba(192,57,43,.28)}
+.reset-confirm:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;background:var(--ink-3);border-color:var(--ink-3)}
+.reset-cancel{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.reset-cancel:hover{background:var(--paper);border-color:var(--line-strong);transform:translateY(-1px)}
 /* layout */
 main{max-width:1600px;margin:0 auto;display:flex;min-height:calc(100vh - 62px);gap:0}
 .sidebar{width:var(--sidebar-w);flex-shrink:0;padding:18px 14px 24px 20px;overflow-y:auto;max-height:calc(100vh - 62px);position:sticky;top:62px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
@@ -448,6 +467,7 @@ button:focus-visible{outline-offset:1px}
 <div class="header-actions">
 <button type="button" class="ht-btn ht-export" id="exportBtn" title="导出为 PDF">⤓ 导出 PDF</button>
 <button type="button" class="ht-btn ht-save" id="saveBtn">⤓ 保存选课下载 html</button>
+<button type="button" class="ht-btn ht-reset" id="resetBtn" title="重置所有选课">↺ 重置选课</button>
 </div>
 </div>
 </div>
@@ -526,6 +546,19 @@ button:focus-visible{outline-offset:1px}
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="reset-overlay" id="resetOverlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+  <div class="reset-modal" role="document">
+    <h3 id="resetTitle"><i>!</i> 确认重置选课？</h3>
+    <p>将清空当前班级与所有学期的已选课程、冲突组选择及筛选状态，恢复至初始未选状态。此操作不可撤销。</p>
+    <div class="reset-count" id="resetCountdown">5<small>秒后可确认</small></div>
+    <div class="reset-hint" id="resetHint">请等待倒计时结束后再确认，防止误触</div>
+    <div class="reset-actions">
+      <button type="button" class="reset-cancel" id="resetCancel">取消</button>
+      <button type="button" class="reset-confirm" id="resetConfirm" disabled>确认重置</button>
+    </div>
+  </div>
+</div>
 
 <!-- 首次访问免责声明 + 使用指南（ponytail 极简实现：无依赖、与档案纸张风格一致） -->
 <div class="fv-overlay" id="fvOverlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="fvTitle">
@@ -1844,6 +1877,81 @@ function switchClass(newClassId) {
   }
 })();
 
+
+// ========== RESET WITH COUNTDOWN ==========
+(function(){
+  var overlay = document.getElementById('resetOverlay');
+  var btn = document.getElementById('resetBtn');
+  var cancelBtn = document.getElementById('resetCancel');
+  var confirmBtn = document.getElementById('resetConfirm');
+  var countdownEl = document.getElementById('resetCountdown');
+  var hintEl = document.getElementById('resetHint');
+  var timer = null;
+  var remaining = 5;
+  function updateCountdown(){
+    if(remaining > 0){
+      countdownEl.innerHTML = remaining + '<small>秒后可确认</small>';
+      hintEl.textContent = '请等待倒计时结束后再确认，防止误触';
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = '确认重置 ('+remaining+')';
+    } else {
+      countdownEl.innerHTML = '0<small>秒</small>';
+      hintEl.textContent = '可确认重置';
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = '确认重置';
+      if(timer){ clearInterval(timer); timer = null; }
+    }
+  }
+  function showReset(){
+    if(!overlay) return;
+    remaining = 5;
+    updateCountdown();
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden','false');
+    // disable background scroll
+    document.body.style.overflow = 'hidden';
+    timer = setInterval(function(){
+      remaining--;
+      updateCountdown();
+      if(remaining <= 0){
+        clearInterval(timer); timer = null;
+        confirmBtn.focus();
+      }
+    }, 1000);
+  }
+  function hideReset(){
+    if(!overlay) return;
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+    if(timer){ clearInterval(timer); timer = null; }
+  }
+  function doReset(){
+    state.selections = {};
+    state.filter = "all";
+    initElectiveDefaults();
+    renderAll();
+    hideReset();
+    showToast('已重置 · 全部选课已清空');
+  }
+  if(btn) btn.addEventListener('click', showReset);
+  if(cancelBtn) cancelBtn.addEventListener('click', hideReset);
+  if(confirmBtn) confirmBtn.addEventListener('click', function(){
+    if(confirmBtn.disabled) return;
+    doReset();
+  });
+  if(overlay) overlay.addEventListener('click', function(e){
+    if(e.target === overlay) hideReset();
+  });
+  document.addEventListener('keydown', function(e){
+    if(overlay && overlay.classList.contains('show') && e.key === 'Escape'){
+      e.stopPropagation();
+      hideReset();
+    }
+  });
+  // expose for tests
+  window.__resetForTest = { showReset: showReset, hideReset: hideReset, doReset: doReset };
+})();
 
 // Init
 if (window.__SAVED_STATE) {
