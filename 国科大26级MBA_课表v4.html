@@ -415,6 +415,8 @@ button:focus-visible{outline-offset:1px}
   .cal-card::after{content:"← 左右滑动查看整月 →";position:absolute;bottom:6px;right:10px;font-size:10px;color:var(--ink-3);background:rgba(255,255,255,.9);border:1px solid var(--line);padding:2px 6px;border-radius:999px;pointer-events:none;opacity:.9}
   @media(max-width:360px){
     .cal-weekdays,.cal-grid{min-width:520px;grid-template-columns:repeat(7,minmax(72px,1fr))}
+    .filter-btn{padding:4px 7px;font-size:10.5px}
+    .filter-row{gap:3px}
   }
 
   .dl-day{display:flex;gap:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
@@ -441,10 +443,12 @@ button:focus-visible{outline-offset:1px}
   .sel-item input[type="checkbox"]:checked::after{font-size:13px}
   .si-name{font-size:13.5px}
   .si-type{font-size:10.5px;padding:3px 7px}
-  .filter-section{overflow:hidden}
-  .filter-row{gap:6px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;scroll-snap-type:x proximity}
+  .filter-section{padding:10px 10px 8px;overflow:hidden;position:relative}
+  .filter-section::after{content:"";position:absolute;right:0;top:0;bottom:0;width:24px;background:linear-gradient(90deg,transparent, var(--surface-2));pointer-events:none;opacity:.0;transition:opacity .2s}
+  .filter-section.has-scroll::after{opacity:1}
+  .filter-row{gap:4px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;scroll-snap-type:x proximity}
   .filter-row::-webkit-scrollbar{display:none}
-  .filter-btn{flex:0 0 auto;white-space:nowrap;padding:7px 11px;font-size:11.5px;scroll-snap-align:start}
+  .filter-btn{flex:0 0 auto;white-space:nowrap;padding:5px 9px;font-size:11px;font-weight:600;scroll-snap-align:start;min-height:32px}
   .cg-opt{min-height:40px;padding:9px 12px;font-size:12.5px}
   .cg-clear{min-height:40px;display:inline-flex;align-items:center}
   .conflict-group{grid-template-columns:1fr;gap:7px;padding:10px}
@@ -1493,6 +1497,19 @@ function renderSelectedPanel(){
     })(selItems[si]);
   }
 
+  // filter row scroll hint
+  (function(){
+    var fr=document.getElementById('filterRow');
+    var fs=document.querySelector('.filter-section');
+    if(!fr||!fs) return;
+    function upd(){
+      if(fr.scrollWidth > fr.clientWidth + 4) fs.classList.add('has-scroll');
+      else fs.classList.remove('has-scroll');
+    }
+    fr.addEventListener('scroll', upd);
+    window.addEventListener('resize', upd);
+    setTimeout(upd, 100);
+  })();
   var filterBtns=document.querySelectorAll("#filterRow .filter-btn");
   for(var fi=0;fi<filterBtns.length;fi++){
     filterBtns[fi].onclick=function(){
