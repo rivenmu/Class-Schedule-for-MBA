@@ -13,8 +13,12 @@ Thumbs.db
 .omo/
 .codegraph/
 node_modules/
-# dist/  # 保留 国科大26级MBA_全集班/dist/ 为发布产物，需跟踪
 *.log
+.playwright-mcp/
+
+# Original course tables - local only, not tracked (all PDFs)
+*.pdf
+**/*.pdf
 
 # Temp
 *.tmp

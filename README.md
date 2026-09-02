@@ -43,21 +43,20 @@ cd tests && npm install && npx playwright install chromium && npx playwright tes
 ```
 Class-Schedule-for-MBA/
 ├── README.md                       # 本文件
-├── .gitignore
-├── tests/                          # 移动端端到端测试（Playwright）
-├── 国科大26级MBA_课表v4.html            # 七班合一主版本（单文件）
-├── 国科大26级MBA_全集班/            # 全日制集中班 PDF 源数据
-│   └── source/                     # 元数据（原 PDF）
-│       ├── 2025全日制集中班-课程表.pdf
-│       └── 2026全日制集中班-课程表.pdf
-├── 国科大26 级MBA _综合班/          # 综合班 PDF 源数据
-│   └── source/
-│       ├── 2025综合班-课程表.pdf
-│       └── 2026综合班-课程表.pdf
-└── 国科大26 级MBA _非集班/          # 非全日制集中班 PDF 源数据
-    └── source/
-        ├── 2025非全日制集中班-课程表.pdf
-        └── 2026非全日制集中班-课程表.pdf
+├── .gitignore                      # 已忽略所有 *.pdf 原表及 .playwright-mcp/
+├── 国科大26级MBA_课表v4.html        # 七班合一主版本（单文件，直接双击可用）
+├── tests/                          # 移动端端到端测试（Playwright，72 项）
+│   ├── mobile.spec.mjs
+│   ├── playwright.config.mjs
+│   └── scripts/lib.mjs
+└── 原始课表 PDFs（本地自备，已加入 .gitignore，不提交）
+    ├── 国科大26级MBA_全集班/source/*.pdf
+    ├── 国科大26 级MBA _综合班/source/*.pdf
+    ├── 国科大26 级MBA _非集班/source/*.pdf
+    ├── 国科大26级MBA_人工智能班/source/*.pdf
+    ├── 国科大26级MBA_数字化班/source/*.pdf
+    ├── 国科大26级MBA_脱产班/source/*.pdf
+    └── 国科大26级MBA_金融班/source/*.pdf
 ```
 
 ## 扩展其他班级
