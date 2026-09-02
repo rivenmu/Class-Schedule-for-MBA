@@ -6,7 +6,7 @@
 
 点击下方链接下载 HTML 到本地，浏览器双击即可打开使用（单文件、无需安装、可离线运行）：
 
-- **七班合一 · 2026 秋季 / 2027 春夏**（含全集班 / 综合班 / 非集班 / 人工智能与应用班 / 数字化转型与数字化创业班 / 脱产班 / 金融班 一键切换）：[国科大26级MBA_课表v5.html](https://raw.githubusercontent.com/rivenmu/Class-Schedule-for-MBA/master/国科大26级MBA_课表v5.html)
+- **七班合一 · 2026 秋季 / 2027 春夏**（含全集班 / 综合班 / 非集班 / 人工智能与应用班 / 数字化转型与数字化创业班 / 脱产班 / 金融班 一键切换）：[MBA-Schedule-v6.html](https://raw.githubusercontent.com/rivenmu/Class-Schedule-for-MBA/master/MBA-Schedule-v6.html)
 
 > 💡 如果浏览器直接显示源码，请右键 →「另存为」下载后再打开。
 
@@ -45,7 +45,7 @@ cd tests && npm install && npx playwright install chromium && npx playwright tes
 Class-Schedule-for-MBA/
 ├── README.md                       # 本文件
 ├── .gitignore                      # 已忽略所有 *.pdf 原表及 .playwright-mcp/
-├── 国科大26级MBA_课表v5.html        # 七班合一主版本 v5（单文件，直接双击可用）
+├── MBA-Schedule-v6.html            # 七班合一主版本 v6 毛玻璃质感（单文件，直接双击可用）
 ├── tests/                          # 移动端端到端测试（Playwright，72 项）
 │   ├── mobile.spec.mjs
 │   ├── playwright.config.mjs
@@ -62,7 +62,7 @@ Class-Schedule-for-MBA/
 
 ## 扩展其他班级
 - 七班共享同一 HTML 文件，通过顶部班级下拉切换器加载不同数据。新增班级只需：
-  1. 在 `国科大26级MBA_课表v5.html` 的 `CLASSES` 对象中追加新班级数据
+  1. 在 `MBA-Schedule-v6.html` 的 `CLASSES` 对象中追加新班级数据
   2. 在 header 的 `#classSelect` 下拉中追加 `<option>`
 - 班级文件夹命名规范：`{学校}{年级}MBA_{班级}`
 - 历史版本：`archive-v*.html`
