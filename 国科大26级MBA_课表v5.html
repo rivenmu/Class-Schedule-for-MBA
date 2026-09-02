@@ -1149,7 +1149,8 @@ function renderCalendar(){
 
       var courses=getCoursesForDate(ds);
       var hasConflict=false;
-      var coursesHtml='<div class="cal-courses">';
+      var allEvening=courses.length>0&&courses.every(function(x){return x.session.ts>="18:00";});
+      var coursesHtml='<div class="cal-courses"'+((allEvening&&!holName)?' style="margin-top:auto"' : '')+'>';
       if(holName&&!courses.length){
         coursesHtml+='<div class="cal-empty">'+holName+' · 停课</div>';
       }else if(courses.length){
@@ -1203,6 +1204,7 @@ function renderDayList(){
     var isToday=ds===todayStr;
     var holName=sem.holidays[ds];
     var courses=getCoursesForDate(ds);
+    var allEvening=courses.length>0&&courses.every(function(x){return x.session.ts>="18:00";});
     var cls="dl-day";
     if(isToday) cls+=" is-today";
     if(dow===0||dow===6) cls+=" is-weekend";
@@ -1217,7 +1219,7 @@ function renderDayList(){
     }
     html+='\x3cspan class="dl-date-num"\x3e'+day+'\x3c/span\x3e';
     html+='\x3c/div\x3e';
-    html+='\x3cdiv class="dl-body"\x3e';
+    html+='\x3cdiv class="dl-body"'+((allEvening&&!holName)?' style="justify-content:flex-end"' : '')+'\x3e';
     if(holName && !courses.length){
       html+='\x3cdiv class="cal-empty"\x3e'+holName+' \u00b7 \u505c\u8bfe\x3c/div\x3e';
     } else if(courses.length){
