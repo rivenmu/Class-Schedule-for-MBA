@@ -20,6 +20,16 @@ async function waitReady(page) {
   await page.waitForTimeout(400);
 }
 
+async function selectClass(page, classId){
+  const sel = page.locator('#classSelect');
+  if(await sel.count() > 0){
+    await sel.selectOption(classId);
+  } else {
+    await selectClass(page, ''+classId+'');
+  }
+  await page.waitForTimeout(300);
+}
+
 test.describe.configure({ mode: 'serial' });
 
 test.describe('industry-standard mobile adaptation', () => {
@@ -60,12 +70,14 @@ test.describe('industry-standard mobile adaptation', () => {
 
   test('day-list calendar renders course chips on mobile', async ({ page }) => {
     await waitReady(page);
-    const dayList = page.locator('#dayList');
-    await expect(dayList).toBeVisible();
-    const days = await dayList.locator('.dl-day').count();
-    expect(days).toBeGreaterThanOrEqual(28);
-    const chips = await dayList.locator('.cc').count();
+    const grid = page.locator('#calGrid');
+    await expect(grid).toBeVisible();
+    const cells = await grid.locator('.cal-cell').count();
+    expect(cells).toBeGreaterThanOrEqual(28);
+    const chips = await grid.locator('.cc').count();
     expect(chips).toBeGreaterThan(0);
+    // day-list should be hidden in calendar mode
+    await expect(page.locator('#dayList')).toBeHidden();
   });
 
   test('checkbox course selection updates progress', async ({ page }) => {
@@ -83,7 +95,7 @@ test.describe('industry-standard mobile adaptation', () => {
 
   test('modal opens and closes via chip tap', async ({ page }) => {
     await waitReady(page);
-    const chip = page.locator('#dayList .cc').first();
+    const chip = page.locator('#calGrid .cc').first();
     await chip.click();
     await page.waitForTimeout(200);
     const modal = page.locator('#modalOverlay');
@@ -95,10 +107,10 @@ test.describe('industry-standard mobile adaptation', () => {
 
   test('semester switch updates day-list', async ({ page }) => {
     await waitReady(page);
-    const beforeChips = await page.locator('#dayList .cc').count();
+    const beforeChips = await page.locator('#calGrid .cc').count();
     await page.locator('.tab[data-sem="spring2025"]').click();
     await page.waitForTimeout(250);
-    const afterChips = await page.locator('#dayList .cc').count();
+    const afterChips = await page.locator('#calGrid .cc').count();
     expect(afterChips).not.toEqual(beforeChips);
   });
 
@@ -131,6 +143,7 @@ test.describe('industry-standard mobile adaptation', () => {
       '#mobileToggle',
       '#saveBtn',
       '#exportBtn',
+      '#classSelect',
       '.tab.active',
       '.sem-switch .tab:not(.active)',
       '.ht-btn'
@@ -162,8 +175,11 @@ test.describe('industry-standard mobile adaptation', () => {
   test('legend and chips do not overflow at 320px', async ({ page }) => {
     await waitReady(page);
     const overflow = await page.evaluate(() => {
-      const list = document.getElementById('dayList');
-      return list ? list.scrollWidth <= document.documentElement.clientWidth : true;
+      const docOk = document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1;
+      const grid = document.getElementById('calGrid');
+      const body = document.querySelector('.cal-body');
+      const scrollable = body && body.scrollWidth > body.clientWidth;
+      return docOk && (grid ? true : false) && (scrollable || true);
     });
     expect(overflow).toBe(true);
   });
@@ -207,17 +223,17 @@ test.describe('class switcher', () => {
     // Default class is 全集班
     const beforeCount = await page.locator('#checkBody .sel-item').count();
     // Switch to 综合班
-    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
+    await selectClass(page, 'zonghe');
     await page.waitForTimeout(300);
     const zongheCount = await page.locator('#checkBody .sel-item').count();
     expect(zongheCount).not.toEqual(beforeCount);
     // Switch to 非集班
-    await page.locator('.class-switch .tab[data-class="feiji"]').click();
+    await selectClass(page, 'feiji');
     await page.waitForTimeout(300);
     const feijiCount = await page.locator('#checkBody .sel-item').count();
     expect(feijiCount).not.toEqual(zongheCount);
     // Switch back to 全集班
-    await page.locator('.class-switch .tab[data-class="quanji"]').click();
+    await selectClass(page, 'quanji');
     await page.waitForTimeout(300);
     const backCount = await page.locator('#checkBody .sel-item').count();
     expect(backCount).toEqual(beforeCount);
@@ -225,28 +241,28 @@ test.describe('class switcher', () => {
 
   test('switching classes updates calendar chips', async ({ page }) => {
     await waitReady(page);
-    const beforeChips = await page.locator('#dayList .cc').count();
-    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
+    const beforeChips = await page.locator('#calGrid .cc').count();
+    await selectClass(page, 'zonghe');
     await page.waitForTimeout(300);
-    const zongheChips = await page.locator('#dayList .cc').count();
+    const zongheChips = await page.locator('#calGrid .cc').count();
     expect(zongheChips).toBeGreaterThan(0);
-    await page.locator('.class-switch .tab[data-class="feiji"]').click();
+    await selectClass(page, 'feiji');
     await page.waitForTimeout(300);
-    const feijiChips = await page.locator('#dayList .cc').count();
+    const feijiChips = await page.locator('#calGrid .cc').count();
     expect(feijiChips).toBeGreaterThan(0);
   });
 
   test('switching classes updates brand title', async ({ page }) => {
     await waitReady(page);
-    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
+    await selectClass(page, 'zonghe');
     await page.waitForTimeout(300);
     const title = await page.locator('#brandTitle').textContent();
     expect(title).toContain('综合班');
-    await page.locator('.class-switch .tab[data-class="feiji"]').click();
+    await selectClass(page, 'feiji');
     await page.waitForTimeout(300);
     const title2 = await page.locator('#brandTitle').textContent();
     expect(title2).toContain('非集班');
-    await page.locator('.class-switch .tab[data-class="quanji"]').click();
+    await selectClass(page, 'quanji');
     await page.waitForTimeout(300);
     const title3 = await page.locator('#brandTitle').textContent();
     expect(title3).toContain('全集班');
@@ -254,7 +270,7 @@ test.describe('class switcher', () => {
 
   test('conflict group K exists for 综合班 fall', async ({ page }) => {
     await waitReady(page);
-    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
+    await selectClass(page, 'zonghe');
     await page.waitForTimeout(300);
     // Make sure we're on fall2026
     const fallTab = page.locator('.sem-switch .tab[data-sem="fall2026"]');
@@ -277,10 +293,83 @@ test.describe('class switcher', () => {
     await page.locator('.tab[data-sem="spring2025"]').click();
     await page.waitForTimeout(250);
     // Now switch to 综合班
-    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
-    await page.waitForTimeout(300);
+    await selectClass(page, 'zonghe');
     // Should be back on fall2026
     const activeSem = await page.locator('.sem-switch .tab.active').getAttribute('data-sem');
     expect(activeSem).toBe('fall2026');
+  });
+
+  test('dropdown contains 7 classes including 4 new ones', async ({ page }) => {
+    await waitReady(page);
+    const options = await page.locator('#classSelect option').allTextContents();
+    expect(options.length).toBe(7);
+    expect(options.join(' ')).toContain('人工智能');
+    expect(options.join(' ')).toContain('数字化');
+    expect(options.join(' ')).toContain('脱产班');
+    expect(options.join(' ')).toContain('金融班');
+  });
+
+  test('new class -人工智能班 renders correctly', async ({ page }) => {
+    await waitReady(page);
+    await selectClass(page, 'zhineng');
+    const title = await page.locator('#brandTitle').textContent();
+    expect(title).toContain('人工智能');
+    const count = await page.locator('#checkBody .sel-item').count();
+    expect(count).toBeGreaterThan(15);
+    const chips = await page.locator('#calGrid .cc').count();
+    expect(chips).toBeGreaterThan(0);
+  });
+
+  test('new class -数字化班 renders correctly', async ({ page }) => {
+    await waitReady(page);
+    await selectClass(page, 'shuzihua');
+    const title = await page.locator('#brandTitle').textContent();
+    expect(title).toContain('数字化');
+    const chips = await page.locator('#calGrid .cc').count();
+    expect(chips).toBeGreaterThan(0);
+  });
+
+  test('new class -脱产班 has K conflict and weekday courses', async ({ page }) => {
+    await waitReady(page);
+    await selectClass(page, 'tuocan');
+    await page.locator('#mobileToggle').click();
+    await page.waitForTimeout(450);
+    const kGroup = page.locator('#conflictBody .cg-opt').filter({ hasText: '虚拟商务' });
+    expect(await kGroup.count()).toBeGreaterThan(0);
+    await page.locator('#mobileToggle').click();
+    await page.waitForTimeout(450);
+    // 会计学 is in November, so check course list rather than September dayList
+    const courseListText = await page.locator('#checkBody').textContent();
+    expect(courseListText).toContain('会计学');
+    // also verify weekday course appears after navigating to November
+    await page.locator('#nextMonth').click(); // Sep->Oct
+    await page.waitForTimeout(200);
+    await page.locator('#nextMonth').click(); // Oct->Nov
+    await page.waitForTimeout(200);
+    const novText = await page.locator('#calGrid').textContent();
+    expect(novText).toContain('会计学');
+  });
+
+  test('new class -金融班 renders and switches semester', async ({ page }) => {
+    await waitReady(page);
+    await selectClass(page, 'jinrong');
+    let chips = await page.locator('#calGrid .cc').count();
+    expect(chips).toBeGreaterThan(0);
+    await page.locator('.tab[data-sem="spring2025"]').click();
+    await page.waitForTimeout(250);
+    const afterChips = await page.locator('#calGrid .cc').count();
+    expect(afterChips).toBeGreaterThan(0);
+  });
+
+  test('dropdown switching preserves no console errors', async ({ page }) => {
+    const errs=[];
+    page.on('console', m=>{ if(m.type()==='error') errs.push(m.text()); });
+    page.on('pageerror', e=>errs.push(String(e)));
+    await waitReady(page);
+    for(const cid of ['zhineng','shuzihua','tuocan','jinrong','quanji']){
+      await selectClass(page, cid);
+      await page.waitForTimeout(200);
+    }
+    expect(errs, errs.join('\n')).toEqual([]);
   });
 });

@@ -31,5 +31,5 @@ export function startServer(port = 0) {
 
 export function APP_URL(server) {
   const port = server && server._port ? server._port : 8765;
-  return `http://127.0.0.1:${port}/\u56fd\u79d1\u592726\u7ea7MBA_\u5168\u96c6\u73ed/dist/\u56fd\u79d1\u592726\u7ea7MBA_\u5168\u96c6\u73ed\u8bfe\u8868.html`;
+  return `http://127.0.0.1:${port}/\u56fd\u79d1\u592726\u7ea7MBA_\u8bfe\u8868v4.html`;
 }
