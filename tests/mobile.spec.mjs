@@ -200,3 +200,87 @@ test.describe('industry-standard mobile adaptation', () => {
     expect(cls).toContain('selected');
   });
 });
+
+test.describe('class switcher', () => {
+  test('switching classes updates course list', async ({ page }) => {
+    await waitReady(page);
+    // Default class is 全集班
+    const beforeCount = await page.locator('#checkBody .sel-item').count();
+    // Switch to 综合班
+    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
+    await page.waitForTimeout(300);
+    const zongheCount = await page.locator('#checkBody .sel-item').count();
+    expect(zongheCount).not.toEqual(beforeCount);
+    // Switch to 非集班
+    await page.locator('.class-switch .tab[data-class="feiji"]').click();
+    await page.waitForTimeout(300);
+    const feijiCount = await page.locator('#checkBody .sel-item').count();
+    expect(feijiCount).not.toEqual(zongheCount);
+    // Switch back to 全集班
+    await page.locator('.class-switch .tab[data-class="quanji"]').click();
+    await page.waitForTimeout(300);
+    const backCount = await page.locator('#checkBody .sel-item').count();
+    expect(backCount).toEqual(beforeCount);
+  });
+
+  test('switching classes updates calendar chips', async ({ page }) => {
+    await waitReady(page);
+    const beforeChips = await page.locator('#dayList .cc').count();
+    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
+    await page.waitForTimeout(300);
+    const zongheChips = await page.locator('#dayList .cc').count();
+    expect(zongheChips).toBeGreaterThan(0);
+    await page.locator('.class-switch .tab[data-class="feiji"]').click();
+    await page.waitForTimeout(300);
+    const feijiChips = await page.locator('#dayList .cc').count();
+    expect(feijiChips).toBeGreaterThan(0);
+  });
+
+  test('switching classes updates brand title', async ({ page }) => {
+    await waitReady(page);
+    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
+    await page.waitForTimeout(300);
+    const title = await page.locator('#brandTitle').textContent();
+    expect(title).toContain('综合班');
+    await page.locator('.class-switch .tab[data-class="feiji"]').click();
+    await page.waitForTimeout(300);
+    const title2 = await page.locator('#brandTitle').textContent();
+    expect(title2).toContain('非集班');
+    await page.locator('.class-switch .tab[data-class="quanji"]').click();
+    await page.waitForTimeout(300);
+    const title3 = await page.locator('#brandTitle').textContent();
+    expect(title3).toContain('全集班');
+  });
+
+  test('conflict group K exists for 综合班 fall', async ({ page }) => {
+    await waitReady(page);
+    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
+    await page.waitForTimeout(300);
+    // Make sure we're on fall2026
+    const fallTab = page.locator('.sem-switch .tab[data-sem="fall2026"]');
+    if (!await fallTab.evaluate(el => el.classList.contains('active'))) {
+      await fallTab.click();
+      await page.waitForTimeout(200);
+    }
+    // Open sidebar on mobile
+    await page.locator('#mobileToggle').click();
+    await page.waitForTimeout(450);
+    // Check K conflict exists
+    const kGroup = page.locator('#conflictBody .cg-opt:has(.dot)').filter({ hasText: '虚拟商务' });
+    const kCount = await kGroup.count();
+    expect(kCount).toBeGreaterThan(0);
+  });
+
+  test('class switch resets semester to fall2026', async ({ page }) => {
+    await waitReady(page);
+    // Switch to spring2025 first
+    await page.locator('.tab[data-sem="spring2025"]').click();
+    await page.waitForTimeout(250);
+    // Now switch to 综合班
+    await page.locator('.class-switch .tab[data-class="zonghe"]').click();
+    await page.waitForTimeout(300);
+    // Should be back on fall2026
+    const activeSem = await page.locator('.sem-switch .tab.active').getAttribute('data-sem');
+    expect(activeSem).toBe('fall2026');
+  });
+});
