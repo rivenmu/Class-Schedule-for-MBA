@@ -257,31 +257,64 @@ main{max-width:1600px;margin:0 auto;display:flex;min-height:calc(100vh - 62px);g
 /* toast */
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(6px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:all .22s cubic-bezier(.22,1,.36,1);box-shadow:0 10px 30px rgba(0,0,0,.18);pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* print */
+/* print - unified with paper archive style */
 @media print{
-  @page{size:A3 landscape;margin:10mm}
-  header,.sidebar,.cal-area,.mobile-toggle,.modal-overlay,.toast,.sidebar-toggle{display:none!important}
-  #printContainer{display:block!important}
-  .print-header{text-align:center;margin-bottom:14px}
-  .print-header h1{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:24px}
-  .print-header p{font-size:13px;color:#475569;margin-top:4px}
-  .print-legend{margin-top:8px;font-size:12px}
-  .print-legend span{margin-right:12px}
-  .print-month{page-break-after:always}
+  @page{size:A3 landscape;margin:12mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{background:var(--paper)!important}
+  header,.sidebar,.cal-area,.mobile-toggle,.modal-overlay,.toast,.sidebar-toggle,.fv-overlay,.reset-overlay{display:none!important}
+  #printContainer{display:block!important;max-width:1600px;margin:0 auto;background:var(--paper);color:var(--ink)}
+  .print-header{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 20px 14px;margin-bottom:14px;box-shadow:none}
+  .print-header-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
+  .print-header h1{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:22px;font-weight:400;letter-spacing:-.02em;line-height:1;color:var(--ink);margin:0}
+  .print-header h1 i{font-style:italic;color:var(--indigo)}
+  .print-header .print-sub{font-size:11px;color:var(--ink-2);line-height:1.5}
+  .print-header .print-sub b{color:var(--ink);font-weight:700}
+  .print-header p{font-size:11px;color:var(--ink-2);line-height:1.6;margin:4px 0 0}
+  .print-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .print-legend .legend-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:11px;font-weight:600;white-space:nowrap}
+  .print-legend .legend-pill i{width:10px;height:10px;border-radius:3px;border:1px solid rgba(0,0,0,.08);flex-shrink:0}
+  .print-month{page-break-inside:avoid;break-inside:avoid;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:none}
   .print-month:last-child{page-break-after:auto}
-  .print-month-title{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:18px;margin:10px 0 6px}
-  .print-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
-  .print-cal-wd{text-align:center;font-size:13px;font-weight:600;color:#475569;padding:6px 0}
-  .print-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-  .print-cal-grid .cal-cell{min-height:120px!important;overflow:visible!important}
-  .print-cal-grid .cc{font-size:11px!important}
+  .print-month-title{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:16px;font-weight:400;letter-spacing:-.02em;padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface) 0%, var(--surface-2) 100%);margin:0}
+  .print-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:8px 12px 0;background:var(--surface)}
+  .print-cal-wd{text-align:center;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding:6px 0}
+  .print-cal-wd.weekend{color:var(--hol)}
+  .print-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:8px 12px 12px;background:var(--surface)}
+  .print-cal-grid .cal-cell{min-height:118px!important;padding:6px 6px 7px!important;border-radius:12px!important;overflow:hidden!important;background:var(--surface)!important;border:1px solid var(--line)!important}
+  .print-cal-grid .cal-cell.other{background:var(--paper)!important;border-color:transparent!important;opacity:.55}
+  .print-cal-grid .cal-cell.today{border-color:var(--indigo)!important;box-shadow:0 0 0 2px var(--indigo-soft)!important}
+  .print-cal-grid .cal-cell.holiday{background:var(--hol-soft)!important;border-color:#F3C9C3!important}
+  .print-cal-grid .cal-date{font-family:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;font-size:10px;font-weight:600;color:var(--ink-2)}
+  .print-cal-grid .cal-date b{font-size:11px;color:var(--ink)}
+  .print-cal-grid .cal-date .hol-name{font-family:Inter,sans-serif;font-size:9px;color:var(--hol);font-weight:600;background:#fff;border:1px solid #F3C9C3;padding:1px 5px;border-radius:999px}
+  .print-cal-grid .cc{font-size:10.5px!important;padding:5px 6px!important;border-left-width:3px!important;line-height:1.35}
+  .print-cal-grid .cc-core{border-left-color:var(--indigo)!important;background:var(--indigo-soft)!important;color:#1E2A4A!important}
+  .print-cal-grid .cc-req{border-left-color:var(--moss)!important;background:var(--moss-soft)!important;color:#12372A!important}
+  .print-cal-grid .cc-ele{border-left-color:var(--moss)!important;background:#F0F7F4!important;color:#143628!important}
+  .print-cal-grid .cc-man{border-left-color:var(--ochre)!important;background:var(--ochre-soft)!important;color:#5A3E0A!important}
+  .print-cal-grid .cc-sum{border-left-color:var(--plum)!important;background:var(--plum-soft)!important;color:#3E2A4A!important}
+  .print-cal-grid .cc-name{font-weight:700;font-size:10.5px;word-break:break-word}
+  .print-cal-grid .cc-time{opacity:.7;font-size:9px;font-family:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;margin-top:2px}
+  .print-cal-grid .cal-empty{font-size:10px;color:var(--ink-3);text-align:center;padding:6px 4px;border:1px dashed var(--line);border-radius:8px;background:var(--surface-2)}
+  .print-course-list{margin-top:6px;padding:0 4px 12px}
+  .print-course-list h3{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:13px;font-weight:400;letter-spacing:-.02em;margin:8px 0 6px;color:var(--ink)}
+  .print-course-list table{width:100%;border-collapse:separate;border-spacing:0;font-size:11px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .print-course-list th{text-align:left;padding:7px 8px;background:var(--surface-2);border-bottom:1px solid var(--line);font-weight:700;color:var(--ink-2);font-size:10px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+  .print-course-list td{padding:6px 8px;border-bottom:1px solid #F0EBE3;vertical-align:top;font-size:11px}
+  .print-course-list tr:last-child td{border-bottom:none}
+  .print-footer{text-align:center;font-size:9px;color:var(--ink-3);margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
 }
 /* mobile + toggles */
 .mobile-toggle{display:none}
-.sidebar-toggle{position:fixed;left:var(--sidebar-w);top:62px;z-index:95;background:var(--ink);color:#fff;border:1px solid rgba(255,255,255,.12);border-left:none;border-radius:0 10px 10px 0;width:22px;height:44px;cursor:pointer;font-size:12px;transition:left .2s, background .14s;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.12)}
-.sidebar-toggle:hover{background:#1e1e22}
+.sidebar-toggle{position:fixed;left:calc(var(--sidebar-w) - 14px);top:50%;transform:translateY(-50%);z-index:96;background:var(--surface);color:var(--ink-2);border:1px solid var(--line);width:28px;height:56px;border-radius:999px;cursor:pointer;font-size:14px;transition:all .22s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-card)}
+.sidebar-toggle:hover{background:var(--surface-2);color:var(--ink);border-color:var(--line-strong);box-shadow:var(--shadow-hover);transform:translateY(-50%) scale(1.04)}
+.sidebar-toggle:active{transform:translateY(-50%) scale(.96)}
+.sidebar-toggle:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.sidebar-toggle .st-icon{font-size:14px;transition:transform .22s cubic-bezier(.22,1,.36,1);display:block;line-height:1}
 main.collapsed .sidebar{display:none}
-main.collapsed .sidebar-toggle{left:0}
+main.collapsed .sidebar-toggle{left:12px;background:var(--surface)}
+main.collapsed .sidebar-toggle .st-icon{transform:rotate(180deg)}
 @media(max-width:980px){
   :root{--sidebar-w:100%}
   header{padding:12px 14px}
@@ -474,7 +507,7 @@ button:focus-visible{outline-offset:1px}
 </header>
 
 <main>
-<button type="button" class="sidebar-toggle" id="sidebarToggle" title="收起/展开侧栏" aria-label="收起侧栏">‹</button>
+<button type="button" class="sidebar-toggle" id="sidebarToggle" title="收起/展开侧栏" aria-label="收起侧栏"><span class="st-icon">‹</span></button>
 <aside class="sidebar" id="sidebar">
 <div class="panel" id="progressPanel">
 <div class="panel-head"><span>选课进度展示区</span><span class="eyebrow">Credit ledger</span></div>
@@ -1657,31 +1690,32 @@ document.onkeydown=function(e){
 };
 
 
-// ========== SIDEBAR TOGGLE ==========
+// ========== SIDEBAR TOGGLE (archive handle) ==========
 document.getElementById("sidebarToggle").onclick = function() {
   var m = document.querySelector("main");
-  m.classList.toggle("collapsed");
-  this.textContent = m.classList.contains("collapsed") ? "›" : "‹";
-  this.setAttribute("aria-label", m.classList.contains("collapsed")?"展开侧栏":"收起侧栏");
+  var isCollapsed = m.classList.toggle("collapsed");
+  this.setAttribute("aria-label", isCollapsed?"展开侧栏":"收起侧栏");
+  this.setAttribute("title", isCollapsed?"展开侧栏":"收起侧栏");
 };
 
-// ========== EXPORT PDF ==========
+// ========== EXPORT PDF (unified archive style) ==========
 function exportPDF() {
   var sem = SEMESTERS[state.sem];
   var container = document.getElementById("printContainer");
   var typeColors = {core:"#2F4A7A",req:"#1B6B4A",ele:"#1B6B4A",man:"#B7791F",sum:"#6B4B7A"};
   var typeBgs = {core:"#EDF0F7",req:"#E6F4EE",ele:"#E6F4EE",man:"#FFF7E6",sum:"#F5EEF7"};
   var monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+  var className = CLASSES[state.classId] ? CLASSES[state.classId].name : "";
   var html = '<div class="print-header">';
-  html += '<h1>' + sem.name + ' 课程表</h1>';
-  html += '<p>导出日期: ' + new Date().toLocaleDateString("zh-CN") + '</p>';
+  html += '<div class="print-header-top"><h1>国科大26级MBA <i>'+className+'</i> — '+sem.name+'</h1><div class="print-sub"><b>'+new Date().toLocaleDateString("zh-CN")+' 导出</b><br>'+className+' · '+sem.name+'</div></div>';
   var sels = [];
   for (var gid in state.selections) {
     var sc = getCourseById(state.sem, state.selections[gid]);
     if (sc) sels.push(sc.name);
   }
-  if (sels.length) html += '<p>已选冲突课: ' + sels.join("、") + '</p>';
-  html += '<div class="print-legend"><span style="color:#2F4A7A">■ 核心</span><span style="color:#1B6B4A">■ 选修</span><span style="color:#B7791F">■ 必选</span><span style="color:#6B4B7A">■ 暑期</span><span style="color:#C0392B">■ 假日</span></div>';
+  if (sels.length) html += '<p>已选冲突课：'+sels.join("、")+'</p>';
+  else html += '<p>未选择冲突课 · 核心/必修已自动计入</p>';
+  html += '<div class="print-legend"><span class="legend-pill"><i style="background:var(--indigo-soft);border-color:#C7D2E8"></i>核心</span><span class="legend-pill"><i style="background:var(--moss-soft);border-color:#BFE0D2"></i>选修</span><span class="legend-pill"><i style="background:var(--ochre-soft);border-color:#F0D9A8"></i>必选</span><span class="legend-pill"><i style="background:var(--plum-soft);border-color:#E2D0E8"></i>暑期</span><span class="legend-pill"><i style="background:var(--hol-soft);border-color:#F3C9C3"></i>假日</span></div>';
   html += '</div>';
 
   var y = sem.rangeStart.y, m = sem.rangeStart.m;
@@ -1690,6 +1724,42 @@ function exportPDF() {
     m++;
     if (m > 11) { m = 0; y++; }
   }
+  // 已选课程清单（与页面下方清单一致，字体充盈表格）
+  var rows = [];
+  for(var i=0;i<sem.courses.length;i++){
+    var c = sem.courses[i];
+    var isEle = isElectiveType(c.type);
+    var selected = isEle ? state.electiveSel[state.sem][c.id] : true;
+    if(!selected) continue;
+    var timeParts=[];
+    for(var si=0;si<c.sessions.length;si++){
+      var s=c.sessions[si];
+      if(s.weekly){
+        var wds=["日","一","二","三","四","五","六"];
+        var st=s.weekly.start.slice(5).replace("-","/");
+        var en=s.weekly.end.slice(5).replace("-","/");
+        timeParts.push("每周"+wds[s.weekly.dow]+" "+s.ts+"–"+s.te+" "+st+"–"+en);
+      } else if(s.dates&&s.dates.length){
+        var f=s.dates[0].slice(5).replace("-","/");
+        var l=s.dates[s.dates.length-1].slice(5).replace("-","/");
+        timeParts.push(f+"–"+l+" "+s.ts+"–"+s.te);
+      }
+    }
+    var timeStr=timeParts.length?timeParts.join("；"):(c.note||"待定");
+    rows.push({code:c.code,name:c.name,type:c.type,credits:parseCredits(c.credits),teacher:c.teacher,room:c.room,time:timeStr});
+  }
+  if(rows.length){
+    html += '<div class="print-course-list"><h3>已选课程清单 · '+rows.length+' 门</h3><table><thead><tr><th>编码</th><th>课程</th><th>类型</th><th>学分</th><th>教师</th><th>教室</th><th>时间</th></tr></thead><tbody>';
+    var typeBgMap={core:"var(--indigo-soft)",req:"var(--moss-soft)",ele:"#F0F7F4",man:"var(--ochre-soft)",sum:"var(--plum-soft)"};
+    var typeColorMap={core:"var(--indigo)",req:"var(--moss)",ele:"var(--moss)",man:"var(--ochre)",sum:"var(--plum)"};
+    var typeNameMap={core:"核心",req:"必修",ele:"选修",man:"必选",sum:"暑期"};
+    for(var r=0;r<rows.length;r++){
+      var row=rows[r];
+      html += '<tr><td style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-3)">'+row.code+'</td><td style="font-weight:700">'+row.name+'</td><td><span style="display:inline-block;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:600;background:'+(typeBgMap[row.type]||"#F6F3EE")+';color:'+(typeColorMap[row.type]||"#6B6B70")+'">'+typeNameMap[row.type]+'</span></td><td style="font-weight:700">'+row.credits+' 分</td><td>'+row.teacher+'</td><td>'+row.room+'</td><td style="font-size:10px;color:var(--ink-2);line-height:1.5">'+row.time+'</td></tr>';
+    }
+    html += '</tbody></table></div>';
+  }
+  html += '<div class="print-footer">国科大26级MBA '+className+' — '+sem.name+' · 导出于 '+new Date().toLocaleString("zh-CN")+' · 创作者 Riven-26全集班 · 仅供选课参考，以官方课表为准</div>';
 
   container.innerHTML = html;
   window.print();
