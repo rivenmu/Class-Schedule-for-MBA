@@ -266,7 +266,7 @@ main{max-width:1600px;margin:0 auto;display:flex;min-height:calc(100vh - 62px);g
   html,body{background:var(--paper)!important}
   header,.sidebar,.cal-area,.mobile-toggle,.modal-overlay,.toast,.sidebar-toggle,.fv-overlay,.reset-overlay{display:none!important}
   #printContainer{display:block!important;max-width:1600px;margin:0 auto;background:var(--paper);color:var(--ink)}
-  .print-header{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 20px 14px;margin-bottom:14px;box-shadow:none}
+  .print-header{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 20px 14px;margin-bottom:10px;box-shadow:none;break-after:avoid;page-break-after:avoid;break-inside:avoid;page-break-inside:avoid}
   .print-header-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
   .print-header h1{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:22px;font-weight:400;letter-spacing:-.02em;line-height:1;color:var(--ink);margin:0}
   .print-header h1 i{font-style:italic;color:var(--indigo)}
@@ -276,8 +276,9 @@ main{max-width:1600px;margin:0 auto;display:flex;min-height:calc(100vh - 62px);g
   .print-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
   .print-legend .legend-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:11px;font-weight:600;white-space:nowrap}
   .print-legend .legend-pill i{width:10px;height:10px;border-radius:3px;border:1px solid rgba(0,0,0,.08);flex-shrink:0}
-  .print-month{page-break-inside:avoid;break-inside:avoid;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:none}
-  .print-month:last-child{page-break-after:auto}
+  .print-month{break-inside:avoid;page-break-inside:avoid;break-after:auto;page-break-after:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:none}
+  .print-month:first-of-type{break-before:avoid;page-break-before:avoid}
+  .print-month:last-child{break-after:auto;page-break-after:auto}
   .print-month-title{font-family:"Instrument Serif","Georgia","Times New Roman",serif;font-size:16px;font-weight:400;letter-spacing:-.02em;padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface) 0%, var(--surface-2) 100%);margin:0}
   .print-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:8px 12px 0;background:var(--surface)}
   .print-cal-wd{text-align:center;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding:6px 0}
