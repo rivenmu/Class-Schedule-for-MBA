@@ -261,7 +261,7 @@ test.describe('class switcher', () => {
     await selectClass(page, 'feiji');
     await page.waitForTimeout(300);
     const title2 = await page.locator('#brandTitle').textContent();
-    expect(title2).toContain('非集班');
+    expect(title2).toContain('非全日制集中班');
     await selectClass(page, 'quanji');
     await page.waitForTimeout(300);
     const title3 = await page.locator('#brandTitle').textContent();

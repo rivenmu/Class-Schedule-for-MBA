@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>国科大26级MBA 课程预选表</title>
+<title>26级MBA课程预选表</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -498,7 +498,7 @@ button:focus-visible{outline-offset:1px}
 <header>
 <div class="header-inner">
 <div class="brand">
-<h1 id="brandTitle">国科大26级MBA 全集班--课程预选表</h1>
+<h1 id="brandTitle">26级MBA课程预选表—全集班</h1>
 <span class="badge">v0.7.0</span>
 </div>
 <div class="header-tools">
@@ -507,7 +507,7 @@ button:focus-visible{outline-offset:1px}
 <select id="classSelect" class="class-select" aria-label="班级选择">
 <option value="quanji">全集班</option>
 <option value="zonghe">综合班</option>
-<option value="feiji">非集班</option>
+<option value="feiji">非全日制集中班</option>
 <option value="zhineng">人工智能与应用班</option>
 <option value="shuzihua">数字化转型与数字化创业班</option>
 <option value="tuocan">脱产班</option>
@@ -588,7 +588,7 @@ button:focus-visible{outline-offset:1px}
 </div>
 </main>
 
-<footer style="max-width:1600px;margin:0 auto;padding:14px 20px 18px;text-align:center;font-size:11px;color:var(--ink-3);border-top:1px solid var(--line);background:rgba(232,238,244,.7);backdrop-filter:blur(10px)">创作者：<b style="color:var(--ink-2);font-weight:700">Riven-26全集班</b> · <span id="footerTitle">国科大26级MBA 全集班--课程预选表</span> · <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-3);border:1px solid var(--line);padding:2px 6px;border-radius:999px;background:var(--surface)">v0.7.0</span></footer>
+<footer style="max-width:1600px;margin:0 auto;padding:14px 20px 18px;text-align:center;font-size:11px;color:var(--ink-3);border-top:1px solid var(--line);background:rgba(232,238,244,.7);backdrop-filter:blur(10px)">创作者：<b style="color:var(--ink-2);font-weight:700">Riven-26全集班</b> · <span id="footerTitle">26级MBA课程预选表—全集班</span> · <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-3);border:1px solid var(--line);padding:2px 6px;border-radius:999px;background:var(--surface)">v0.7.0</span></footer>
 <div class="mobile-toggle" id="mobileToggle" role="button" tabindex="0">
 <span>选课面板</span>
 <span class="arrow" id="mobileArrow">▴</span>
@@ -933,7 +933,7 @@ const CLASSES = {
   }
   },
   feiji: {
-    name: "非集班",
+    name: "非全日制集中班",
     semesters: {
   fall2026: {
     name: "2026-2027 秋季学期",
@@ -1759,7 +1759,7 @@ function exportPDF() {
   var className = CLASSES[state.classId] ? CLASSES[state.classId].name : "";
   var html = '';
   // 精简封面：居中标题 + 班级学期 + 导出日期 + 图例，占首面约 1/3 高度，9月自次面完整开始
-  html += '<div class="print-cover"><div class="print-cover-inner"><div class="print-cover-badge">国科大 · MBA 2026</div><h1>国科大26级MBA <i>'+className+'</i></h1><div class="print-cover-sub">'+sem.name+' · 课程预选表</div><div class="print-cover-meta">'+new Date().toLocaleDateString("zh-CN")+' 导出 · 共 '+sem.courses.length+' 门课程</div><div class="print-cover-legend"><span class="legend-pill"><i style="background:var(--indigo-soft);border-color:#B8C7DE"></i>核心</span><span class="legend-pill"><i style="background:var(--amber-soft);border-color:#ECD0A0"></i>专业</span><span class="legend-pill"><i style="background:var(--moss-soft);border-color:#B8D8C8"></i>必修</span><span class="legend-pill"><i style="background:#F0F7F4;border-color:#BFE0D2"></i>选修</span><span class="legend-pill"><i style="background:var(--plum-soft);border-color:#D8C8E0"></i>暑期选修</span></div><div class="print-cover-desc">本表仅供选课冲突与学分测算参考，以官方课表为准</div></div></div>';
+  html += '<div class="print-cover"><div class="print-cover-inner"><div class="print-cover-badge">26级 · MBA 2026</div><h1>26级MBA课程预选表—<i>'+className+'</i></h1><div class="print-cover-sub">'+sem.name+' · 课程预选表</div><div class="print-cover-meta">'+new Date().toLocaleDateString("zh-CN")+' 导出 · 共 '+sem.courses.length+' 门课程</div><div class="print-cover-legend"><span class="legend-pill"><i style="background:var(--indigo-soft);border-color:#B8C7DE"></i>核心</span><span class="legend-pill"><i style="background:var(--amber-soft);border-color:#ECD0A0"></i>专业</span><span class="legend-pill"><i style="background:var(--moss-soft);border-color:#B8D8C8"></i>必修</span><span class="legend-pill"><i style="background:#F0F7F4;border-color:#BFE0D2"></i>选修</span><span class="legend-pill"><i style="background:var(--plum-soft);border-color:#D8C8E0"></i>暑期选修</span></div><div class="print-cover-desc">本表仅供选课冲突与学分测算参考，以官方课表为准</div></div></div>';
 
   var y = sem.rangeStart.y, m = sem.rangeStart.m;
   while (y < sem.rangeEnd.y || (y === sem.rangeEnd.y && m <= sem.rangeEnd.m)) {
@@ -1804,7 +1804,7 @@ function exportPDF() {
     }
     html += '</tbody></table></div>';
   }
-  html += '<div class="print-footer">国科大26级MBA '+className+' — '+sem.name+' · 导出于 '+new Date().toLocaleString("zh-CN")+' · 创作者 Riven-26全集班 · 仅供选课参考，以官方课表为准</div>';
+  html += '<div class="print-footer">26级MBA课程预选表—'+className+' — '+sem.name+' · 导出于 '+new Date().toLocaleString("zh-CN")+' · 创作者 Riven-26全集班 · 仅供选课参考，以官方课表为准</div>';
 
   container.innerHTML = html;
   window.print();
@@ -1979,9 +1979,9 @@ function switchClass(newClassId) {
   // Update titles
   var className = CLASSES[newClassId].name;
   var bt = document.getElementById("brandTitle");
-  if (bt) bt.textContent = "国科大26级MBA " + className + "--课程预选表";
+  if (bt) bt.textContent = "26级MBA课程预选表—" + className;
   var ft = document.getElementById("footerTitle");
-  if (ft) ft.textContent = "国科大26级MBA " + className + "--课程预选表";
+  if (ft) ft.textContent = "26级MBA课程预选表—" + className;
   renderAll();
 }
 (function(){
@@ -2078,9 +2078,9 @@ if (window.__SAVED_STATE) {
     SEMESTERS = CLASSES[s.classId].semesters;
     var className = CLASSES[s.classId].name;
     var bt0 = document.getElementById("brandTitle");
-    if (bt0) bt0.textContent = "国科大26级MBA " + className + "--课程预选表";
+    if (bt0) bt0.textContent = "26级MBA课程预选表—" + className;
     var ft0 = document.getElementById("footerTitle");
-    if (ft0) ft0.textContent = "国科大26级MBA " + className + "--课程预选表";
+    if (ft0) ft0.textContent = "26级MBA课程预选表—" + className;
     var sel0 = document.getElementById("classSelect");
     if(sel0) sel0.value = s.classId;
   }
