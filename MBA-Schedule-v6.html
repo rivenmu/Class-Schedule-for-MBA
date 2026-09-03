@@ -1107,7 +1107,6 @@ function getCoursesForDate(dateStr){
       var dates=getSessionDates(c.sessions[j]);
       if(dates.indexOf(dateStr)>=0){
         results.push({course:c,session:c.sessions[j]});
-        break;
       }
     }
   }
