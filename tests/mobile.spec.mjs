@@ -25,7 +25,7 @@ async function selectClass(page, classId){
   if(await sel.count() > 0){
     await sel.selectOption(classId);
   } else {
-    await selectClass(page, ''+classId+'');
+    await page.locator('.class-switch .tab[data-class="'+classId+'"]').click();
   }
   await page.waitForTimeout(300);
 }
@@ -371,5 +371,16 @@ test.describe('class switcher', () => {
       await page.waitForTimeout(200);
     }
     expect(errs, errs.join('\n')).toEqual([]);
+  });
+
+  test('version v0.7.1 displayed and 5-category filter present', async ({ page }) => {
+    await waitReady(page);
+    const badge = await page.locator('.brand .badge').textContent();
+    expect(badge).toContain('v0.7');
+    const filterTexts = await page.locator('#filterRow .filter-btn').allTextContents();
+    expect(filterTexts.join(' ')).toContain('专业');
+    expect(filterTexts.join(' ')).toContain('暑期选修');
+    const legend = await page.locator('.cal-legend').textContent();
+    expect(legend).toContain('专业');
   });
 });
