@@ -31,5 +31,5 @@ export function startServer(port = 0) {
 
 export function APP_URL(server) {
   const port = server && server._port ? server._port : 8765;
-  return `http://127.0.0.1:${port}/MBA-Schedule-v6.html`;
+  return `http://127.0.0.1:${port}/MBA-Schedule.html`;
 }
