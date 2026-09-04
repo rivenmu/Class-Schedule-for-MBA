@@ -1,0 +1,14 @@
+# MBA 课表小 API (compose 版): 1Panel 容器 -> 编排 -> 创建 -> 粘贴本文件.
+# "<<>>" 4 处按实际填, 其他不动。静态站/lucky/证书都不受影响。
+services:
+  mba-api:
+    build: /root/mba-deploy/api
+    container_name: mba-schedule-api
+    restart: unless-stopped
+    ports: ["127.0.0.1:3000:3000"] # 只绑本机, OpenResty 反代, 外网直连不进来
+    extra_hosts: ["host.docker.internal:host-gateway"] # 指宿主机, 走 PG 发布端口
+    environment:
+      PORT: "3000"
+      PGURL: postgres://mba:<<mba密码>>@host.docker.internal:<<PG端口>>/mba
+      LOGTO_ISSUER: https://login.rivenmu.cn:20001/oidc
+      LOGTO_CLIENT_ID: <<Logto App ID>>

@@ -1,6 +1,6 @@
 {
   "name": "mba-schedule-api",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "private": true,
   "description": "MBA 选课云方案小 API: 验 Logto ID Token, 存每用户 3 份命名方案",
   "main": "index.js",
