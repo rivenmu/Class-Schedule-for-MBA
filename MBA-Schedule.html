@@ -71,7 +71,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(232,238,244,.82);backdr
 .ht-btn:active{transform:translateY(0) scale(.98)}
 .ht-btn.ht-reset{background:rgba(255,255,255,.7);color:var(--ink);border-color:var(--line)}
 .ht-btn.ht-reset:hover{background:rgba(208,64,64,.06);border-color:#E8A0A0;color:var(--hol);transform:translateY(-1px);box-shadow:0 4px 12px rgba(208,64,64,.12)}
-/* v0.8.0 云方案增量: 复用 ht-btn/panel/modal, 仅此几行 */
+/* v0.8.1 云方案增量: 复用 ht-btn/panel/modal, 仅此几行 */
 #saveBtn{padding:5px 10px;font-size:12px;box-shadow:none}
 .ht-btn.ht-login{background:var(--indigo);color:#fff;border-color:var(--indigo)}
 #userChip{font-size:12px;color:var(--ink-2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:center}
@@ -511,7 +511,7 @@ button:focus-visible{outline-offset:1px}
 <div class="header-inner">
 <div class="brand">
 <h1 id="brandTitle">26级MBA课程预选表—全集班</h1>
-<span class="badge">v0.8.0</span>
+<span class="badge">v0.8.1</span>
 </div>
 <div class="header-tools">
 <div class="class-switch" aria-label="班级切换">
@@ -607,7 +607,7 @@ button:focus-visible{outline-offset:1px}
 </div>
 </main>
 
-<footer style="max-width:1600px;margin:0 auto;padding:14px 20px 18px;text-align:center;font-size:11px;color:var(--ink-3);border-top:1px solid var(--line);background:rgba(232,238,244,.7);backdrop-filter:blur(10px)">创作者：<b style="color:var(--ink-2);font-weight:700">Riven-26全集班</b> · <span id="footerTitle">26级MBA课程预选表—全集班</span> · <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-3);border:1px solid var(--line);padding:2px 6px;border-radius:999px;background:var(--surface)">v0.8.0</span></footer>
+<footer style="max-width:1600px;margin:0 auto;padding:14px 20px 18px;text-align:center;font-size:11px;color:var(--ink-3);border-top:1px solid var(--line);background:rgba(232,238,244,.7);backdrop-filter:blur(10px)">创作者：<b style="color:var(--ink-2);font-weight:700">Riven-26全集班</b> · <span id="footerTitle">26级MBA课程预选表—全集班</span> · <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-3);border:1px solid var(--line);padding:2px 6px;border-radius:999px;background:var(--surface)">v0.8.1</span></footer>
 <div class="mobile-toggle" id="mobileToggle" role="button" tabindex="0">
 <span>选课面板</span>
 <span class="arrow" id="mobileArrow">▴</span>
@@ -672,7 +672,7 @@ button:focus-visible{outline-offset:1px}
 </div>
 
 <script id="app">
-const VERSION = "v0.8.0";
+const VERSION = "v0.8.1";
 // ========== DATA ==========
 const CLASSES = {
   quanji: {
@@ -1354,7 +1354,25 @@ function renderSelectedPanel(){
       if(c.type==="core") core+=cr;
       else if(c.type==="req"){
         if(c.selectable){
-          if(state.electiveSel[sk][c.id]) req+=cr;
+          if(c.code==="MB001Z-02" || c.code==="MB001Z-01"){
+            // Cross-semester: only count once, prefer fall
+            var selectedInAny = false;
+            var ids = CROSS_MARX[c.code]||[];
+            for(var ii=0;ii<ids.length;ii++){
+              for(var ssk in state.electiveSel){
+                if(state.electiveSel[ssk][ids[ii]]) selectedInAny=true;
+              }
+            }
+            if(selectedInAny){
+              // Only count for fall to avoid double count
+              if(sk==="fall2026" && state.electiveSel[sk][c.id]) req+=cr;
+              else if(sk==="spring2025" && !state.electiveSel["fall2026"][CROSS_MARX[c.code][0]] && state.electiveSel[sk][c.id]) req+=cr;
+              // Actually simpler: if selected in any, count only for fall
+              // So for spring, don't count if already selected in fall
+            }
+          } else {
+            if(state.electiveSel[sk][c.id]) req+=cr;
+          }
         } else req+=cr;
       }
       else if(c.type==="man") man+=cr;
@@ -1489,6 +1507,11 @@ function renderSelectedPanel(){
     var keepList = listEl ? listEl.scrollTop : 0;
     // 阻止 label/checkbox 默认的滚动行为，状态由我们统一驱动
     state.electiveSel[sem2][cid2]=nextChecked;
+    // Sync cross-semester Marxist
+    var courseForSync = getCourseById(sem2, cid2);
+    if(courseForSync && (courseForSync.code==="MB001Z-02" || courseForSync.code==="MB001Z-01")){
+      syncCrossMarx(courseForSync.code, nextChecked);
+    }
     if(course&&course.conflict){
       if(nextChecked){
         state.selections[course.conflict]=cid2;
@@ -1968,6 +1991,34 @@ function semLabel(s){return s==="fall2026"?"秋季":"春夏";}
 var typeNamesFull={core:"核心",req:"必修",ele:"选修",man:"必修",sum:"暑期选修",pro:"专业"};
 var typeShortColors={core:"#2F4A7A",req:"#1B6B4A",ele:"#1B6B4A",man:"#B7791F",sum:"#6B4B7A"};
 
+// Cross-semester Marxist courses: same code, cannot be taken twice
+var CROSS_MARX = { "MB001Z-02": ["tcf18","tcs20"], "MB001Z-01": ["tcf19","tcs21"] };
+function isCrossMarxSelected(code){
+  for(var k in CROSS_MARX){
+    if(k===code){
+      var ids=CROSS_MARX[k];
+      for(var i=0;i<ids.length;i++){
+        var id=ids[i];
+        for(var sk in state.electiveSel){
+          if(state.electiveSel[sk][id]) return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+function syncCrossMarx(code, checked){
+  var ids=CROSS_MARX[code];
+  if(!ids) return;
+  for(var i=0;i<ids.length;i++){
+    var id=ids[i];
+    for(var sk in state.electiveSel){
+      if(state.electiveSel[sk].hasOwnProperty(id)){
+        state.electiveSel[sk][id]=checked;
+      }
+    }
+  }
+}
 function syncConflictToElective(gid,cid){
   var cg=null;
   var sem=SEMESTERS[state.sem];
@@ -2167,7 +2218,7 @@ renderAll();
 })();
 </script>
 <script id="cloud">
-/* v0.8.0 云方案: Logto OIDC PKCE 登录 + 每用户 3 份云方案 + 未登录 Cookie 一年暂存。
+/* v0.8.1 云方案: Logto OIDC PKCE 登录 + 每用户 3 份云方案 + 未登录 Cookie 一年暂存。
    部署前在 1Panel 装好 Logto 后, 把下面 issuer/clientId 换成真实值 (见 docs/deploy.md);
    未填时登录按钮仅 toast 提示, 本地勾选/Cookie/离线下载一切照常。 */
 (function(){

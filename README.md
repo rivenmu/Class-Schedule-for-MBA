@@ -1,4 +1,4 @@
-# 📅 MBA 课程预选表 · 可视化日历 `v0.8.0`
+# 📅 MBA 课程预选表 · 可视化日历 `v0.8.1`
 
 > 个人业余整理 · 仅供直观了解选课冲突与学分测算参考 · 见页内免责声明
 
@@ -6,7 +6,7 @@
 
 点击下方链接下载 HTML 到本地，浏览器双击即可打开使用（单文件、无需安装、可离线运行）：
 
-- **七班合一 · 2026 秋季 / 2027 春夏**（含全集班 / 综合班 / 非全日制集中班 / 人工智能与应用班 / 数字化转型与数字化创业班 / 脱产班 / 金融班 一键切换）：[MBA-Schedule.html](https://raw.githubusercontent.com/rivenmu/Class-Schedule-for-MBA/master/MBA-Schedule.html) `v0.8.0`
+- **七班合一 · 2026 秋季 / 2027 春夏**（含全集班 / 综合班 / 非全日制集中班 / 人工智能与应用班 / 数字化转型与数字化创业班 / 脱产班 / 金融班 一键切换）：[MBA-Schedule.html](https://raw.githubusercontent.com/rivenmu/Class-Schedule-for-MBA/master/MBA-Schedule.html) `v0.8.1`
 
 > 💡 如果浏览器直接显示源码，请右键 →「另存为」下载后再打开。
 
@@ -45,7 +45,7 @@ cd tests && npm install && npx playwright install chromium && npx playwright tes
 Class-Schedule-for-MBA/
 ├── README.md                       # 本文件
 ├── .gitignore                      # 已忽略所有 *.pdf 原表及 .playwright-mcp/
-├── MBA-Schedule.html               # 七班合一主版本 v0.8.0 毛玻璃质感（单文件，直接双击可用）
+├── MBA-Schedule.html               # 七班合一主版本 v0.8.1 毛玻璃质感（单文件，直接双击可用）
 ├── tests/                          # 移动端端到端测试（Playwright，72 项）
 │   ├── mobile.spec.mjs
 │   ├── playwright.config.mjs
