@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: '.',
-  testMatch: /mobile\.spec\.m?js$/,
+  testMatch: /(mobile|auth|schemes|guest)\.spec\.m?js$/,
   timeout: 30000,
   reporter: [['list']],
   use: {

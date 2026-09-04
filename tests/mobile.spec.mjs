@@ -373,10 +373,10 @@ test.describe('class switcher', () => {
     expect(errs, errs.join('\n')).toEqual([]);
   });
 
-  test('version v0.7.1 displayed and 5-category filter present', async ({ page }) => {
+  test('version v0.8.0 displayed and 5-category filter present', async ({ page }) => {
     await waitReady(page);
     const badge = await page.locator('.brand .badge').textContent();
-    expect(badge).toContain('v0.7');
+    expect(badge).toContain('v0.8');
     const filterTexts = await page.locator('#filterRow .filter-btn').allTextContents();
     expect(filterTexts.join(' ')).toContain('专业');
     expect(filterTexts.join(' ')).toContain('暑期选修');

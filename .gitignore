@@ -20,6 +20,9 @@ node_modules/
 *.pdf
 **/*.pdf
 
+# Secrets - never commit real values
+api/.env
+
 # Temp
 *.tmp
 *.bak
