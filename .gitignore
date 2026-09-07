@@ -20,6 +20,9 @@ node_modules/
 *.pdf
 **/*.pdf
 
+# deploy.sh 注入后的上线文件 (本机生成, 不进仓库)
+/web/
+
 # Secrets - never commit real values
 api/.env
 

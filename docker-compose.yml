@@ -1,6 +1,17 @@
-# MBA 课表小 API (compose 版): 1Panel 容器 -> 编排 -> 创建 -> 粘贴本文件.
-# "<<>>" 4 处按实际填, 其他不动。静态站/lucky/证书都不受影响。
+# MBA 课表全站 (compose 版): web(nginx  serving HTML + 反代 /api) + mba-api.
+# 1Panel 容器 -> 编排 -> 创建 -> 粘贴本文件. "<<>>" 按实际填, 其他不动。
+# 1Panel 侧只留一个反代网站 (mba.rivenmu.cn:20001, 挂通配符证书) 指到 127.0.0.1:7880,
+# 旧的静态站可删; lucky 不用动。更新: deploy.sh 一键 pull + 注入 + up。
 services:
+  web:
+    image: nginx:1.27-alpine
+    container_name: mba-schedule-web
+    restart: unless-stopped
+    ports: ["127.0.0.1:7880:80"] # 只绑本机, 给 OpenResty 反代, 外网直连不进来
+    volumes:
+      - ./web:/usr/share/nginx/html:ro # deploy.sh 注入后的 HTML 放这里 (git 忽略)
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [mba-api]
   mba-api:
     build: /root/mba-deploy/api
     container_name: mba-schedule-api
