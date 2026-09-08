@@ -16,6 +16,14 @@ mkdir -p web
 sed "s|https://login.你的域名/oidc|$LOGTO_ISSUER|g; s|PASTE_LOGTO_APP_ID|$LOGTO_CLIENT_ID|g" \
   MBA-Schedule.html > web/MBA-Schedule.html
 
+# compose 真值: 同步 ~/.mba-deploy.env 到仓库根 .env (git 忽略, compose 插值用)
+{
+  echo "PGURL=${PGURL:?先填 PGURL, 如 postgres://mba:密码@host.docker.internal:5432/mba}"
+  echo "LOGTO_ISSUER=${LOGTO_ISSUER}"
+  echo "LOGTO_CLIENT_ID=${LOGTO_CLIENT_ID}"
+} > .env
+chmod 600 .env
+
 # 后端: 只有 api/ 变了才 rebuild
 if git diff --name-only HEAD@{1} HEAD 2>/dev/null | grep -q "^api/"; then
   docker compose -f docker-compose.yml up -d --build
@@ -23,4 +31,4 @@ else
   docker compose -f docker-compose.yml up -d --no-recreate 2>/dev/null || docker compose -f docker-compose.yml up -d
 fi
 echo ">>> 完成: $(grep -o 'const VERSION = "[^"]*"' web/MBA-Schedule.html)"
-curl -s http://127.0.0.1:7880/api/health || echo ">>> Web/API 未响应, 去 1Panel 编排看 mba-schedule 日志"
+curl -s http://127.0.0.1:7899/api/health || echo ">>> Web/API 未响应, 去 1Panel 编排看 mba-schedule 日志"

@@ -3,6 +3,8 @@
 前置: 你已有 PG + 域名 + HTTPS + 静态站。**日常更新只跑一条命令**,
 首次才做下面 0-4 步。
 
+compose 真值另存仓库根 `.env`（deploy.sh 自动从 `~/.mba-deploy.env` 同步，含 PG 密码，已 git 忽略）。
+
 ## 一键更新 (以后每次)
 
 ```bash

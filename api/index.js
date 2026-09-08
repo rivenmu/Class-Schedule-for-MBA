@@ -20,4 +20,5 @@ app.use('/api/schemes', requireUser, makeSchemesRouter(pool));
 app.use((err, req, res, next) => { console.error(err); res.status(500).json({ error: 'internal' }); });
 
 const port = process.env.PORT || 3000;
-app.listen(port, '127.0.0.1', () => console.log(`[api] listening on 127.0.0.1:${port}`));
+// 绑 0.0.0.0: compose 下 nginx 从别的容器经网桥进来, 只绑回环则 /api 全挂.
+app.listen(port, '0.0.0.0', () => console.log(`[api] listening on 0.0.0.0:${port}`));
