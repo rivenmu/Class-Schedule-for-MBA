@@ -1,5 +1,5 @@
 # MBA 课表全站 (compose 版): web(nginx  serving HTML + 反代 /api) + mba-api.
-# 1Panel 容器 -> 编排 -> 创建 -> 指向 /root/mba-deploy/docker-compose.yml.
+# 1Panel 容器 -> 编排 -> 创建 -> 指向 /opt/mba-deploy/docker-compose.yml.
 # 真值 (PGURL/LOGTO_*) 由 deploy.sh 写入仓库根 .env (不进 git).
 # web 绑 0.0.0.0:7899, 内网直连 http://10.0.0.2:7899; 公网域名走
 # Lucky 转发到该端口 (mba.rivenmu.cn:20001)。更新: bash deploy.sh.
@@ -14,7 +14,7 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on: [mba-api]
   mba-api:
-    build: /root/mba-deploy/api
+    build: /opt/mba-deploy/api
     container_name: mba-schedule-api
     restart: unless-stopped
     # 不发布主机端口 (避开 3000 与 new-api 冲突); web 经 compose 内网直连容器
