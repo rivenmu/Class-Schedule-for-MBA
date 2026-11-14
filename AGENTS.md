@@ -17,6 +17,31 @@
   本次必须递增一档后再提交，禁止与上一版本同号（曾出现并行提交同标 `v0.8.0` 的事故）。
   测试中徽章断言用精确匹配（`toBe('vX.Y.Z')`），号没同步测试即红。
 
+## 命名规范（全仓通用 · 硬性）
+
+**默认规则**：新建的目录名、以及 AI 新建的文件名，一律**全小写英文 + 下划线连词**（`mba_class`、`schedule_analysis`、`build_deck.py`）。禁止中文、大写字母、空格、连字符。
+
+**只有这两类受本规则约束**：
+
+1. 目录名
+2. AI 新建的产物与脚本：`.html` / `.css` / `.py` / `.sh` / 自建 `.json` / 图片 / pptx、pdf、csv 等导出文件
+
+**例外清单（命中即保持原名，禁止为「统一风格」改名）**：
+
+| # | 例外 | 例子 |
+|---|---|---|
+| 1 | `.md` 文档 | `AGENTS.md`、`README.md`、`HANDOVER.md` |
+| 2 | 生态约定俗称的固定文件名 | `Dockerfile`、`Dockerfile.dev`、`Makefile`、`CMakeLists.txt`、`LICENSE`、`Procfile`、`Gemfile`、`Cargo.toml`、`package.json`、`package-lock.json`、`tsconfig*.json`、`requirements.txt`、`docker-compose.yml`、`nginx.conf`、`pytest.ini` |
+| 3 | 点文件与工具配置 | `.gitignore`、`.gitattributes`、`.editorconfig`、`.env*`、`.eslintrc*`、`.prettierrc*`、`.npmrc`、`.DS_Store` |
+| 4 | 代码源文件：跟随语言 / 框架约定，且必须与引用路径一致 | React 组件 PascalCase（`EChart.tsx`）、camelCase 工具（`chartTheme.ts`）、Vue 单文件（`App.vue`）、既有交付物（`MBA-Schedule.html`）。**已存在的代码文件永不因本规则改名** |
+| 5 | 用户提供 / 第三方产出 | 原始数据、下载包、解压目录、厂商模板、软件安装目录 |
+| 6 | 既有历史文件与目录 | 只约束新建；发现不合规**先报告，不擅自批量改名** |
+| 7 | 外部硬性要求 | 平台 / 工具强制的大小写、系统保留名 |
+
+**判定顺序**：先比对例外表 1–7，命中则保持原名；全部未命中才套默认规则。若某名字命中例外、但明显是 AI 自己造的临时文件（`新建文件夹`、`未命名-2`、`111`），仍按默认规则重命名。
+
+> 本节与 `../../platform/AGENTS.md` 同名小节保持一致，冲突时以 platform 为准。
+
 ## 约定
 - 单文件交付，直接双击可用；测试 `cd tests && npx playwright test` 保持 `72` 项通过。
 - 原始 PDF 已加入 `.gitignore`，不提交。
