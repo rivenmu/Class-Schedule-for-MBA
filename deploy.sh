@@ -46,7 +46,7 @@ else
   docker compose -f docker-compose.yml up -d --no-recreate 2>/dev/null || docker compose -f docker-compose.yml up -d
 fi
 
-# nginx.conf 是 bind mount：文件换了但进程还读旧配置，必须 reload。
-docker compose exec -T web nginx -s reload >/dev/null 2>&1 || docker compose restart web >/dev/null 2>&1 || true
+# nginx.conf 是 bind mount：git pull 换了 inode，必须重建容器才能看到新文件。
+docker compose up -d --force-recreate web >/dev/null
 echo ">>> 完成: $(grep -o 'const VERSION = "[^"]*"' web/MBA-Schedule.html)"
 curl -s http://127.0.0.1:7899/api/health || echo ">>> Web/API 未响应, 去 1Panel 编排看 mba-schedule 日志"
