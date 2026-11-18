@@ -1249,7 +1249,7 @@ function cloudChipHtml(){
     </span>`;
   }
   if(c.state==="loading")return `<span class="acct-chip" id="cloudChip"><span class="acct-avatar">…</span><span class="acct-meta"><b>检查登录</b><span>请稍候</span></span></span>`;
-  return `<a class="acct-chip guest" id="cloudChip" href="/schedule" title="先在课表页登录，进度就会同步到账号">
+  return `<a class="acct-chip guest" id="cloudChip" href="/schedule?login=1&from=/accounting_study" title="去统一登录后回到会计练习">
     <span class="acct-avatar">登</span><span class="acct-name">课表登录</span>
   </a>`;
 }
@@ -1530,9 +1530,10 @@ function renderHome(){
   const rtag=rs?(rs.tag==="exam"?EXAM_LABEL[rs.exam]+"演练":rs.tag==="wrong"?"错题重练":rs.tag==="guide"?"速查练习":"分拣练习"):"";
   $("#app").innerHTML=`
    <div class="top">
-     <a class="brand" href="/schedule" title="回课表" style="color:inherit;text-decoration:none">${LOGO}三表分拣台 <em>会计期末</em></a>
+     <a class="brand" href="/" title="返回 MBA 学习区首页" style="color:inherit;text-decoration:none">${LOGO}三表分拣台 <em>会计期末</em></a>
      <div class="nav acct-nav">
        <span class="online-chip ${S.online===0?"offline":""}" id="onlineChip" title="最近 5 分钟打开过练习页的人数"><i></i><span id="onlineCount">${S.online==null?"在线":`${S.online} 人在线`}</span></span>
+       <a class="acct-chip guest" href="/schedule" title="回课表">课表</a>
        <span class="acct-wrap">${cloudChipHtml()}</span>
      </div>
    </div>
@@ -1676,7 +1677,7 @@ function renderPlay(){
   $("#app").innerHTML=`
    <div class="top">
      <div class="brand">${LOGO}三表分拣台 <em>${S.mode==="exam"?"真题填表":S.tableMode?"填表练习":"分拣练习"}</em></div>
-     <div class="nav"><a class="navhand" href="/accounting_study/handbook/" target="_blank" rel="noopener">手册</a><button data-home>返回</button></div>
+     <div class="nav"><a class="navhand" href="/" title="返回学习区首页">学习区</a><a class="navhand" href="/accounting_study/handbook/" target="_blank" rel="noopener">手册</a><button data-home>返回</button></div>
    </div>
    ${hud()}
    <div class="railwrap">

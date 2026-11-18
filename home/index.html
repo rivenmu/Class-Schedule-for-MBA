@@ -28,6 +28,8 @@ body{
 .brand span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
 .spacer{flex:1}
 .tag{font-size:11px;color:var(--muted);border:1px solid var(--line);background:var(--card);padding:6px 10px;border-radius:999px}
+.home-link{font-size:12px;font-weight:600;color:var(--indigo);text-decoration:none;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.6)}
+.home-link:hover{background:#fff;box-shadow:0 4px 14px rgba(30,40,70,.08)}
 .hero{margin:34px 0 26px}
 .hero h1{margin:0 0 10px;font-size:38px;line-height:1.12;letter-spacing:-.02em}
 .hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.8;max-width:620px}
@@ -59,6 +61,7 @@ body{
   .grid{grid-template-columns:1fr}
   .card{min-height:240px;padding:22px 20px 18px}
   .tag{display:none}
+  .home-link{font-size:12px;padding:6px 9px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -69,6 +72,7 @@ body{
     <div class="logo">M</div>
     <div class="brand"><b>RIVEN · MBA 学习区</b><span>课表、选课与会计练习</span></div>
     <div class="spacer"></div>
+    <a class="home-link" href="https://home.rivenmu.cn:20001/" title="返回 RIVEN 统一入口">← 统一入口</a>
     <span class="tag">mba.rivenmu.cn</span>
   </header>
 

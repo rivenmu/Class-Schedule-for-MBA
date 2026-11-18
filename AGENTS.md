@@ -6,10 +6,10 @@
 26级MBA 学习站 —— 单文件课表 `MBA-Schedule.html`（七班合一、双学期、日历+选课+冲突+进度+打印）+ 会计练习页 `study/`（部署为 `/accounting_study`）+ 开卷手册 + 选课云方案 API。线上 `https://mba.rivenmu.cn:20001` 是学习区首页，课表在 `/schedule`。
 
 ## 当前版本
-`v0.8.9` — 展示于 `MBA-Schedule.html` 标题徽章与页脚，代码内 `const VERSION = "v0.8.9"`，`README` 标题区同步。
+`v0.8.10` — 展示于 `MBA-Schedule.html` 标题徽章与页脚，代码内 `const VERSION = "v0.8.10"`，`README` 标题区同步。
 
 ## 发版规则（强制）
-- 每次更新自动升 **小版本**：`v0.8.9` → `v0.8.9` … 以此类推，无需询问。
+- 每次更新自动升 **小版本**：`v0.8.10` → `v0.8.11` … 以此类推，无需询问。
 - 较重大的 bug 修复或功能更新：可升 **次版本**：`v0.8.x` → `v0.9.0`。
 - **禁止**自行升至 `1.0.0`，需用户明确通知后方可升级。
 - 版本号需同步更新三处：`MBA-Schedule.html` 内 `VERSION` 常量与标题/页脚徽标、`README`、`AGENTS.md`/`CLAUDE.md` 本段。
@@ -44,7 +44,8 @@
 
 ## 学习页与 API
 - `/accounting_study`：MBA 会计三表练习，单文件 `study/index.html`，公开可看，进度默认只存浏览器；旧 `/study/` 301 过来。
-- 云同步：登录态取自课表的 `sessionStorage["mba-id-token"]`（同源同标签页），调 `/api/study/progress` 与 `/api/study/online`；不自己做 OIDC。
+- 云同步：课表与学习页共用 `localStorage` 的 `mba-id-token` / `mba-refresh-token`（新标签页、关浏览器都保持登录）；续期用公开的 `/api/auth/config` 取 issuer/clientId，再调 Logto `/token`，401 时先续期重试一次；不自己做 OIDC 跳转。
+- 登录会话：课表页 scope 含 `offline_access`，回调校验 `state`；打开页面若无令牌但本机登录过，`prompt=none` 静默登回；登出结束 Logto 会话，避免被静默登回。Logto 应用须开 `alwaysIssueRefreshToken`。
 - API（`api/`，Express）：先验 Logto ID Token，再校验 `organizations` 含 UCAS（`LOGTO_ORG_ID`），否则 403；`schemes`、`study` 都走同一道校验。
 - 数据库：`mba` 库，`db/001-schemes.sql`、`db/002-study.sql`，复用 `iqair_db` 实例。
 - 手册：源文件在 `../会计期末考试资料/开卷考试极速快查手册.html`，用 `scripts/publish_handbook.sh` 原子发布。
