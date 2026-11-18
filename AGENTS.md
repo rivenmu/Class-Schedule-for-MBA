@@ -50,7 +50,7 @@
 - 手册：源文件在 `../会计期末考试资料/开卷考试极速快查手册.html`，用 `scripts/publish_handbook.sh` 原子发布。
 
 ## 部署
-- 全部走 `docker-compose.yml`（web nginx `7899` + mba-api 内网），`bash deploy.sh` 注入 Logto 真值并重建。
+- 全部走 `docker-compose.yml`（web nginx `7899` + mba-api 内网），Mac 推 `origin`（GitHub）与 `server`（服务器裸仓），服务器 `bash deploy.sh` 注入 Logto 真值并重建。
 - 真值在服务器 `~/.mba-deploy.env`（600，不进 git）；Lucky 把 `mba.rivenmu.cn` 指向 `10.0.0.2:7899`。
 - 回滚：Lucky 指回 `7900` 静态站（文件保留一周）。
 

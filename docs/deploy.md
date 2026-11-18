@@ -34,9 +34,20 @@
 
 ## 1. 日常更新
 
+Mac 上先推到两个远端（GitHub 给公开下载，`server` 是服务器裸仓）：
+
+```bash
+git push origin master      # GitHub
+git push server master      # ssh://rivenmu@10.0.0.2/home/rivenmu/repos/mba_class.git
+```
+
+服务器上：
+
 ```bash
 cd /opt/mba-deploy && bash deploy.sh
 ```
+
+`/opt/mba-deploy` 的 `origin` 指向服务器本地裸仓，不依赖 GitHub（服务器访问 GitHub 曾因 TLS 失败）。
 
 脚本：`git pull` → 注入 Logto 真值到 `web/`（`index.html` + `MBA-Schedule.html`）→ 同步 `study/` 与 `favicon.svg` → 写 `.env`（含 PGURL / Logto / UCAS 组织）→ `docker compose up -d`。
 
