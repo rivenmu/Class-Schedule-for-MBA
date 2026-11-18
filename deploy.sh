@@ -45,5 +45,8 @@ if git diff --name-only HEAD@{1} HEAD 2>/dev/null | grep -q "^api/"; then
 else
   docker compose -f docker-compose.yml up -d --no-recreate 2>/dev/null || docker compose -f docker-compose.yml up -d
 fi
+
+# nginx.conf 是 bind mount：文件换了但进程还读旧配置，必须 reload。
+docker compose exec -T web nginx -s reload >/dev/null 2>&1 || docker compose restart web >/dev/null 2>&1 || true
 echo ">>> 完成: $(grep -o 'const VERSION = "[^"]*"' web/MBA-Schedule.html)"
 curl -s http://127.0.0.1:7899/api/health || echo ">>> Web/API 未响应, 去 1Panel 编排看 mba-schedule 日志"
