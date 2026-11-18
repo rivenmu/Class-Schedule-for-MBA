@@ -1209,7 +1209,7 @@ function cloudChipHtml(){
     </span>`;
   }
   if(c.state==="loading")return `<span class="acct-chip" id="cloudChip"><span class="acct-avatar">…</span><span class="acct-meta"><b>检查登录</b><span>请稍候</span></span></span>`;
-  return `<a class="acct-chip guest" id="cloudChip" href="/" title="先在课表页登录，进度就会同步到账号">
+  return `<a class="acct-chip guest" id="cloudChip" href="/schedule" title="先在课表页登录，进度就会同步到账号">
     <span class="acct-avatar">登</span><span class="acct-name">课表登录</span>
   </a>`;
 }
@@ -1490,7 +1490,7 @@ function renderHome(){
   const rtag=rs?(rs.tag==="exam"?EXAM_LABEL[rs.exam]+"演练":rs.tag==="wrong"?"错题重练":rs.tag==="guide"?"速查练习":"分拣练习"):"";
   $("#app").innerHTML=`
    <div class="top">
-     <a class="brand" href="/" title="回课表" style="color:inherit;text-decoration:none">${LOGO}三表分拣台 <em>会计期末</em></a>
+     <a class="brand" href="/schedule" title="回课表" style="color:inherit;text-decoration:none">${LOGO}三表分拣台 <em>会计期末</em></a>
      <div class="nav acct-nav">
        <span class="online-chip ${S.online===0?"offline":""}" id="onlineChip" title="最近 5 分钟打开过练习页的人数"><i></i><span id="onlineCount">${S.online==null?"在线":`${S.online} 人在线`}</span></span>
        <span class="acct-wrap">${cloudChipHtml()}</span>
@@ -1512,7 +1512,7 @@ function renderHome(){
        </div>
        <button id="reset" class="reset-link">清空进度</button>
      </div>
-     <a class="handbook-card" href="/study/handbook/" target="_blank" rel="noopener">
+     <a class="handbook-card" href="/accounting_study/handbook/" target="_blank" rel="noopener">
        <div class="hc-top"><span class="hc-pill">开卷必备</span><span class="hc-live">持续更新</span></div>
        <div class="hc-main">
          <div class="hc-kicker">28 类业务 · 三表影响 · 模拟卷</div>
@@ -1636,7 +1636,7 @@ function renderPlay(){
   $("#app").innerHTML=`
    <div class="top">
      <div class="brand">${LOGO}三表分拣台 <em>${S.mode==="exam"?"真题填表":S.tableMode?"填表练习":"分拣练习"}</em></div>
-     <div class="nav"><a class="navhand" href="/study/handbook/" target="_blank" rel="noopener">手册</a><button data-home>返回</button></div>
+     <div class="nav"><a class="navhand" href="/accounting_study/handbook/" target="_blank" rel="noopener">手册</a><button data-home>返回</button></div>
    </div>
    ${hud()}
    <div class="railwrap">

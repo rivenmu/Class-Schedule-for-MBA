@@ -19,12 +19,13 @@ fi
 mkdir -p web
 sed "s|https://login.你的域名/oidc|$LOGTO_ISSUER|g; s|PASTE_LOGTO_APP_ID|$LOGTO_CLIENT_ID|g" \
   MBA-Schedule.html > web/MBA-Schedule.html
-# 根路径给 index.html, 否则 nginx 根会 404; 两份内容一致, 兼容两种已登记回调。
-cp web/MBA-Schedule.html web/index.html
+# 根路径是学习区目录页；课表仍在 /MBA-Schedule.html 与 /schedule。
+cp home/index.html web/index.html
 
-# 会计练习页: 静态文件进 web/study/, 由同一 nginx 直接服务。
-mkdir -p web/study
-cp study/index.html web/study/index.html
+# 会计练习页: /accounting_study（含手册子目录），旧的 web/study 清掉。
+mkdir -p web/accounting_study
+cp study/index.html web/accounting_study/index.html
+rm -rf web/study
 
 # 站点图标: 门户健康探针会拉 /favicon.svg
 cp favicon.svg web/favicon.svg

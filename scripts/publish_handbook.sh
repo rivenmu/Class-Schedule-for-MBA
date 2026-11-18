@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 SRC="${1:-../会计期末考试资料/开卷考试极速快查手册.html}"
 HOST="${MBA_HOST:-10.0.0.2}"
-DIR=/opt/mba-deploy/web/study/handbook
+DIR=/opt/mba-deploy/web/accounting_study/handbook
 if [ ! -f "$SRC" ]; then echo "找不到手册: $SRC" >&2; exit 1; fi
 ssh "$HOST" "mkdir -p $DIR"
 scp "$SRC" "$HOST:$DIR/.index.html.tmp"

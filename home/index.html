@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBA 学习区 · 课表与会计练习</title>
+<meta name="description" content="MBA 学习区：课程表与会计三表练习。">
+<style>
+:root{
+  --bg:#F6F2EA; --card:rgba(255,255,255,.82); --solid:#fff; --ink:#1C2330; --muted:#66708A;
+  --line:rgba(28,35,48,.10); --indigo:#2F4A7A; --orange:#E8710A; --green:#0E7C66; --amber:#B45309;
+  --radius:20px; --shadow:0 10px 34px rgba(30,40,70,.09);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  color:var(--ink); background:
+    radial-gradient(900px 520px at 12% -10%, #FFFDF8, transparent 60%),
+    radial-gradient(820px 480px at 100% 0%, #F3E7D6, transparent 55%),
+    var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 22px 70px}
+.top{display:flex;align-items:center;gap:12px}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--indigo),#4E6FA8);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;flex:none}
+.brand b{display:block;font-size:15px;letter-spacing:.01em}
+.brand span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.spacer{flex:1}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--line);background:var(--card);padding:6px 10px;border-radius:999px}
+.hero{margin:34px 0 26px}
+.hero h1{margin:0 0 10px;font-size:38px;line-height:1.12;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.8;max-width:620px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:10px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:10px;min-height:280px;
+  background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 26px 22px;text-decoration:none;color:inherit;overflow:hidden;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s;
+}
+.card::after{content:"";position:absolute;right:-40px;bottom:-56px;width:180px;height:180px;border-radius:50%;border:1px solid rgba(28,35,48,.06);pointer-events:none}
+.card:hover{transform:translateY(-4px);box-shadow:0 22px 50px rgba(30,40,70,.14);border-color:rgba(47,74,122,.22)}
+.icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;flex:none}
+.icon.indigo{background:rgba(47,74,122,.10);color:var(--indigo)}
+.icon.green{background:rgba(14,124,102,.10);color:var(--green)}
+.card h2{margin:6px 0 0;font-size:23px;letter-spacing:-.01em}
+.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.meta{margin-top:auto;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px}
+.meta i{font-style:normal;color:var(--ink);font-weight:700}
+.cta{font-size:13px;font-weight:800;color:var(--indigo)}
+.card.game .cta{color:var(--green)}
+.foot{margin-top:30px;font-size:12px;color:var(--muted);line-height:1.9}
+.foot b{color:var(--ink)}
+@media(max-width:760px){
+  .wrap{padding:20px 16px 56px}
+  .hero{margin:26px 0 18px}
+  .hero h1{font-size:30px}
+  .grid{grid-template-columns:1fr}
+  .card{min-height:240px;padding:22px 20px 18px}
+  .tag{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">M</div>
+    <div class="brand"><b>RIVEN · MBA 学习区</b><span>课表、选课与会计练习</span></div>
+    <div class="spacer"></div>
+    <span class="tag">mba.rivenmu.cn</span>
+  </header>
+
+  <section class="hero">
+    <h1>两件事：看课表，练会计。</h1>
+    <p>课表负责选课、冲突与学分；会计练习负责三表分拣与期末冲刺。两个入口都在这里，登录一次，全站通用。</p>
+  </section>
+
+  <section class="grid">
+    <a class="card" href="/schedule">
+      <div class="icon indigo">📅</div>
+      <h2>课程表</h2>
+      <p>七班合一、双学期；选课冲突、学分进度、存本地与云端方案，支持打印。</p>
+      <div class="meta"><span><i>2026 秋季</i> / 2027 春夏</span><span>七班切换</span><span>登录后可存 3 份云方案</span></div>
+      <span class="cta">打开课表 →</span>
+    </a>
+
+    <a class="card game" href="/accounting_study">
+      <div class="icon green">🧮</div>
+      <h2>会计游戏</h2>
+      <p>三表分拣、真题填表、数字快答、关键词抢答、报表找错；错题本与开卷手册都在里面。</p>
+      <div class="meta"><span>免登录可玩</span><span>登录后云同步</span><span>含开卷快查手册</span></div>
+      <span class="cta">开始练习 →</span>
+    </a>
+  </section>
+
+  <p class="foot">账号由 <b>RIVEN 统一登录</b>提供；课表公开可看，保存云方案与练习进度需要登录。遇到问题找 Riven。</p>
+</div>
+</body>
+</html>

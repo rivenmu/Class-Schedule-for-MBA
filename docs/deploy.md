@@ -49,17 +49,19 @@ cd /opt/mba-deploy && bash deploy.sh
 
 `/opt/mba-deploy` 的 `origin` 指向服务器本地裸仓，不依赖 GitHub（服务器访问 GitHub 曾因 TLS 失败）。
 
-脚本：`git pull` → 注入 Logto 真值到 `web/`（`index.html` + `MBA-Schedule.html`）→ 同步 `study/` 与 `favicon.svg` → 写 `.env`（含 PGURL / Logto / UCAS 组织）→ `docker compose up -d`。
+脚本：`git pull` → 注入 Logto 真值到 `web/`（`index.html` 学习区首页 + `MBA-Schedule.html`）→ 同步 `accounting_study/` 与 `favicon.svg` → 写 `.env`（含 PGURL / Logto / UCAS 组织）→ `docker compose up -d`。
 
-- **手册**：`bash scripts/publish_handbook.sh [html路径]`，原子替换服务器 `web/study/handbook/index.html`，不重建容器。
+- **手册**：`bash scripts/publish_handbook.sh [html路径]`，原子替换服务器 `web/accounting_study/handbook/index.html`，不重建容器。
 - **不要**在服务器手改代码；`/opt/mba-deploy` 是 git clone。
 
 ## 2. 验证
 
 ```bash
 curl -s http://127.0.0.1:7899/api/health            # {"ok":true}
-curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:7899/          # 200
-curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:7899/study/    # 200
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:7899/                    # 200（学习区首页）
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:7899/schedule           # 200（课表）
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:7899/accounting_study   # 200（会计练习）
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:7899/study/             # 301 → accounting_study
 ```
 
 浏览器（局域网）`http://10.0.0.2:7899/` 可登录；生产 HTTPS 下走 Logto PKCE。

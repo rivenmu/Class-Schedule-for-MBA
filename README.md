@@ -1,4 +1,4 @@
-# 📅 MBA 课程预选表 · 可视化日历 `v0.8.8`
+# 📅 MBA 课程预选表 · 可视化日历 `v0.8.9`
 
 > 个人业余整理 · 仅供直观了解选课冲突与学分测算参考 · 见页内免责声明
 
@@ -6,15 +6,16 @@
 
 点击下方链接下载 HTML 到本地，浏览器双击即可打开使用（单文件、无需安装、可离线运行）：
 
-- **七班合一 · 2026 秋季 / 2027 春夏**（含全集班 / 综合班 / 非全日制集中班 / 人工智能与应用班 / 数字化转型与数字化创业班 / 脱产班 / 金融班 一键切换）：[MBA-Schedule.html](https://raw.githubusercontent.com/rivenmu/Class-Schedule-for-MBA/master/MBA-Schedule.html) `v0.8.8`
+- **七班合一 · 2026 秋季 / 2027 春夏**（含全集班 / 综合班 / 非全日制集中班 / 人工智能与应用班 / 数字化转型与数字化创业班 / 脱产班 / 金融班 一键切换）：[MBA-Schedule.html](https://raw.githubusercontent.com/rivenmu/Class-Schedule-for-MBA/master/MBA-Schedule.html) `v0.8.9`
 
 > 💡 如果浏览器直接显示源码，请右键 →「另存为」下载后再打开。
 
 ## 在线入口
 
-- 课表与选课：`https://mba.rivenmu.cn:20001/`
-- 会计练习：`https://mba.rivenmu.cn:20001/study/`
-- 开卷手册：`https://mba.rivenmu.cn:20001/study/handbook/`
+- 学习区首页：`https://mba.rivenmu.cn:20001/`
+- 课表与选课：`https://mba.rivenmu.cn:20001/schedule`
+- 会计练习：`https://mba.rivenmu.cn:20001/accounting_study`
+- 开卷手册：`https://mba.rivenmu.cn:20001/accounting_study/handbook/`
 
 ## 功能简介
 
@@ -51,8 +52,9 @@ cd tests && npm install && npx playwright install chromium && npx playwright tes
 Class-Schedule-for-MBA/
 ├── README.md                       # 本文件
 ├── .gitignore                      # 已忽略所有 *.pdf 原表及 .playwright-mcp/
-├── MBA-Schedule.html               # 七班合一主版本 v0.8.8 毛玻璃质感（单文件，直接双击可用）
-├── study/index.html                # 会计三表练习（公开，登录后云同步）
+├── MBA-Schedule.html               # 七班合一主版本 v0.8.9 毛玻璃质感（单文件，直接双击可用）
+├── home/index.html                 # 学习区首页（课表 + 会计两个入口）
+├── study/index.html                # 会计三表练习（部署为 /accounting_study）
 ├── handbook/                       # 开卷手册发布落点（git 忽略正文）
 ├── scripts/publish_handbook.sh     # 手册原子发布
 ├── api/                            # Express API：云方案 + 学习进度 + 在线人数
