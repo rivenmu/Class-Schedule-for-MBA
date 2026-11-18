@@ -17,9 +17,15 @@ function orgOk(payload, orgId) {
   return Array.isArray(orgs) && orgs.includes(orgId);
 }
 
+// Logto 的 jwks_uri 是 <issuer>/jwks（例如 /oidc/jwks），
+// 不是 OIDC 通用的 /.well-known/jwks.json——后者在 Logto 上是 404。
+function jwksUrl(issuer) {
+  return issuer.replace(/\/+$/, '') + '/jwks';
+}
+
 let jwks = null;
 function getJwks() {
-  if (!jwks) jwks = createRemoteJWKSet(new URL(required('LOGTO_ISSUER') + '/.well-known/jwks.json'));
+  if (!jwks) jwks = createRemoteJWKSet(new URL(jwksUrl(required('LOGTO_ISSUER'))));
   return jwks;
 }
 
@@ -41,8 +47,14 @@ async function requireUser(req, res, next) {
     req.userName = payload.username || payload.preferred_username || '';
     next();
   } catch (e) {
+    // 只记诊断字段，不打印 token；常见为 JWKS 拉取失败、aud/iss 不匹配、过期。
+    console.error('[auth] token verify failed', {
+      code: e && e.code,
+      claim: e && e.claim,
+      message: e && e.message,
+    });
     return res.status(401).json({ error: 'unauthorized' });
   }
 }
 
-module.exports = { requireUser, orgOk };
+module.exports = { requireUser, orgOk, jwksUrl };
