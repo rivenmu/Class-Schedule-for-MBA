@@ -65,6 +65,8 @@ curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:7899/study/           
 ```
 
 浏览器（局域网）`http://10.0.0.2:7899/` 可登录；生产 HTTPS 下走 Logto PKCE。
+
+登录态存 `localStorage`（`mba-id-token` / `mba-refresh-token`），ID Token 30 分钟、refresh token 7 天轮换；打开页面/401 时自动续期，续不上才要求重新登录。学习页续期通过公开接口 `/api/auth/config` 拿 issuer/clientId，因此 API 必须能读到 `LOGTO_ISSUER` / `LOGTO_CLIENT_ID` 环境变量。
 `/api/study/progress` 需 Bearer ID Token，且 `organizations` 含 UCAS，否则 403。
 
 ## 3. 入口与回滚
