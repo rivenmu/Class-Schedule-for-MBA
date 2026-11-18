@@ -1,0 +1,2409 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="data:,">
+<title>三表分拣台 · 会计期末冲刺</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231A5FD0'/%3E%3Crect x='7' y='8' width='18' height='3.4' rx='1.7' fill='%23fff'/%3E%3Crect x='7' y='14.3' width='13' height='3.4' rx='1.7' fill='%23fff' opacity='.82'/%3E%3Crect x='7' y='20.6' width='9' height='3.4' rx='1.7' fill='%23FFB020'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#F7F8FA; --surface:#FFFFFF; --surface2:#F3F4F7; --surface3:#EBEDF2;
+  --text:#1F2329; --text2:#5A616D; --text3:#666D78;
+  --primary:#1A5FD0; --primary-h:#164FB0; --primary-c:#E8F0FE;
+  --error:#C42C74; --error-c:#FDF0F6;
+  --warning:#B45309; --warning-c:#FFF8EC;
+  --success:#0B7C7C; --success-c:#EDF9F9;
+  --border:#EDEFF3; --border2:#DDE1E8;
+  --r-xs:6px; --r-sm:8px; --r-md:12px; --r-lg:18px; --r-xl:24px; --r-full:999px;
+  --sh1:0 4px 14px rgba(13,32,84,.04);
+  --sh2:0 8px 22px rgba(13,32,84,.06);
+  --sh3:0 18px 44px rgba(13,32,84,.14);
+  --sys:"Inter","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --num:"Inter",ui-monospace,"SF Mono",Menlo,sans-serif;
+  --serif:"Songti SC","STSong","Noto Serif CJK SC","Source Han Serif SC",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sys);font-size:14px;line-height:22px;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+.wrap{width:100%;padding:0 0 72px}
+.wrap>.top{width:100%}
+.wrap>*:not(.top){max-width:1200px;margin-left:auto;margin-right:auto;padding-left:32px;padding-right:32px}
+.numbar{display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 180px);align-items:center}
+.numbar .hud{width:100%;max-width:760px;margin:0 auto 16px}
+.wrap>.numcard{max-width:760px;padding:32px}
+
+/* ---------- top bar ---------- */
+.top{display:flex;align-items:center;gap:20px;height:64px;position:sticky;top:0;z-index:40;
+  background:rgba(255,255,255,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);margin-bottom:24px;
+  padding:0 max(32px,calc((100vw - 1200px)/2 + 32px))}
+.brand{font-size:15px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.brand i{width:8px;height:8px;border-radius:2px;background:#FFB020;display:inline-block}
+.brand .logo{width:28px;height:28px;display:block;flex:none}
+.brand em{font-style:normal;color:var(--text2);font-weight:500;font-size:12px;letter-spacing:0}
+.nav{display:flex;gap:4px;margin-left:auto}
+.nav button{border:0;background:none;color:var(--text2);font-size:13px;font-weight:500;padding:7px 14px;border-radius:var(--r-full);transition:.12s}
+.nav button:hover{background:var(--surface2);color:var(--text)}
+.nav button.on{background:var(--primary-c);color:var(--primary);font-weight:600}
+
+/* ---------- hud ---------- */
+.hud{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.hud .k{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:7px 12px;font-size:12px;color:var(--text2);font-weight:500}
+.hud b{color:var(--text);font-family:var(--num);font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.hud .k.grow{margin-left:auto}
+.hp{width:88px;height:6px;background:var(--surface3);border-radius:var(--r-full);overflow:hidden}
+.hp i{display:block;height:100%;background:var(--success);border-radius:var(--r-full);transition:width .3s}
+.hp.low i{background:var(--error)}
+.combo.hot{color:var(--primary)}
+
+/* ---------- home ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.8fr);gap:24px;background:linear-gradient(180deg,#FFFFFF 0%,#F8FAFF 100%);border:1px solid #DCE7F7;border-radius:24px;padding:30px;box-shadow:var(--sh1);margin-bottom:14px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;right:-90px;top:-110px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,var(--primary-c) 0%,rgba(232,240,254,0) 70%);pointer-events:none}
+.hero-copy{position:relative;z-index:1}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--primary);background:var(--primary-c);border:1px solid #D6E4F8;border-radius:var(--r-full);padding:5px 11px;margin-bottom:16px}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:#FFB020}
+.hero h1{font-family:var(--serif);font-size:clamp(30px,4vw,44px);line-height:1.16;font-weight:700;letter-spacing:-.01em;margin:0 0 12px;color:var(--text)}
+.hero p{margin:0;color:var(--text2);font-size:14px;line-height:22px;max-width:520px}
+.stats{display:flex;flex-wrap:wrap;margin-top:22px;border-top:1px solid #E6ECF5;padding-top:16px}
+.stats>div{min-width:90px;padding:0 18px;border-left:1px solid #E6ECF5}
+.stats>div:first-child{padding-left:0;border-left:0}
+.stats b{display:block;font-family:var(--num);font-size:24px;line-height:30px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stats span{display:block;font-size:11px;color:var(--text3);font-weight:500;margin-top:2px}
+.stats .stat-rank b{font-size:18px;line-height:26px;letter-spacing:0}
+.reset-link{margin-top:12px;background:none;border:0;padding:0;color:var(--text3);font-size:11px;text-decoration:underline}
+.handbook-card{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:space-between;background:#FFB020;color:var(--text);border:1px solid #EDA300;border-radius:20px;padding:22px;min-height:252px;text-decoration:none;box-shadow:0 16px 34px rgba(255,176,32,.28);transition:.16s;overflow:hidden}
+.handbook-card:before{content:"";position:absolute;right:-36px;bottom:-48px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.22)}
+.handbook-card:hover{transform:translateY(-3px);box-shadow:0 22px 46px rgba(255,176,32,.36)}
+.handbook-card:focus-visible{outline:3px solid rgba(26,95,208,.35);outline-offset:3px}
+.trow:focus-visible{outline:2px solid var(--primary);outline-offset:-2px;background:#F8FAFF}
+.hc-top,.hc-main,.hc-foot{position:relative;z-index:1}
+.hc-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hc-pill{background:var(--text);color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;padding:4px 9px;border-radius:var(--r-full)}
+.hc-live{font-size:11px;font-weight:600;color:var(--text);background:rgba(255,255,255,.55);padding:4px 9px;border-radius:var(--r-full)}
+.hc-main{margin:18px 0 16px}
+.hc-kicker{font-size:11px;font-weight:600;letter-spacing:.04em;color:rgba(31,35,41,.72);margin-bottom:6px}
+.hc-title{font-family:var(--serif);font-size:clamp(30px,3vw,40px);line-height:1.05;font-weight:700;letter-spacing:.02em}
+.hc-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:600;color:rgba(31,35,41,.78);border-top:1px solid rgba(31,35,41,.18);padding-top:12px}
+.hc-arrow{background:var(--text);color:#fff;padding:6px 12px;border-radius:var(--r-full);font-size:12px;font-weight:600}
+.navhand{display:inline-flex;align-items:center;padding:7px 14px;border-radius:var(--r-full);background:var(--primary);color:#fff;font-size:13px;font-weight:600;text-decoration:none}
+.navhand:hover{background:var(--primary-h)}
+.train{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px 22px 8px;box-shadow:var(--sh1);margin-top:14px}
+.train-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:2px 2px 14px;border-bottom:1px solid var(--border)}
+.kicker{display:block;font-size:10.5px;font-weight:700;letter-spacing:.14em;color:var(--primary);margin-bottom:3px}
+.train-head h2{font-family:var(--serif);font-size:21px;font-weight:700;margin:0;letter-spacing:.01em}
+.train-note{font-size:11.5px;color:var(--text3);padding-bottom:2px}
+.train-list{display:flex;flex-direction:column}
+.trow{display:grid;grid-template-columns:38px minmax(0,1fr) 170px 72px;align-items:center;gap:14px;width:100%;padding:14px 2px;background:none;border:0;border-bottom:1px solid var(--border);text-align:left;color:var(--text);transition:background .12s}
+.trow:last-child{border-bottom:0}
+.trow:hover{background:#F8FAFF}
+.tnum{width:34px;height:34px;border-radius:10px;border:1px solid;display:grid;place-items:center;font-family:var(--num);font-size:11.5px;font-weight:700}
+.tmain b{display:block;font-size:14.5px;font-weight:600;margin-bottom:2px}
+.tmain span{display:block;font-size:12px;color:var(--text2);line-height:17px}
+.tprog{display:flex;align-items:center;gap:8px}
+.tbar{flex:1;height:5px;border-radius:var(--r-full);background:var(--surface3);overflow:hidden}
+.tbar i{display:block;height:100%;border-radius:var(--r-full)}
+.tprog em{font-style:normal;font-family:var(--num);font-size:11px;color:var(--text3);min-width:38px;text-align:right}
+.tgo{font-size:12px;font-weight:600;text-align:right;white-space:nowrap}
+
+/* ---------- traps ---------- */
+.traps{background:linear-gradient(180deg,var(--warning-c) 0%,#FFFFFF 100%);border:1px solid #F1DFC4;border-radius:20px;padding:18px 22px;box-shadow:none;margin-top:14px}
+.traps .th{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--warning);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.traps .th:before{content:"";width:3px;height:14px;border-radius:2px;background:var(--warning)}
+.traps ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+.traps li{padding:0 16px;border-left:1px solid var(--border)}
+.traps li:first-child{border-left:0;padding-left:0}
+.traps b{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+.traps span{font-size:12px;line-height:18px;color:var(--text2);display:block}
+
+
+/* ---------- exam rail / picker ---------- */
+.railwrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+.rail{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1;min-width:220px}
+.rail .rq{width:30px;height:30px;padding:0;border:1px solid var(--border2);border-radius:8px;background:var(--surface);color:var(--text2);font-family:var(--num);font-size:12px;font-weight:600}
+.rail .rq:hover{border-color:var(--primary);color:var(--primary)}
+.rail .rq.ok{border-color:var(--success);background:var(--success-c);color:#0B7C7C}
+.rail .rq.no{border-color:var(--error);background:var(--error-c);color:var(--error)}
+.rail .rq.cur{border-color:var(--primary);background:var(--primary);color:#fff}
+.rail .rq.cur.ok,.rail .rq.cur.no{color:#fff}
+.rail .rq.cur.ok{background:var(--success);border-color:var(--success)}
+.rail .rq.cur.no{background:var(--error);border-color:var(--error)}
+.rail span{font-size:11px;color:var(--text3);white-space:nowrap}
+.jumpbox{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);white-space:nowrap}
+.jumpbox input{width:58px;height:30px;border:1px solid var(--border2);border-radius:8px;text-align:center;font-family:var(--num);font-size:12px;background:var(--surface);color:var(--text)}
+.jumpbox button{height:30px;padding:0 12px;border:1px solid var(--border2);background:var(--surface);border-radius:8px;font-size:12px;color:var(--text2)}
+.jumpbox button:hover{border-color:var(--primary);color:var(--primary)}
+
+.jepanel{background:var(--warning-c);border:1px solid #F0DFC4;border-left:3px solid var(--warning);border-radius:var(--r-md);padding:12px 14px}
+.jepanel .lab{font-size:11px;font-weight:600;color:var(--warning);margin-bottom:6px}
+.entryline{font-family:var(--num);font-size:12px;line-height:20px;background:var(--surface2);border-radius:var(--r-sm);padding:9px 12px;color:var(--text)}
+
+.exgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.excard{cursor:pointer;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;
+  box-shadow:var(--sh1);transition:.16s;display:flex;flex-direction:column;color:var(--text)}
+.excard:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.excard .n{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--primary);margin-bottom:8px}
+.excard h3{margin:0 0 6px;font-size:17px;letter-spacing:-.01em}
+.excard p{margin:0;font-size:12.5px;color:var(--text2);line-height:19px}
+.excard .meta{display:flex;gap:14px;margin:14px 0 12px;font-size:11.5px;color:var(--text3);font-family:var(--num)}
+.excard .go{font-size:13px;font-weight:600;color:var(--primary);margin-top:auto}
+.wrongbar{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 16px;background:var(--error-c);border:1px solid #F6D9E7;border-radius:var(--r-md)}
+.wrongbar b{font-size:13px}
+.wrongbar span{margin-left:8px;font-size:12px;color:var(--text2)}
+.wrongbar .btn{margin-left:auto}
+.tipnote{margin-top:16px;font-size:12px;color:var(--text3);line-height:19px}
+.pagefill{padding-top:8px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;margin-top:22px;background:var(--surface)}
+.steps>div{padding:16px 18px;border-left:1px solid var(--border)}
+.steps>div:first-child{border-left:0}
+.hist{margin-top:22px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;box-shadow:var(--sh1)}
+.hist .hh{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px}
+.hist table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+.hist td{padding:7px 4px;border-bottom:1px solid var(--border);color:var(--text2)}
+.hist td:first-child{color:var(--text);font-weight:600;width:90px}
+.hist td:last-child{text-align:right;color:var(--text3);font-size:11.5px}
+.hist tr:last-child td{border-bottom:0}
+.hist .ok{color:var(--success);font-weight:700}
+.hist .mid{color:var(--warning);font-weight:700}
+.hist .no{color:var(--error);font-weight:700}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+.tags i{font-style:normal;font-size:11px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--r-full);padding:2px 9px}
+.steps b{display:block;font-size:13px;margin-bottom:5px}
+.steps span{font-size:12px;color:var(--text2);line-height:18px;display:block}
+
+/* ---------- play ---------- */
+.board{display:grid;gap:14px}
+.ticket{position:relative;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--sh1)}
+.ticket .meta{display:flex;gap:8px;align-items:center;font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--text3);margin-bottom:10px}
+.ticket .meta .tag{background:var(--primary-c);color:var(--primary);padding:2px 8px;border-radius:var(--r-xs)}
+.ticket p{margin:0;font-size:16px;line-height:26px;color:var(--text);max-width:920px}
+.stamp{position:absolute;right:20px;top:20px;border:2px solid var(--success);color:var(--success);border-radius:var(--r-full);
+  padding:5px 14px;font-size:11px;font-weight:700;letter-spacing:.18em;opacity:0;transform:scale(.6)}
+.stamp.on{animation:stampin .34s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes stampin{0%{opacity:0;transform:scale(1.5)}60%{opacity:1;transform:scale(.96)}100%{opacity:1;transform:scale(1)}}
+
+.tray-label{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;color:var(--text2);margin:4px 0 2px}
+.tray-label:after{content:"";flex:1;height:1px;background:var(--border)}
+.tray{display:flex;flex-wrap:wrap;gap:8px;min-height:56px;padding:12px;border:1px dashed var(--border2);border-radius:var(--r-md);background:#FBFCFD}
+*:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:4px}
+.chip{min-height:40px;border:1px solid var(--border2);background:var(--surface);color:var(--text);padding:9px 14px;border-radius:var(--r-md);
+  font-size:13px;font-weight:500;line-height:20px;transition:.12s;text-align:left}
+.chip:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-1px)}
+.chip.sel{border-color:var(--primary);background:var(--primary);color:#fff;font-weight:600;box-shadow:0 0 0 3px rgba(26,95,208,.18);transform:translateY(-1px)}
+.chip.sel:hover{color:#fff}
+.chip .selmark{display:inline-block;margin-left:7px;padding:1px 6px;border-radius:99px;background:rgba(255,255,255,.22);font-size:10px;font-weight:700}
+.chip.done{opacity:.4;pointer-events:none;text-decoration:line-through}
+.chip.bad{border-color:var(--error);background:var(--error-c);color:var(--error)}
+.selbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:40px;margin:8px 0 2px;padding:9px 12px;border:1px dashed var(--border2);border-radius:10px;background:#FBFCFD;font-size:12px;color:var(--text2)}
+.selbar.on{border-style:solid;border-color:var(--primary);background:var(--primary-c)}
+.selbar .sb-k{font-family:var(--num);font-size:10px;letter-spacing:.08em;color:var(--primary);background:#fff;border:1px solid #D6E4F8;border-radius:99px;padding:2px 7px;flex:none}
+.selbar b{color:var(--text);font-size:13px;font-weight:700}
+.selbar .sb-hint{flex:1;min-width:160px;line-height:1.5}
+.selbar .sb-x{border:0;background:none;color:var(--text3);font-size:12px;text-decoration:underline;padding:0;flex:none}
+.selbar .sb-x:hover{color:var(--text)}
+.bins.targeting .bin{border-color:var(--primary);box-shadow:0 0 0 2px rgba(26,95,208,.1);cursor:pointer}
+.bins.targeting .bin .drop{cursor:pointer}
+.bins.targeting .bin h3 span{color:var(--primary);font-weight:600}
+.bin.flash{animation:binflash .45s ease}
+@keyframes binflash{0%{box-shadow:0 0 0 0 rgba(26,95,208,.4)}100%{box-shadow:0 0 0 10px rgba(26,95,208,0)}}
+.chip .ok{color:var(--success);margin-left:6px;font-weight:700}
+.chip .no{color:var(--error);margin-left:6px;font-weight:700}
+
+.bins{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.bin{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh1);display:flex;flex-direction:column;min-height:clamp(180px,20vh,230px);overflow:hidden}
+.bin h3{margin:0;font-size:13px;font-weight:600;padding:13px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bin h3 span{font-size:11px;font-weight:500;color:var(--text3);letter-spacing:0}
+.bin[data-s="bs"] h3{color:var(--primary);background:#F7FAFF}
+.bin[data-s="is"] h3{color:#0B7C7C;background:#F5FBFB}
+.bin[data-s="cf"] h3{color:var(--warning);background:#FFFBF5}
+.drop{flex:1;padding:12px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;min-height:clamp(130px,15vh,180px);position:relative;transition:.12s;border-radius:0 0 var(--r-lg) var(--r-lg)}
+.drop.armed{background:var(--primary-c);outline:1px dashed var(--primary);outline-offset:-4px}
+.drop .ph{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:var(--text3);pointer-events:none}
+.drop *:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:4px}
+.chip.lock{pointer-events:none;cursor:default}
+.drop .chip.good{border-color:var(--success);background:var(--success-c);color:#0B7C7C}
+.drop .chip.bad{border-color:var(--error);background:var(--error-c)}
+.tip{font-size:12px;color:var(--text3)}
+.fillrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;width:100%;padding:7px 8px;margin-bottom:6px;border:1px solid var(--border2);border-radius:8px;background:var(--surface)}
+.fillrow .fr-k{flex:1 1 120px;min-width:0;font-size:12.5px;font-weight:500;line-height:1.35;color:var(--text)}
+.fillrow .fr-sign{width:30px;height:28px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:var(--num);font-size:14px;font-weight:700;padding:0;flex:none}
+.fillrow .fr-sign.neg{color:var(--error);border-color:var(--error);background:var(--error-c)}
+.fillrow .fr-amt{width:74px;height:28px;border:1px solid var(--border2);border-radius:6px;text-align:right;font-family:var(--num);font-size:13px;padding:0 6px;background:var(--surface);color:var(--text);flex:none}
+.fillrow .fr-amt:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(26,95,208,.12)}
+.fillrow .fr-unit{font-size:10px;color:var(--text3);flex:none}
+.fillrow .fr-x{width:22px;height:24px;border:0;background:none;color:var(--text3);font-size:15px;padding:0;flex:none}
+.fillrow .fr-x:hover{color:var(--error)}
+.fillrow .fr-hint{font-style:normal;font-size:11px;color:var(--text3);margin-left:auto;white-space:nowrap}
+.fillrow.ok{border-color:var(--success);background:var(--success-c)}
+.fillrow.ok .fr-hint{color:var(--success)}
+.fillrow.no{border-color:var(--error);background:var(--error-c)}
+.fillrow.no .fr-hint{color:var(--error)}
+.fillrow.ghost{border-style:dashed;border-color:var(--error);background:transparent;color:var(--error)}
+.fillrow.ghost .fr-sign,.fillrow.ghost .fr-amt{color:var(--error);background:transparent;border-color:var(--error)}
+.fillrow.ok .fr-sign,.fillrow.ok .fr-amt,.fillrow.no .fr-sign,.fillrow.no .fr-amt{background:transparent;border-color:transparent;pointer-events:none}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:2px}
+.btn{border:0;border-radius:var(--r-full);height:40px;padding:0 22px;font-size:13.5px;font-weight:600;transition:.12s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.primary:hover{background:var(--primary-h)}
+.btn.ghost{background:var(--surface);color:var(--text2);border:1px solid var(--border2)}
+.btn.ghost:hover{color:var(--text);border-color:var(--text3)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.spacer{flex:1}
+.kbd{font-size:11px;color:var(--text3);border:1px solid var(--border);background:var(--surface);padding:3px 8px;border-radius:var(--r-xs)}
+
+/* ---------- feedback ---------- */
+.fbtop{display:flex;align-items:center;gap:10px;margin:2px 0 10px}
+.fbsum{font-size:14px;font-weight:700;margin-right:auto}
+.fbsum.ok{color:var(--success)}
+.fbsum.no{color:var(--error)}
+#fb{scroll-margin-top:84px}
+.fb{border:1px solid var(--border);border-left:3px solid var(--success);background:var(--success-c);padding:14px 16px;border-radius:var(--r-md);font-size:13px;line-height:22px}
+.fb.bad{border-left-color:var(--error);background:var(--error-c)}
+.fb h4{margin:0 0 8px;font-size:13px;font-weight:600}
+.fb ul{margin:4px 0 0;padding-left:18px}
+.fb li{margin:3px 0}
+.fb .lab{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--text3);margin-top:8px}
+.fb .why{margin-top:10px;padding-top:10px;border-top:1px solid rgba(31,35,41,.06);color:var(--text2);font-size:12.5px;line-height:20px}
+.mono{font-family:var(--num);font-variant-numeric:tabular-nums}
+
+
+.wrongstrip{margin:2px 0;border:1px solid #F3CBDD;background:var(--error-c);border-radius:var(--r-md);padding:12px 14px}
+.ws-h{font-size:11px;font-weight:600;color:var(--error);letter-spacing:.05em;margin-bottom:9px}
+.ws-body{display:flex;flex-wrap:wrap;gap:8px}
+.ws-body .chip{display:inline-flex;align-items:center;gap:7px;cursor:default}
+.ws-body .chip em{font-style:normal;font-size:11px;color:var(--error);opacity:.8}
+.chip.ghost{border:1px dashed var(--error);background:transparent;color:var(--error);opacity:.8;cursor:default}
+.fb li.li-ok{color:var(--text)}
+.fb li.li-no{color:var(--error)}
+
+/* ---------- progress / resume ---------- */
+.hintbar{margin:10px 2px 0;font-size:12px;color:var(--text3);line-height:18px}
+.acct-nav{display:flex;align-items:center;gap:8px}
+.acct-wrap{position:relative;display:inline-flex}
+.acct-caret{font-size:10px;color:var(--text3);margin-left:-2px}
+.acct-menu{position:absolute;right:0;top:calc(100% + 8px);min-width:190px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--sh3);padding:8px;z-index:80}
+.acct-menu[hidden]{display:none}
+.acct-menu .am-head{font-size:11.5px;color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.acct-menu a{display:block;padding:8px;border-radius:8px;color:var(--text);text-decoration:none;font-size:12.5px}
+.acct-menu a:hover{background:var(--surface2)}
+.online-chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border-radius:var(--r-full);color:var(--text2);font-size:12px;font-weight:500;white-space:nowrap;cursor:default}
+.online-chip:hover{background:var(--surface2);color:var(--text)}
+.online-chip i{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px rgba(11,124,124,.16);flex:none}
+.online-chip.offline i{background:var(--text3);box-shadow:none}
+.acct-chip{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px 0 4px;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surface);color:var(--text);text-decoration:none;box-shadow:var(--sh1);transition:.12s}
+.acct-chip:hover{border-color:var(--primary);background:#F8FAFF}
+.acct-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;position:relative}
+.acct-chip.guest .acct-avatar{background:var(--primary-c);color:var(--primary)}
+.acct-chip:not(.guest) .acct-avatar:after{content:"";position:absolute;right:-1px;bottom:-1px;width:9px;height:9px;border-radius:50%;background:var(--success);border:2px solid var(--surface)}
+.acct-chip.error .acct-avatar:after{background:var(--error)}
+.acct-meta{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.acct-meta b{font-size:12.5px;font-weight:600;max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct-meta span{font-size:10.5px;color:var(--text3);white-space:nowrap}
+.acct-chip.error .acct-meta span{color:var(--error)}
+.acct-chip.guest .acct-name{font-size:12.5px;font-weight:600;color:var(--primary);padding-right:6px}
+.train-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.train-link{border:0;background:none;color:var(--primary);font-size:12px;font-weight:600;padding:0;cursor:pointer}
+.train-link:hover{text-decoration:underline}
+.resume{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--primary-c);border:1px solid #D6E4F8;border-radius:var(--r-md);padding:14px 16px;margin:0 0 14px}
+.resume .ri{width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:15px;font-weight:700;flex:none}
+.resume .rt{flex:1;min-width:210px}
+.resume .rt b{display:block;font-size:13.5px;margin-bottom:2px}
+.resume .rt span{font-size:12px;color:var(--text2)}
+.resume .ra{display:flex;gap:8px}
+.resume .ra .btn{height:36px;padding:0 18px;font-size:12.5px}
+.wronghome{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--error-c);border:1px solid #F3CBDD;border-radius:var(--r-md);padding:12px 16px;margin:0 0 14px}
+.wronghome b{font-size:13px;color:var(--error)}
+.wronghome span{flex:1;min-width:180px;font-size:12px;color:var(--text2)}
+.wronghome .btn{height:34px;padding:0 16px;font-size:12px}
+.lv .bar{height:4px;border-radius:var(--r-full);background:var(--surface3);margin-top:12px;overflow:hidden}
+.lv .bar i{display:block;height:100%;border-radius:var(--r-full);background:var(--primary)}
+.lv .meta2{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--text3);margin-top:6px}
+.notice{background:var(--warning-c);border:1px solid #F1DFC4;color:var(--text2);border-radius:var(--r-md);padding:12px 16px;font-size:12.5px;line-height:20px;margin:0 0 14px}
+
+/* ---------- guide ---------- */
+.searchbar{margin-bottom:14px}
+.searchbar input{width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:0 16px;height:44px;border-radius:var(--r-full);font-size:14px;font-family:inherit}
+.searchbar input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,95,208,.12)}
+.guide{display:grid;gap:10px}
+.g{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 18px;box-shadow:var(--sh1)}
+.g .gh{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.g .gh b{font-size:14.5px;font-weight:600}
+.g .gh span{font-size:11px;font-weight:500;color:var(--text3);border:1px solid var(--border2);padding:1px 8px;border-radius:var(--r-full)}
+.g .entry{font-family:var(--num);font-size:12px;color:var(--text);background:var(--surface2);padding:8px 12px;border-radius:var(--r-sm);margin-bottom:10px;line-height:20px}
+.g .rows{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:12.5px;color:var(--text2);line-height:19px}
+.g .rows b{display:block;font-size:10.5px;font-weight:600;letter-spacing:.06em;margin-bottom:2px;color:var(--text3)}
+.g .rows .b1 b{color:var(--primary)}.g .rows .b2 b{color:#0B7C7C}.g .rows .b3 b{color:var(--warning)}
+.g .tip2{margin-top:10px;font-size:12px;color:var(--text2);line-height:19px;padding-top:10px;border-top:1px solid var(--border)}
+
+.kwchips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.kwchips button{border:1px solid var(--border2);background:var(--surface);color:var(--text2);border-radius:var(--r-full);padding:6px 12px;font-size:12px;font-weight:500;transition:.12s}
+.kwchips button:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-c)}
+.g .rows .b1{border-left:3px solid var(--primary);padding-left:9px}
+.g .rows .b2{border-left:3px double #0B7C7C;padding-left:9px}
+.g .rows .b3{border-left:3px dashed var(--warning);padding-left:9px}
+.gbtn{margin-top:12px;border:1px solid var(--primary);background:var(--primary-c);color:var(--primary);border-radius:var(--r-full);padding:7px 16px;font-size:12px;font-weight:600}
+.gbtn:hover{background:var(--primary);color:#fff}
+
+.kwprompt{font-family:var(--display);font-size:26px;line-height:1.5;font-weight:700;letter-spacing:.02em;padding:18px 20px;border:1px solid var(--border2);border-left:4px solid var(--primary);border-radius:var(--r-md);background:var(--primary-c);margin-bottom:8px}
+.quizask{font-size:13px;color:var(--text2);margin:14px 0 12px}
+.quizopts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.quizopts button{display:flex;align-items:center;gap:10px;padding:13px 15px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--surface);font-size:14px;text-align:left;transition:.12s}
+.quizopts button:hover{border-color:var(--primary);background:var(--primary-c)}
+.quizopts .qnum{width:22px;height:22px;border-radius:6px;background:var(--surface2);display:grid;place-items:center;font-family:var(--num);font-size:11px;color:var(--text3);flex:none}
+.quizopts button.ok{border-color:var(--success);background:var(--success-c);color:#0B7C7C}
+.quizopts button.no{border-color:var(--error);background:var(--error-c);color:var(--error)}
+@media(max-width:600px){.quizopts{grid-template-columns:1fr}.kwprompt{font-size:20px}}
+/* ---------- numbers ---------- */
+.numcard{max-width:820px;margin:32px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:32px;box-shadow:var(--sh1)}
+.numcard .qn{font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--text3);margin-bottom:16px}
+.numcard .q{font-size:22px;line-height:32px;font-weight:600;letter-spacing:-.01em;margin-bottom:22px}
+.answer{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.answer input{width:180px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);color:var(--text);
+  font-family:var(--num);font-size:26px;font-weight:600;padding:10px 16px;text-align:right;font-variant-numeric:tabular-nums}
+.answer input:focus{outline:none;border-color:var(--primary);background:var(--surface);box-shadow:0 0 0 3px rgba(26,95,208,.12)}
+.answer .u{color:var(--text3);font-size:13px}
+.streakbar{display:flex;gap:6px;margin-top:20px}
+.streakbar i{width:18px;height:5px;border-radius:var(--r-full);background:var(--surface3)}
+.streakbar i.on{background:var(--primary)}
+
+/* ---------- statements ---------- */
+.sheets{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media(min-width:1400px){
+  .sheets{grid-template-columns:repeat(3,1fr)}
+  .sheets .sheet.tinted{grid-column:1/-1}
+}
+.sheet{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--sh1);animation:print .45s ease both}
+@keyframes print{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sheet h3{font-size:14px;font-weight:600;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:baseline}
+.sheet h3 span{font-size:11px;font-weight:500;color:var(--text3);letter-spacing:0}
+.sheet table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.sheet td{padding:6px 2px;border-bottom:1px solid var(--border);color:var(--text2)}
+.sheet td:last-child{text-align:right;font-family:var(--num);color:var(--text)}
+.sheet tr.tot td{border-top:1px solid var(--text);border-bottom:0;font-weight:700;color:var(--text);padding-top:10px}
+.sheet tr.sub td{color:var(--text3);font-size:12px;padding-top:12px;border-bottom:0;font-weight:600}
+.sheet tr.grp td{font-size:10.5px;letter-spacing:.14em;color:var(--text3);font-weight:600;padding:14px 2px 4px;border-bottom:1px solid var(--border);text-align:left!important}
+.sheet.tinted{background:var(--primary-c);border-color:#D6E4F8}
+.foot{font-size:11.5px;color:var(--text3);margin-top:12px;line-height:18px}
+.check{color:var(--success);font-weight:700}
+.auditrow{cursor:pointer}
+.auditrow td{transition:background .12s}
+.auditrow:hover td{background:#F8FAFF}
+.auditrow.sel td{background:var(--warning-c)}
+.auditrow.found td{background:var(--success-c)}
+.auditrow.missed td{background:var(--error-c)}
+.auditrow.false td{background:var(--error-c);opacity:.6}
+.auditrow:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
+
+/* ---------- toast ---------- */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);pointer-events:none;background:#1F2329;color:#fff;
+  padding:10px 18px;border-radius:var(--r-md);font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:.2s;z-index:99;box-shadow:var(--sh3)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.bad{background:var(--error)}
+
+.quickbar{display:none}
+
+@media(max-width:900px){
+  .wrap>*:not(.top){padding-left:20px;padding-right:20px}
+  .wrap{padding:0 0 64px}
+  .top{padding:0 20px}
+  .hero{grid-template-columns:1fr;padding:24px}
+  .handbook-card{min-height:220px}
+  .train{padding:16px 18px 6px}
+  .traps ol{grid-template-columns:1fr 1fr;gap:14px 0}
+  .traps li:nth-child(3){border-left:0;padding-left:0}
+  .bins{grid-template-columns:1fr}
+  .sheets{grid-template-columns:1fr}
+  .bin{min-height:auto}
+  .drop{min-height:70px}
+  .g .rows{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  body{padding-bottom:96px;font-size:13px;line-height:20px}
+  .wrap>*:not(.top){padding-left:16px;padding-right:16px}
+  .wrap{padding:0 0 64px}
+  .top{padding:0 16px;gap:10px;height:56px;margin-bottom:16px}
+  .brand em{display:none}
+  .brand .logo{width:24px;height:24px}
+  .hero{padding:18px;border-radius:18px;gap:16px}
+  .hero h1{font-size:28px;line-height:1.18}
+  .hero p{font-size:12.5px;line-height:19px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 0;margin-top:18px;padding-top:14px}
+  .stats>div{min-width:0;padding:0 10px}
+  .stats>div:nth-child(3n+1){border-left:0;padding-left:0}
+  .stats b{font-size:20px;line-height:26px}
+  .stats .stat-rank b{font-size:17px;line-height:24px}
+  .handbook-card{min-height:190px;padding:18px;border-radius:16px}
+  .hc-title{font-size:32px}
+  .hc-main{margin:14px 0}
+  .hc-foot span:first-child{font-size:11px}
+  .train{padding:14px 16px 4px;border-radius:16px}
+  .train-head h2{font-size:18px}
+  .train-note{display:none}
+  .acct-nav{gap:4px}
+  .acct-chip{padding:0 8px 0 3px;height:38px}
+  .acct-meta{display:none}
+  .acct-chip.guest .acct-name{font-size:12px;padding-right:4px}
+  .online-chip{padding:0 6px;font-size:11px}
+  .online-chip i{width:7px;height:7px}
+  .trow{grid-template-columns:34px minmax(0,1fr) auto;gap:10px;padding:12px 0}
+  .tprog{grid-column:2/-1;margin-top:2px}
+  .tgo{grid-column:3;grid-row:1}
+  .tnum{width:30px;height:30px;border-radius:9px;font-size:11px}
+  .exgrid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .traps{padding:16px;border-radius:16px}
+  .traps ol{grid-template-columns:1fr;gap:12px 0}
+  .traps li{border-left:0;padding:0}
+  .ticket{padding:16px 16px;border-radius:var(--r-md)}
+  .ticket p{font-size:14px;line-height:22px}
+  .hud .k{padding:6px 10px}
+  .hud b{font-size:14px}
+  .drop{min-height:56px;padding:10px}
+  .fillrow .fr-amt{font-size:16px;width:82px}
+  .drop .ph{display:none}
+  .wrap>.numcard{margin-top:16px;padding:22px 20px;border-radius:var(--r-lg);max-width:none}
+  .numbar{min-height:calc(100vh - 160px)}
+  .numcard .q{font-size:18px;line-height:26px}
+  .answer input{width:140px;font-size:22px}
+  .quickbar{display:flex;position:fixed;left:0;right:0;bottom:0;padding:8px 10px 10px;gap:6px;flex-direction:column;background:rgba(255,255,255,.96);
+    backdrop-filter:blur(12px);border-top:1px solid var(--border);z-index:60}
+  .qb-sel{font-size:11px;font-weight:600;color:var(--text3);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .qb-sel b{color:var(--primary);font-weight:700}
+  .qb-btns{display:flex;gap:6px;width:100%}
+  .quickbar .qb-btns button{flex:1;height:42px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12.5px;font-weight:600;opacity:.55}
+  .quickbar.on .qb-btns button{opacity:1}
+  .quickbar .qb-btns button.qb-bs{color:var(--primary);border-color:#C9DCF7;background:#F7FAFF}
+  .quickbar .qb-btns button.qb-is{color:#0B7C7C;border-color:#BFE7E7;background:#F5FBFB}
+  .quickbar .qb-btns button.qb-cf{color:var(--warning);border-color:#F1D3B0;background:#FFFBF5}
+  .quickbar .qb-btns button.qb-submit{opacity:1;background:var(--primary);color:#fff;border-color:var(--primary)}
+  .quickbar .qb-btns button.qb-submit:disabled{opacity:.4}
+  .quickbar .qb-btns button:active{transform:scale(.98)}
+  .toast{bottom:104px}
+  .actions .kbd{display:none}
+}
+@media print{
+  body{background:#fff}
+  .top,.kwchips,.searchbar,.gbtn,.nav,.quickbar,.toast{display:none!important}
+  .wrap{padding:0}
+  .wrap>*:not(.top){max-width:none;padding-left:0;padding-right:0}
+  .g{break-inside:avoid;box-shadow:none;border-color:#bbb}
+  .guide{gap:8px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast"></div>
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+/* =========================================================
+   数据：业务卡（三表投放）
+   imp = 正确影响 [表, 科目, 金额]
+   dec = 干扰项   [表, 科目]
+   ========================================================= */
+const C=(id,tag,prompt,imp,dec,why,num)=>({id,tag,prompt,imp,dec,why,num});
+
+const CARDS=[
+/* ---------- S 公司：2025 真题 ---------- */
+C("S1","融资","2 月 1 日，财务部从银行取得一年期贷款 100 万元，年利率 12%，当日到账，到期一次还本付息。",
+ [["bs","货币资金",100],["bs","短期借款",100],["bs","应付利息",11],["is","财务费用",11],["cf","取得借款收到的现金",100]],
+ [["is","营业收入"],["cf","偿还债务支付的现金"]],
+ "利息从 2 月到 12 月共 11 个月：100×12%×11/12=11 万元。利息只计提没付，所以现金流量表只有本金 100。",
+ ["年末应计入财务费用的利息（万元）",11,"100×12%×11/12，注意是 11 个月不是 12 个月"]),
+
+C("S2","采购","3 月 1 日，采购原材料 10 万元（不含税），取得 13% 增值税专用发票，款项银行即时支付，材料尚未领用。",
+ [["bs","存货",10],["bs","应交税费",-1.30],["bs","货币资金",-11.30],["cf","购买商品、接受劳务支付的现金",-11.30]],
+ [["is","营业成本"],["is","管理费用"]],
+ "付款是含税额 11.3 万；进项税额抵减应交税费；材料没投产，不影响利润。",
+ ["本次付款金额（万元）",11.30,"10×1.13"]),
+
+C("S3","成本归集","4 月 1 日，生产部第一批产品完工入库 20 万件。生产过程中消耗原材料 10 万元，现金支付生产工人工资 20 万元，设备折旧 10 万元。",
+ [["bs","存货",30],["bs","货币资金",-20],["bs","固定资产",-10],["cf","支付给职工以及为职工支付的现金",-20]],
+ [["is","营业成本"],["cf","购买商品、接受劳务支付的现金"],["is","管理费用"]],
+ "产品成本 10+20+10=40 万，单位成本 2 元/件。领料 10 万是存货内部转换，存货净增 30 万（工资 20 + 折旧 10）。费用全留在存货里，不进利润表；折旧不掏现金。",
+ ["该批产品单位成本（元/件）",2,"40 万 ÷ 20 万件"]),
+
+C("S4","销售","4 月 30 日，销售第一批产品 10 万件，每件售价 10 元（不含税），开出 13% 专用发票，款项已收。",
+ [["bs","货币资金",113],["bs","存货",-20],["bs","应交税费",13],["is","营业收入",100],["is","营业成本",20],["cf","销售商品、提供劳务收到的现金",113]],
+ [["cf","收到其他与经营活动有关的现金"],["bs","应收账款",113]],
+ "收现按含税 113 万；收入 100 万；成本 10 万件×2 元=20 万。销项税形成负债。",
+ ["实际收到现金（万元）",113,"100×1.13"]),
+
+C("S5","政府补助","5 月 1 日，收到政府「绿色节能核心科技」专项补贴 100 万元。项目研发计划已制定，但尚未实施。",
+ [["bs","货币资金",100],["bs","递延收益",100],["cf","收到其他与经营活动有关的现金",100]],
+ [["is","营业外收入",100],["is","其他收益",100]],
+ "补偿以后期间的费用 → 先挂递延收益，当期不进利润。这是全卷最大的陷阱。",
+ ["计入当期损益的金额（万元）",0,"项目还没开始，一分钱不能进利润"]),
+
+C("S6","公允价值","6 月 1 日，以每股 10 元购入某公司股票 10 万股，准备伺机出售。12 月 31 日收盘价每股 16 元。",
+ [["bs","交易性金融资产",160],["bs","货币资金",-100],["is","公允价值变动收益",60],["cf","投资支付的现金",-100]],
+ [["is","投资收益",60],["cf","收回投资收到的现金",60]],
+ "成本 100 万，年末公允 160 万，增值 60 万进公允价值变动损益。没卖出，所以没有投资活动现金流入。",
+ ["公允价值变动损益（万元）",60,"(16-10)×10 万股"]),
+
+C("S7","代扣个税","7 月 1 日，支付外聘律师费 10 万元（税前），实际支付律师 8.4 万元，代扣个人所得税 1.6 万元。",
+ [["bs","货币资金",-8.40],["bs","应交税费（个人所得税）",1.60],["is","管理费用",10],["cf","支付其他与经营活动有关的现金",-8.40]],
+ [["is","销售费用",8.40],["bs","其他应付款",-1.60]],
+ "费用按税前全额 10 万入账；代扣的个税是欠税务局的；现金只流出 8.4 万。利润表 10 与现金流量表 8.4 不一致是正常的。",
+ ["计入管理费用的金额（万元）",10,"按税前全额，不是实付数"]),
+
+C("S8","赞助","10 月 1 日，向残疾人公益体育嘉年华赞助办公用品 100 套，每套库存成本 300 元，市场售价每套 1000 元，货物已交付。",
+ [["bs","存货",-3],["bs","应交税费",1.30],["is","营业外支出",4.30]],
+ [["is","营业收入",10],["is","营业成本",3],["cf","支付其他与经营活动有关的现金",-4.30]],
+ "会计上没收到钱，不确认收入；税法视同销售，按售价 10 万计销项 1.3 万。营业外支出 = 成本 3 + 销项 1.3 = 4.30 万。只交货没付钱，现金流量表不动。",
+ ["营业外支出金额（万元）",4.30,"成本 3 + 销项税 1.3"]),
+
+C("S9","折旧规则","12 月 1 日，研发部购入空调 2 台，总价 10 万元（含 13% 增值税，取得专用发票），预计使用 5 年，无残值。",
+ [["bs","固定资产",8.85],["bs","应交税费",-1.15],["bs","货币资金",-10],["cf","购建固定资产、无形资产和其他长期资产支付的现金",-10]],
+ [["is","管理费用",8.85],["cf","购买商品、接受劳务支付的现金",-10]],
+ "含税价先分离：10÷1.13=8.85 万入固定资产。当月增加的固定资产当月不提折旧 → 12 月购入，2025 年折旧为 0（若课堂口径按「提 1 个月」，则为 8.85÷5÷12=0.15 万）。",
+ ["2025 年应计提折旧（万元）",0,"当月增加当月不提，12 月购入 → 当年 0"]),
+
+C("S10","费用分摊","12 月 31 日，后勤部为各部门提供维修服务，全年发生费用 100 万元（耗用原材料 10 万，应计工资 90 万），由生产、管理、研发、销售部门按 4:1:2:3 分担。",
+ [["bs","存货",30],["bs","开发支出",10],["bs","应付职工薪酬",90],["is","销售费用",30],["is","管理费用",10],["is","研发费用",10]],
+ [["is","财务费用",100],["cf","支付给职工以及为职工支付的现金",-90]],
+ "维修费 100 万分摊：生产 40 进存货，管理 10 进管理费用，研发 20 中研究 10 费用化、开发 10 资本化（开发支出），销售 30 进销售费用。材料 10 冲存货，所以存货净增 30（40−10）。工资只计提没发，无现金流出。",
+ ["计入当期费用的金额（万元）",50,"管理 10 + 研发 10 + 销售 30"]),
+
+/* ---------- N 公司：模拟题 ---------- */
+C("N1","融资","3 月 1 日，取得一年期流动资金借款 200 万元，年利率 12%，当日到账，到期一次还本付息。",
+ [["bs","货币资金",200],["bs","短期借款",200],["bs","应付利息",20],["is","财务费用",20],["cf","取得借款收到的现金",200]],
+ [["is","营业收入"],["cf","偿还债务支付的现金"]],
+ "3 月到 12 月共 10 个月：200×12%×10/12=20 万元。",
+ ["年末应计利息（万元）",20,"200×12%×10/12"]),
+
+C("N2","采购","4 月 1 日，采购原材料 80 万元（不含税），取得 13% 专用发票，银行即时支付，材料已验收入库。",
+ [["bs","存货",80],["bs","应交税费",-10.40],["bs","货币资金",-90.40],["cf","购买商品、接受劳务支付的现金",-90.40]],
+ [["is","营业成本"],["bs","应付账款",80]],
+ "付款 80×1.13=90.4 万；进项税 10.4 万可抵扣。",
+ ["付款金额（万元）",90.40,"80×1.13"]),
+
+C("N3","成本归集","5 月 1 日，第一批产品完工入库 40 万件。领用原材料 40 万元，银行存款支付生产工人薪酬 30 万元，设备折旧 10 万元。",
+ [["bs","存货",40],["bs","货币资金",-30],["bs","固定资产",-10],["cf","支付给职工以及为职工支付的现金",-30]],
+ [["is","营业成本"],["cf","购买商品、接受劳务支付的现金"]],
+ "产品成本 40+30+10=80 万，单位成本 2 元/件。领料 40 万是存货内部转换，存货净增 40 万（工资 30 + 折旧 10）。",
+ ["单位成本（元/件）",2,"80 万 ÷ 40 万件"]),
+
+C("N4","销售","5 月 31 日，销售第一批产品 20 万件，每件售价 5 元（不含税），开出 13% 专用发票，款项已收。",
+ [["bs","货币资金",113],["bs","存货",-40],["bs","应交税费",13],["is","营业收入",100],["is","营业成本",40],["cf","销售商品、提供劳务收到的现金",113]],
+ [["is","营业外收入"],["cf","收到其他与经营活动有关的现金"]],
+ "收入 20 万件×5=100 万；含税收现 113 万；成本 20 万件×2 元=40 万。",
+ ["销售收现（万元）",113,"100×1.13"]),
+
+C("N5","政府补助","6 月 15 日，收到「智能家居制造专项补贴」80 万元，项目实施方案已制定但尚未开始执行。",
+ [["bs","货币资金",80],["bs","递延收益",80],["cf","收到其他与经营活动有关的现金",80]],
+ [["is","其他收益",80],["is","营业外收入",80]],
+ "项目未执行 → 递延收益，当期不进利润。",
+ ["计入当期收益（万元）",0,"尚未实施，不能确认"]),
+
+C("N6","公允价值","7 月 1 日，以每股 20 元购入股票 5 万股准备伺机出售。12 月 31 日收盘价每股 25 元。",
+ [["bs","交易性金融资产",125],["bs","货币资金",-100],["is","公允价值变动收益",25],["cf","投资支付的现金",-100]],
+ [["is","投资收益",25],["cf","收回投资收到的现金",25]],
+ "成本 100 万，年末公允 125 万，增值 25 万进损益但无现金。",
+ ["公允价值变动损益（万元）",25,"(25-20)×5 万股"]),
+
+C("N7","代扣个税","8 月 1 日，支付外聘专家授课费 5 万元（税前），实际支付 4.2 万元，代扣个人所得税 0.8 万元。",
+ [["bs","货币资金",-4.20],["bs","应交税费（个人所得税）",0.80],["is","管理费用",5],["cf","支付其他与经营活动有关的现金",-4.20]],
+ [["is","销售费用",4.20],["bs","其他应付款",-0.80]],
+ "费用按税前 5 万，现金流出 4.2 万，差额是代扣的个税负债。",
+ ["管理费用（万元）",5,"按税前全额"]),
+
+C("N8","赞助","9 月 10 日，向市慈善总会捐赠办公桌椅 200 套，每套成本 400 元，市场售价每套 1000 元，货物已交付。",
+ [["bs","存货",-8],["bs","应交税费",2.60],["is","营业外支出",10.60]],
+ [["is","营业收入",20],["is","营业成本",8],["cf","支付其他与经营活动有关的现金",-10.60]],
+ "会计上不确认收入；税法视同销售，按售价 20 万计销项 2.6 万。营业外支出 = 成本 8 + 销项 2.6 = 10.60 万。只交货没付钱，现金流量表不动。",
+ ["营业外支出（万元）",10.60,"成本 8 + 销项税 2.6"]),
+
+C("N9","折旧规则","11 月 1 日，研发部购入检测设备一台，专用发票注明不含税价 24 万元，税率 13%，款项已付，预计使用 5 年，无残值。",
+ [["bs","固定资产",23.60],["bs","应交税费",-3.12],["bs","货币资金",-27.12],["is","研发费用",0.40],["cf","购建固定资产、无形资产和其他长期资产支付的现金",-27.12]],
+ [["is","管理费用",24],["cf","购买商品、接受劳务支付的现金",-27.12]],
+ "11 月购入，12 月起计提，2025 年只提 1 个月：24÷5÷12=0.40 万。固定资产按净额 +23.60（购入 24 − 折旧 0.40）。",
+ ["2025 年折旧（万元）",0.40,"24÷5÷12"]),
+
+C("N10","费用分摊","12 月 31 日，后勤部全年发生费用 60 万元（耗用原材料 10 万，应计薪酬 50 万，尚未支付），由生产、管理、研发、销售部门按 5:2:1:2 分担。",
+ [["bs","存货",20],["bs","应付职工薪酬",50],["is","管理费用",12],["is","研发费用",6],["is","销售费用",12]],
+ [["is","财务费用",60],["cf","支付给职工以及为职工支付的现金",-50]],
+ "维修费 60 万分摊：生产 30 进存货，管理 12、研发 6、销售 12 费用化。材料 10 冲存货，所以存货净增 20（30−10）。工资只计提没发，无现金流出。",
+ ["计入当期费用（万元）",30,"管理 12 + 研发 6 + 销售 12"]),
+
+/* ---------- Q 公司：清源环境模拟卷 ---------- */
+C("Q1","融资","2 月 1 日向银行借入一年期借款 200 万元，年利率 6%，到期一次还本付息，款项已到账。",
+ [["bs","货币资金",200],["bs","短期借款",200],["bs","应付利息",11],["is","财务费用",11],["cf","取得借款收到的现金",200]],
+ [["is","营业收入"],["cf","偿还债务支付的现金"]],
+ "2 月到 12 月共 11 个月：200×6%×11/12=11 万元。利息只计提没付，现金流量表只有本金 200。",
+ ["年末应计利息（万元）",11,"200×6%×11/12"]),
+
+C("Q2","采购","3 月 1 日采购原材料一批，取得增值税专用发票，不含税价 300 万元，税额 39 万元，款项即付。",
+ [["bs","存货",300],["bs","应交税费",-39],["bs","货币资金",-339],["cf","购买商品、接受劳务支付的现金",-339]],
+ [["is","营业成本"],["bs","应付账款",300]],
+ "付款是含税 339 万；进项税 39 万抵减应交税费；材料没投产，不影响利润。",
+ ["本次付款金额（万元）",339,"300+39"]),
+
+C("Q3","设备","4 月 1 日购入车间生产设备一台，专用发票注明不含税价 120 万元，税额 15.6 万元，款项即付，当月投入使用，按 10 年计提折旧。",
+ [["bs","固定资产",120],["bs","应交税费",-15.60],["bs","货币资金",-135.60],["cf","购建固定资产、无形资产和其他长期资产支付的现金",-135.60]],
+ [["is","管理费用",120],["cf","购买商品、接受劳务支付的现金",-135.60]],
+ "设备是资产，不进当期费用；当月购入次月起提折旧，年末调整 8 万（120÷10÷12×8），进产品成本。",
+ ["本次付款金额（万元）",135.60,"120+15.60"]),
+
+C("Q4","工资","6 月计提工资 100 万元（生产工人 60、管理人员 15、销售人员 10、研发人员 15，研发处于研究阶段），当月发放，代扣个人所得税 2 万元，实发 98 万元。",
+ [["bs","存货",60],["bs","货币资金",-98],["bs","应交税费",2],["is","管理费用",15],["is","销售费用",10],["is","研发费用",15],["cf","支付给职工以及为职工支付的现金",-98]],
+ [["bs","应付职工薪酬",100],["is","营业成本",60]],
+ "生产工人 60 进存货；计提和发放同月，应付职工薪酬净影响为 0；代扣个税 2 留应交税费，实发 98 才是现金流出。",
+ ["实发工资（万元）",98,"100−2"]),
+
+C("Q5","完工","7 月领用原材料 240 万元投入生产，分配车间设备折旧，产品全部完工入库（折旧在要求 3 统一计算，本笔先按完工处理）。",
+ [["bs","存货",8],["bs","固定资产",-8]],
+ [["is","营业成本"],["is","管理费用"],["cf","支付给职工以及为职工支付的现金",-8]],
+ "领料 240 万是存货内部转换；车间设备折旧 8 万（120÷10÷12×8）进存货，固定资产减 8 万；无损益、无现金。",
+ ["本笔车间折旧（万元）",8,"120÷10÷12×8"]),
+
+C("Q6","销售","8 月销售空气净化器一批，专用发票注明不含税售价 500 万元，税额 65 万元，款项已收存银行；该批产品成本 300 万元。",
+ [["bs","货币资金",565],["bs","存货",-300],["bs","应交税费",65],["is","营业收入",500],["is","营业成本",300],["cf","销售商品、提供劳务收到的现金",565]],
+ [["bs","应收账款",565],["cf","收到其他与经营活动有关的现金",565]],
+ "收现是含税 565 万；收入 500 万；成本 300 万；销项税形成负债。",
+ ["销售收现（万元）",565,"500+65"]),
+
+C("Q7","补助","9 月收到政府专项补贴 100 万元，用于补偿以后期间费用，项目尚未实施。",
+ [["bs","货币资金",100],["bs","递延收益",100],["cf","收到其他与经营活动有关的现金",100]],
+ [["is","其他收益",100],["is","营业外收入",100]],
+ "补偿以后期间且尚未实施 → 先挂递延收益，当期不进利润。",
+ ["计入当期损益（万元）",0,"尚未实施"]),
+
+C("Q8","公允价值","10 月以银行存款购入两类股票：A 股票准备短期出售，成本 50 万元，年末公允价值 60 万元；B 股权长期持有并指定为以公允价值计量且其变动计入其他综合收益，成本 30 万元，年末公允价值 35 万元。",
+ [["bs","交易性金融资产",60],["bs","其他权益工具投资",35],["bs","其他综合收益",5],["bs","货币资金",-80],["is","公允价值变动收益",10],["cf","投资支付的现金",-80]],
+ [["is","投资收益",10],["is","营业外收入",5],["cf","收回投资收到的现金",15]],
+ "A 股票增值 10（60−50）进公允价值变动收益；B 股权增值 5（35−30）进其他综合收益，不进利润表；投资共支付 80 万。",
+ ["计入利润表的公允价值变动（万元）",10,"60−50；B 的 5 进其他综合收益"]),
+
+C("Q9","赞助","11 月将自产空气净化器一批用于非公益性赞助，成本 5 万元，公允售价 10 万元。",
+ [["bs","存货",-5],["bs","应交税费",1.30],["is","营业外支出",6.30]],
+ [["is","营业收入",10],["is","营业成本",5],["cf","支付其他与经营活动有关的现金",-6.30]],
+ "会计不确认收入；税法视同销售，按公允售价 10 万计销项 1.3 万；营业外支出 = 成本 5 + 销项 1.3 = 6.30 万；无现金流。",
+ ["营业外支出（万元）",6.30,"5+1.3"]),
+
+C("Q10","咨询","12 月支付律师事务所常年法律顾问费，专用发票注明不含税 10 万元，税额 0.6 万元，款项即付。",
+ [["bs","货币资金",-10.60],["bs","应交税费",-0.60],["is","管理费用",10],["cf","支付其他与经营活动有关的现金",-10.60]],
+ [["is","营业成本",10],["cf","购买商品、接受劳务支付的现金",-10.60]],
+ "咨询费税率 6%，进项 0.6 万抵减应交税费；费用按不含税 10 万入管理费用；现金流出 10.6 万。",
+ ["本次付款（万元）",10.60,"10+0.6"]),
+
+/* ---------- T 系列：手册 28 类里游戏缺的题型 ---------- */
+C("T1","摊销","7 月 1 日，一项专利技术达到预定用途，成本 30 万元，按 10 年摊销，无残值。",
+ [["bs","无形资产",-1.50],["is","管理费用",1.50]],
+ [["bs","固定资产",-1.50],["is","研发费用",1.50],["cf","购建固定资产、无形资产和其他长期资产支付的现金",-1.50]],
+ "无形资产当月增加当月起摊：30÷10÷12×6=1.50 万。摊销不掏现金。",
+ ["当年摊销额（万元）",1.50,"30÷10÷12×6"]),
+
+C("T2","研发","研究阶段耗用材料 5 万元、计提研发人员工资 15 万元；开发阶段耗材 10 万元、工资 20 万元，项目成功并达到预定用途。",
+ [["bs","存货",-15],["bs","应付职工薪酬",35],["bs","无形资产",30],["is","研发费用",20]],
+ [["is","营业成本",20],["bs","固定资产",30],["is","管理费用",20]],
+ "研究阶段 5+15=20 万全部费用化；开发阶段 10+20=30 万满足条件资本化，转无形资产。资本化部分不进当期利润。",
+ ["计入研发费用的金额（万元）",20,"研究阶段 5+15"]),
+
+C("T3","收入","合同总价 1000 万元，预计总成本 800 万元，履约进度 75%，本期按进度确认收入，尚未结算。",
+ [["bs","合同资产",750],["bs","合同履约成本",-600],["is","营业收入",750],["is","营业成本",600]],
+ [["bs","应收账款",750],["bs","合同负债",750],["cf","销售商品、提供劳务收到的现金",750]],
+ "收入=1000×75%=750；成本=800×75%=600。未到收款权利记合同资产；没收到钱，现金流量表不填。",
+ ["本期确认收入（万元）",750,"1000×75%"]),
+
+C("T4","坏账","年末应收账款余额 1000 万元，按 10% 计提坏账准备。",
+ [["bs","应收账款",-100],["is","信用减值损失",100]],
+ [["bs","货币资金",-100],["bs","坏账准备",100],["is","资产减值损失",100]],
+ "应收账款按净额列示：1000×10%=100 万。计提坏账不掏现金。",
+ ["计提坏账（万元）",100,"1000×10%"]),
+
+C("T5","预计负债","按销售额计提产品质量保证 5 万元；另有一项很可能败诉的诉讼，预计赔偿 40 万元。",
+ [["bs","预计负债",45],["is","营业成本",5],["is","营业外支出",40]],
+ [["bs","货币资金",-45],["is","销售费用",45],["bs","应收账款",45]],
+ "产品质量保证进营业成本；诉讼赔偿进营业外支出；都只计提、没付钱。",
+ ["计入营业外支出的金额（万元）",40,"诉讼 40；质保 5 进营业成本"]),
+
+C("T6","税费","当期实际缴纳增值税 10 万元，按 7%+3%+2% 计提附加税。",
+ [["bs","应交税费",1.20],["is","税金及附加",1.20]],
+ [["is","管理费用",1.20],["is","营业外支出",1.20],["cf","支付其他与经营活动有关的现金",-1.20]],
+ "附加税=10×12%=1.20 万，进税金及附加；计提未缴不产生现金流出。",
+ ["附加税（万元）",1.20,"10×12%"]),
+
+C("T7","现金折扣","采购芯片不含税 200 万元，增值税 26 万元；10 天内付款享 2% 折扣（4 万元），实际支付 222 万元。",
+ [["bs","存货",196],["bs","应交税费",-26],["bs","货币资金",-222],["cf","购买商品、接受劳务支付的现金",-222]],
+ [["is","财务费用",-4],["is","营业外收入",4],["bs","存货（按全额入账）",200]],
+ "按老师口径净额法：折扣 4 万冲存货，不确认财务费用；进项税仍按发票 26 万。",
+ ["实际支付（万元）",222,"226−4"]),
+
+C("T8","福利","外购风扇 100 台发给员工，含税价 11.3 万元（不含税 10 万元，进项 1.3 万元），款项已付，进项不得抵扣。",
+ [["bs","管理费用",11.30],["bs","货币资金",-11.30],["cf","购买商品、接受劳务支付的现金",-11.30]],
+ [["bs","存货",11.30],["bs","应交税费",-1.30],["bs","应付职工薪酬",11.30]],
+ "外购福利进项不得抵扣，价税合计 11.3 万全额进管理费用；没有存货。",
+ ["计入费用的金额（万元）",11.30,"10+1.3"]),
+
+C("T9","在建工程","自建生产线归集物资、人工、水电共 2000 万元，达到预定可使用状态转固。",
+ [["bs","固定资产",2000],["bs","在建工程",-2000]],
+ [["is","管理费用",2000],["bs","货币资金",-2000]],
+ "在建工程转固是资产内部转换，不影响利润，也不产生新的现金流。",
+ ["转固金额（万元）",2000,"归集总额"]),
+
+C("T10","预付","按合同预付电池定金 2542.5 万元，货物尚未收到。",
+ [["bs","货币资金",-2542.50],["bs","预付账款",2542.50],["cf","购买商品、接受劳务支付的现金",-2542.50]],
+ [["bs","存货",2542.50],["bs","管理费用",2542.50],["bs","应付账款",2542.50]],
+ "钱出去、货没到：货币资金转预付账款，资产总额不变；没影响利润。",
+ ["预付金额（万元）",2542.50,"合同定金"]),
+
+C("T11","保证金","收到客户履约保证金 20 万元存入银行。",
+ [["bs","货币资金",20],["bs","其他应付款",20],["cf","收到其他与经营活动有关的现金",20]],
+ [["is","营业收入",20],["bs","其他应收款",20],["bs","合同负债",20]],
+ "保证金是暂收款，记其他应付款，不是收入；现金流列经营活动。",
+ ["确认收入（万元）",0,"暂收款不确认收入"]),
+
+C("T12","票据","销售商品不含税 300 万元、销项 39 万元，收到银行承兑汇票 339 万元；成本 180 万元。",
+ [["bs","应收票据",339],["bs","存货",-180],["bs","应交税费",39],["is","营业收入",300],["is","营业成本",180]],
+ [["bs","货币资金",339],["bs","应收账款",339],["cf","销售商品、提供劳务收到的现金",339]],
+ "票据按价税合计 339 万入账；收入成本在销售时确认；当期没收到现金。",
+ ["应收票据入账（万元）",339,"300+39"]),
+
+C("T13","退货","退回商品售价 10 万元、销项 1.3 万元、成本 6 万元，已退款。",
+ [["bs","存货",6],["bs","货币资金",-11.30],["bs","应交税费",-1.30],["is","营业收入",-10],["is","营业成本",-6],["cf","销售商品、提供劳务收到的现金",-11.30]],
+ [["is","营业外支出",11.30],["bs","应收账款",-11.30],["cf","支付其他与经营活动有关的现金",-11.30]],
+ "冲减营业收入 10、销项 1.3，冲回营业成本 6、商品入库；退款 11.3 万。",
+ ["退款金额（万元）",11.30,"10+1.3"]),
+
+C("T14","低值易耗","领用工具 10 万元，管理用 6 万元、车间用 4 万元，一次摊销。",
+ [["bs","存货",-6],["is","管理费用",6]],
+ [["is","营业成本",6],["bs","制造费用",10],["bs","货币资金",-10]],
+ "低值易耗品总额减 10；车间 4 万进制造费用再回存货，存货净减 6；管理 6 万进管理费用。",
+ ["计入管理费用的金额（万元）",6,"管理用部分"]),
+
+C("T15","委托加工","发出材料 50 万元委托加工，支付加工费 10 万元、进项 1.3 万元，收回入库。",
+ [["bs","存货",10],["bs","货币资金",-11.30],["bs","应交税费",-1.30],["cf","购买商品、接受劳务支付的现金",-11.30]],
+ [["is","营业成本",10],["bs","应收账款",10],["is","管理费用",10]],
+ "存货内部转换：原材料 50 转库存商品 60，净增 10（加工费）；不进利润。",
+ ["存货净增（万元）",10,"加工费 10"]),
+
+C("T16","专利出资","专利账面净值 240 万元，评估作价 300 万元对外投资，取得长期股权投资。",
+ [["bs","长期股权投资",300],["bs","无形资产",-240],["is","资产处置损益",60]],
+ [["bs","货币资金",-300],["is","营业外收入",60],["is","投资收益",60]],
+ "非货币性投资不产生现金；公允作价 300 − 账面净值 240 = 资产处置损益 60。",
+ ["资产处置损益（万元）",60,"300−240"]),
+
+C("T17","重分类","3 年期长期借款 300 万元，年末其中 100 万元将于一年内到期。",
+ [["bs","长期借款",-100],["bs","一年内到期的非流动负债",100]],
+ [["bs","短期借款",100],["bs","应付利息",100],["bs","货币资金",-100]],
+ "一年内到期的长期借款重分类到流动负债，不影响利润，也不产生现金流。",
+ ["重分类金额（万元）",100,"一年内到期部分"]),
+
+/* ---------- 补充常见业务 ---------- */
+C("P1","预收","收到客户预付货款 50 万元存入银行，商品尚未发出。",
+ [["bs","货币资金",50],["bs","合同负债",50],["cf","销售商品、提供劳务收到的现金",50]],
+ [["is","营业收入",50],["bs","应收账款",50]],
+ "钱到手但货没发 → 合同负债（原预收账款），不能确认收入；现金按「销售商品收到的现金」列报。",
+ ["应确认收入（万元）",0,"未发货不确认收入"]),
+
+C("P2","赊销","销售商品一批，不含税售价 100 万元，成本 60 万元，开出 13% 专用发票，款项尚未收到。",
+ [["bs","应收账款",113],["bs","存货",-60],["bs","应交税费",13],["is","营业收入",100],["is","营业成本",60]],
+ [["cf","销售商品、提供劳务收到的现金",113],["bs","货币资金",113]],
+ "应收 113 万（含税）；收入 100 万；没收到钱，现金流量表不填。",
+ ["应收账款入账（万元）",113,"100×1.13"]),
+
+C("P3","计提工资","月末计提管理人员工资 30 万元，尚未发放。",
+ [["bs","应付职工薪酬",30],["is","管理费用",30]],
+ [["cf","支付给职工以及为职工支付的现金",-30],["is","营业成本",30]],
+ "只计提没发钱 → 负债增加，无现金流出。",
+ ["现金流出（万元）",0,"尚未发放"]),
+
+C("P4","发放工资","以银行存款发放上月已计提的工资 30 万元。",
+ [["bs","货币资金",-30],["bs","应付职工薪酬",-30],["cf","支付给职工以及为职工支付的现金",-30]],
+ [["is","管理费用",30],["is","销售费用",30]],
+ "发放时不再进费用（上个月已计提），只减负债和现金。",
+ ["计入管理费用（万元）",0,"计提时已入费用"]),
+
+C("P5","缴税","以银行存款缴纳上月应交增值税 10 万元。",
+ [["bs","货币资金",-10],["bs","应交税费",-10],["cf","支付其他与经营活动有关的现金",-10]],
+ [["is","税金及附加",10],["is","所得税费用",10]],
+ "缴税只减负债和现金，不进利润表。",
+ ["影响利润表金额（万元）",0,"缴纳不是费用"]),
+
+C("P6","处置固定资产","处置一台设备，原值 100 万元，已提折旧 80 万元，售价 30 万元已收存银行。",
+ [["bs","货币资金",30],["bs","固定资产",-20],["is","资产处置损益",10],["cf","处置固定资产、无形资产和其他长期资产收回的现金净额",30]],
+ [["is","营业收入",30],["cf","销售商品、提供劳务收到的现金",30]],
+ "账面净值 20 万，卖 30 万，赚 10 万进资产处置收益；现金流入属投资活动。",
+ ["资产处置损益（万元）",10,"30-(100-80)"]),
+
+C("P7","减值","年末计提存货跌价准备 5 万元。",
+ [["bs","存货",-5],["is","资产减值损失",5]],
+ [["cf","支付其他与经营活动有关的现金",-5],["is","营业外支出",5]],
+ "计提减值只减资产、增费用，没有现金流动。",
+ ["现金流出（万元）",0,"计提不涉及现金"]),
+
+C("P8","收回应收","收到客户偿还的应收账款 20 万元存入银行。",
+ [["bs","货币资金",20],["bs","应收账款",-20],["cf","销售商品、提供劳务收到的现金",20]],
+ [["is","营业收入",20],["is","财务费用",20]],
+ "收回欠款不是新收入，只换了个资产形态。",
+ ["确认收入（万元）",0,"此前已确认"]),
+
+C("P9","付息","以银行存款支付已计提的短期借款利息 11 万元。",
+ [["bs","货币资金",-11],["bs","应付利息",-11],["cf","分配股利、利润或偿付利息支付的现金",-11]],
+ [["is","财务费用",11],["cf","偿还债务支付的现金",-11]],
+ "利息费用在计提时已进利润表，支付时只减负债；现金流量表列筹资活动。",
+ ["影响财务费用（万元）",0,"计提时已确认"]),
+
+C("P10","投资","股东追加投入现金 200 万元，其中 150 万元计入注册资本。",
+ [["bs","货币资金",200],["bs","实收资本",150],["bs","资本公积",50],["cf","吸收投资收到的现金",200]],
+ [["is","营业外收入",200],["cf","取得借款收到的现金",200]],
+ "超出注册资本份额的部分进资本公积，股东投入不是收入。",
+ ["计入资本公积（万元）",50,"200-150"])
+];
+
+
+/* 真题填表用：每笔业务的分录 */
+const JE={
+ S1:"借：银行存款 100　贷：短期借款 100；每月计提：借：财务费用 1　贷：应付利息 1（2—12 月共 11 个月）",
+ S2:"借：原材料 10、应交税费—进项 1.30　贷：银行存款 11.30（报表层面：存货 +10、应交税费 −1.30）",
+ S3:"借：库存商品 40　贷：原材料 10、银行存款 20、累计折旧 10（报表层面：存货净增 30）",
+ S4:"借：银行存款 113　贷：主营业务收入 100、应交税费—销项 13；借：主营业务成本 20　贷：库存商品 20",
+ S5:"借：银行存款 100　贷：递延收益 100",
+ S6:"借：交易性金融资产 100　贷：银行存款 100；借：交易性金融资产 60　贷：公允价值变动收益 60",
+ S7:"借：管理费用 10　贷：银行存款 8.40、应交税费—个人所得税 1.60",
+ S8:"借：营业外支出 4.30　贷：库存商品 3、应交税费—销项 1.30（会计不确认收入）",
+ S9:"借：固定资产 8.85、应交税费—进项 1.15　贷：银行存款 10",
+ S10:"借：生产成本 40、管理费用 10、研发支出—费用化 10、研发支出—资本化 10、销售费用 30　贷：原材料 10、应付职工薪酬 90；资本化部分转开发支出 10",
+ N1:"借：银行存款 200　贷：短期借款 200；每月计提：借：财务费用 2　贷：应付利息 2（3—12 月共 10 个月）",
+ N2:"借：原材料 80、应交税费—进项 10.40　贷：银行存款 90.40",
+ N3:"借：库存商品 80　贷：原材料 40、银行存款 30、累计折旧 10",
+ N4:"借：银行存款 113　贷：主营业务收入 100、应交税费—销项 13；借：主营业务成本 40　贷：库存商品 40",
+ N5:"借：银行存款 80　贷：递延收益 80",
+ N6:"借：交易性金融资产 100　贷：银行存款 100；借：交易性金融资产 25　贷：公允价值变动收益 25",
+ N7:"借：管理费用 5　贷：银行存款 4.20、应交税费—个人所得税 0.80",
+ N8:"借：营业外支出 10.60　贷：库存商品 8、应交税费—销项 2.60（会计不确认收入）",
+ N9:"借：固定资产 24、应交税费—进项 3.12　贷：银行存款 27.12；借：研发费用 0.40　贷：累计折旧 0.40",
+ N10:"借：生产成本 30、管理费用 12、研发费用 6、销售费用 12　贷：原材料 10、应付职工薪酬 50（报表层面：存货净增 20）",
+ Q1:"借：银行存款 200　贷：短期借款 200；年末计提：借：财务费用 11　贷：应付利息 11（2—12 月共 11 个月）",
+ Q2:"借：原材料 300、应交税费—进项 39　贷：银行存款 339",
+ Q3:"借：固定资产 120、应交税费—进项 15.60　贷：银行存款 135.60",
+ Q4:"计提：借：生产成本 60、管理费用 15、销售费用 10、研发费用 15　贷：应付职工薪酬 100；发放：借：应付职工薪酬 100　贷：银行存款 98、应交税费—个税 2",
+ Q5:"借：库存商品 8　贷：累计折旧 8（报表层面：存货 +8、固定资产 −8）",
+ Q6:"借：银行存款 565　贷：主营业务收入 500、应交税费—销项 65；借：主营业务成本 300　贷：库存商品 300",
+ Q7:"借：银行存款 100　贷：递延收益 100",
+ Q8:"借：交易性金融资产 60、其他权益工具投资 35　贷：银行存款 80、公允价值变动收益 10、其他综合收益 5",
+ Q9:"借：营业外支出 6.30　贷：库存商品 5、应交税费—销项 1.30",
+ Q10:"借：管理费用 10、应交税费—进项 0.60　贷：银行存款 10.60",
+ T1:"借：管理费用 1.50　贷：累计摊销 1.50（资产负债表写无形资产 −1.50）",
+ T2:"借：研发支出—费用化 20、—资本化 30　贷：原材料 15、应付职工薪酬 35；结转：借：研发费用 20　贷：研发支出—费用化 20；借：无形资产 30　贷：研发支出—资本化 30",
+ T3:"借：合同资产 750　贷：主营业务收入 750；借：主营业务成本 600　贷：合同履约成本 600",
+ T4:"借：信用减值损失 100　贷：坏账准备 100",
+ T5:"借：营业成本 5、营业外支出 40　贷：预计负债 45",
+ T6:"借：税金及附加 1.20　贷：应交税费 1.20",
+ T7:"借：原材料 196、应交税费—进项 26　贷：银行存款 222（折扣冲存货，不进财务费用）",
+ T8:"借：管理费用 11.30　贷：银行存款 11.30（进项不得抵扣，价税合计进费用）",
+ T9:"借：固定资产 2000　贷：在建工程 2000",
+ T10:"借：预付账款 2542.50　贷：银行存款 2542.50",
+ T11:"借：银行存款 20　贷：其他应付款 20",
+ T12:"借：应收票据 339　贷：主营业务收入 300、应交税费—销项 39；借：主营业务成本 180　贷：库存商品 180",
+ T13:"借：主营业务收入 10、应交税费—销项 1.30　贷：银行存款 11.30；借：库存商品 6　贷：主营业务成本 6",
+ T14:"借：制造费用 4、管理费用 6　贷：周转材料 10",
+ T15:"借：委托加工物资 50　贷：原材料 50；借：委托加工物资 10、应交税费—进项 1.30　贷：银行存款 11.30；借：库存商品 60　贷：委托加工物资 60",
+ T16:"借：长期股权投资 300　贷：无形资产 240、资产处置损益 60",
+ T17:"借：长期借款 100　贷：一年内到期的非流动负债 100"
+};
+
+/* 两套完整卷：BOSS 用 */
+const EXAMS={
+ S:{name:"S 公司（2025 真题）",ids:["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10"],
+  bs:{assets:[["货币资金",663.30],["交易性金融资产",160.00],["存货",547.00],["固定资产",2998.85],["无形资产",2000.00],["开发支出",10.00]],
+      liab:[["短期借款",100.00],["应付利息",11.00],["应付职工薪酬",90.00],["应交税费",29.63],["递延收益",100.00]],
+      eq:[["实收资本",5000.00],["资本公积",1000.00],["未分配利润",48.52]],
+      total:6379.15},
+  is:[["营业收入",100.00],["营业成本",20.00],["销售费用",30.00],["管理费用",20.00],["研发费用",10.00],["财务费用",11.00],["公允价值变动收益",60.00],["营业利润",69.00],["营业外支出",4.30],["利润总额",64.70],["所得税费用",16.18],["净利润",48.52]],
+  cf:[["销售商品、提供劳务收到的现金",113.00],["收到其他与经营活动有关的现金",100.00],["购买商品、接受劳务支付的现金",-11.30],["支付给职工以及为职工支付的现金",-20.00],["支付其他与经营活动有关的现金",-8.40],["经营活动净额",173.30],["投资支付的现金",-100.00],["购建固定资产支付的现金",-10.00],["投资活动净额",-110.00],["取得借款收到的现金",100.00],["筹资活动净额",100.00],["现金净增加额",163.30],["期初现金",500.00],["期末现金",663.30]],
+  note:"按老师口径：赞助不确认收入，营业外支出 4.30；维修费研发 20 中研究 10 费用化、开发 10 资本化（开发支出 +10）。真题表若无「开发支出」行，可并入无形资产或其他资产。所得税按利润总额 64.70×25%=16.18（四舍五入）。"},
+ N:{name:"N 公司（模拟题）",ids:["N1","N2","N3","N4","N5","N6","N7","N8","N9","N10"],
+  bs:{assets:[["货币资金",741.28],["交易性金融资产",125.00],["存货",92.00],["固定资产",5413.60],["无形资产",600.00]],
+      liab:[["短期借款",200.00],["应付利息",20.00],["应付职工薪酬",50.00],["应交税费",7.63],["递延收益",80.00]],
+      eq:[["实收资本",6000.00],["资本公积",600.00],["未分配利润",14.25]],
+      total:6971.88},
+  is:[["营业收入",100.00],["营业成本",40.00],["销售费用",12.00],["管理费用",17.00],["研发费用",6.40],["财务费用",20.00],["公允价值变动收益",25.00],["营业利润",29.60],["营业外支出",10.60],["利润总额",19.00],["所得税费用",4.75],["净利润",14.25]],
+  cf:[["销售商品、提供劳务收到的现金",113.00],["收到其他与经营活动有关的现金",80.00],["购买商品、接受劳务支付的现金",-90.40],["支付给职工以及为职工支付的现金",-30.00],["支付其他与经营活动有关的现金",-4.20],["经营活动净额",68.40],["投资支付的现金",-100.00],["购建固定资产支付的现金",-27.12],["投资活动净额",-127.12],["取得借款收到的现金",200.00],["筹资活动净额",200.00],["现金净增加额",141.28],["期初现金",600.00],["期末现金",741.28]],
+  note:"赞助不确认收入，营业外支出 10.60；利润总额和净利润与原口径相同。自检：资产 6971.88 = 负债和权益 6971.88；期末现金 741.28 = 货币资金；净利润 14.25 = 未分配利润。"},
+ Q:{name:"Q 公司（清源环境模拟卷）",ids:["Q1","Q2","Q3","Q4","Q5","Q6","Q7","Q8","Q9","Q10"],
+  bs:{assets:[["货币资金",1701.80],["交易性金融资产",60.00],["应收账款",0.00],["存货",63.00],["固定资产",1257.00],["无形资产",450.00],["其他权益工具投资",35.00]],
+      liab:[["短期借款",200.00],["应付利息",11.00],["应付职工薪酬",0.00],["应交税费",24.10],["递延收益",100.00]],
+      eq:[["实收资本",3000.00],["资本公积",200.00],["其他综合收益",5.00],["盈余公积",2.67],["未分配利润",24.03]],
+      total:3566.80},
+  is:[["营业收入",500.00],["营业成本",300.00],["销售费用",10.00],["管理费用",130.00],["研发费用",15.00],["财务费用",11.00],["公允价值变动收益",10.00],["营业利润",44.00],["营业外支出",6.30],["利润总额",37.70],["所得税费用",11.00],["净利润",26.70]],
+  cf:[["销售商品、提供劳务收到的现金",565.00],["收到其他与经营活动有关的现金",100.00],["购买商品、接受劳务支付的现金",-339.00],["支付给职工以及为职工支付的现金",-98.00],["支付其他与经营活动有关的现金",-10.60],["经营活动净额",217.40],["投资支付的现金",-80.00],["购建固定资产支付的现金",-135.60],["投资活动净额",-215.60],["取得借款收到的现金",200.00],["筹资活动净额",200.00],["现金净增加额",201.80],["期初现金",1500.00],["期末现金",1701.80]],
+  note:"本卷含年末调整：利息 11、房产折旧 55、专利摊销 50、车间设备折旧 8、所得税 11、盈余公积 2.67。非公益性赞助 6.30 全额纳税调增，应纳税所得额 44.00，所得税 11.00。"}
+};
+const EXAM_LABEL={S:"S 卷",N:"N 卷",Q:"Q 卷"};
+const AUDIT_ERRORS={
+  S:[{key:"is:1",delta:6},{key:"bs.liab:3",delta:-10},{key:"cf:13",delta:-10}],
+  N:[{key:"is:0",delta:10},{key:"bs.assets:2",delta:10},{key:"cf:13",delta:-10}],
+  Q:[{key:"is:3",delta:-10},{key:"bs.assets:4",delta:10},{key:"cf:13",delta:-10}]
+};
+function auditData(paper){
+  const e=EXAMS[paper];
+  const d={bs:{assets:e.bs.assets.map(r=>r.slice()),liab:e.bs.liab.map(r=>r.slice()),eq:e.bs.eq.map(r=>r.slice())},is:e.is.map(r=>r.slice()),cf:e.cf.map(r=>r.slice())};
+  AUDIT_ERRORS[paper].forEach(x=>{
+    const [sec,idx]=x.key.split(":");
+    const arr=sec==="bs.assets"?d.bs.assets:sec==="bs.liab"?d.bs.liab:sec==="bs.eq"?d.bs.eq:sec==="is"?d.is:d.cf;
+    const row=arr[+idx]; row[1]=Math.round((row[1]+x.delta)*100)/100;
+  });
+  return d;
+}
+function auditRow(paper,key){
+  const [sec,idx]=key.split(":"), e=EXAMS[paper];
+  const arr=sec==="bs.assets"?e.bs.assets:sec==="bs.liab"?e.bs.liab:sec==="bs.eq"?e.bs.eq:sec==="is"?e.is:e.cf;
+  return arr[+idx];
+}
+function auditLabel(paper,key){
+  const [sec]=key.split(":"), row=auditRow(paper,key);
+  const prefix=sec==="bs.assets"?"资产负债表":sec==="bs.liab"?"资产负债表":sec==="bs.eq"?"资产负债表":sec==="is"?"利润表":"现金流量表";
+  return `${prefix} · ${row[0]}`;
+}
+
+/* 数字快答额外题 */
+const NUMEXTRA=[
+ ["利润总额 64.70 万元，所得税率 25%，净利润是多少？（万元）",48.52,"64.70×0.75（所得税 16.18）"],
+ ["资产总计 6379.15 万元，负债合计 330.63 万元，所有者权益是多少？（万元）",6048.52,"资产 − 负债"],
+ ["销项税额合计 14.30 万元，进项税额 2.45 万元，应交增值税是多少？（万元）",11.85,"销项 − 进项"],
+ ["含税价 27.12 万元、税率 13%，不含税价是多少？（万元）",24.00,"27.12÷1.13"],
+ ["借款 100 万、年利率 12%、借入 5 个月，利息是多少？（万元）",5,"100×12%×5/12"],
+ ["固定资产原值 3000 万，本年折旧 10 万，期末净值？（万元）",2990,"原值 − 累计折旧"]
+];
+
+/* =========================================================
+   开卷速查：常见业务 → 三表
+   ========================================================= */
+const GUIDE=[
+ {c:"筹资",n:"股东投入现金",e:"借：银行存款　贷：实收资本 / 资本公积",bs:"货币资金↑、实收资本↑（超出份额进资本公积）",is:"不影响",cf:"筹资｜吸收投资收到的现金",t:"股东投入不是收入，绝不能进利润表。"},
+ {c:"筹资",n:"取得银行借款",e:"借：银行存款　贷：短期借款 / 长期借款",bs:"货币资金↑、借款↑",is:"不影响",cf:"筹资｜取得借款收到的现金",t:"本金进筹资活动，利息另算。"},
+ {c:"筹资",n:"计提借款利息",e:"借：财务费用　贷：应付利息",bs:"应付利息↑",is:"财务费用↑",cf:"不填（没付钱）",t:"按月计提，几个月就是几个月，别默认 12 个月。"},
+ {c:"筹资",n:"支付利息",e:"借：应付利息　贷：银行存款",bs:"货币资金↓、应付利息↓",is:"不影响（计提时已进）",cf:"筹资｜分配股利、利润或偿付利息支付的现金",t:"支付时不再进费用。"},
+ {c:"采购",n:"采购材料（已付款）",e:"借：原材料、应交税费—进项　贷：银行存款",bs:"原材料↑、进项税↑、货币资金↓",is:"不影响",cf:"经营｜购买商品、接受劳务支付的现金",t:"付款是含税额；进项税可抵扣。"},
+ {c:"采购",n:"采购材料（未付款）",e:"借：原材料、应交税费—进项　贷：应付账款",bs:"原材料↑、进项税↑、应付账款↑",is:"不影响",cf:"不填",t:"赊购不动现金。"},
+ {c:"生产",n:"领用材料投产",e:"借：生产成本　贷：原材料",bs:"原材料↓、生产成本↑",is:"不影响",cf:"不填",t:"只是存货内部搬家。"},
+ {c:"生产",n:"完工入库",e:"借：库存商品　贷：生产成本",bs:"生产成本↓、库存商品↑",is:"不影响",cf:"不填",t:"单位成本 = 总成本 ÷ 完工数量，后面结转要用。"},
+ {c:"生产",n:"计提生产工人工资",e:"借：生产成本　贷：应付职工薪酬",bs:"生产成本↑、应付职工薪酬↑",is:"不影响",cf:"不填",t:"生产人工进存货，不进当期费用。"},
+ {c:"生产",n:"计提管理部门工资",e:"借：管理费用　贷：应付职工薪酬",bs:"应付职工薪酬↑",is:"管理费用↑",cf:"不填",t:"部门决定科目：生产→存货，管理→管理费用。"},
+ {c:"生产",n:"发放工资",e:"借：应付职工薪酬　贷：银行存款",bs:"货币资金↓、应付职工薪酬↓",is:"不影响",cf:"经营｜支付给职工以及为职工支付的现金",t:"计提和发放是两笔，别重复进费用。"},
+ {c:"销售",n:"现销（含税）",e:"借：银行存款　贷：主营业务收入、应交税费—销项",bs:"货币资金↑、销项税↑",is:"营业收入↑",cf:"经营｜销售商品、提供劳务收到的现金",t:"收现按含税额，收入按不含税额。"},
+ {c:"销售",n:"赊销",e:"借：应收账款　贷：主营业务收入、应交税费—销项",bs:"应收账款↑、销项税↑",is:"营业收入↑",cf:"不填",t:"没收到钱，现金流量表空着。"},
+ {c:"销售",n:"结转销售成本",e:"借：主营业务成本　贷：库存商品",bs:"库存商品↓",is:"营业成本↑",cf:"不填",t:"卖多少件乘单位成本，别忘了这一步。"},
+ {c:"销售",n:"收回应收账款",e:"借：银行存款　贷：应收账款",bs:"货币资金↑、应收账款↓",is:"不影响",cf:"经营｜销售商品、提供劳务收到的现金",t:"不是新收入。"},
+ {c:"销售",n:"预收货款",e:"借：银行存款　贷：合同负债（预收账款）",bs:"货币资金↑、合同负债↑",is:"不影响",cf:"经营｜销售商品、提供劳务收到的现金",t:"没发货不能确认收入。"},
+ {c:"税费",n:"缴纳增值税",e:"借：应交税费　贷：银行存款",bs:"货币资金↓、应交税费↓",is:"不影响",cf:"经营｜支付的各项税费",t:"缴税不是费用。"},
+ {c:"税费",n:"代扣个人所得税",e:"借：管理费用（税前全额）　贷：银行存款、应交税费—个税",bs:"货币资金↓（实付）、应交税费↑",is:"管理费用↑（税前全额）",cf:"经营｜支付其他与经营活动有关的现金（实付）",t:"利润表和现金流量表金额不同，正常。"},
+ {c:"税费",n:"计提所得税",e:"借：所得税费用　贷：应交税费—应交所得税",bs:"应交税费↑",is:"所得税费用↑",cf:"不填",t:"按利润总额×25%，最后一步再算。"},
+ {c:"补助",n:"政府补助（未实施）",e:"借：银行存款　贷：递延收益",bs:"货币资金↑、递延收益↑",is:"不影响",cf:"经营｜收到其他与经营活动有关的现金",t:"补偿以后期间 → 挂负债，不许一次性进利润。"},
+ {c:"补助",n:"政府补助（补偿已发生费用）",e:"借：银行存款　贷：其他收益 / 营业外收入",bs:"货币资金↑",is:"其他收益↑",cf:"经营｜收到其他与经营活动有关的现金",t:"已经花掉的费用才可以直接进损益。"},
+ {c:"投资",n:"购买股票（交易性）",e:"借：交易性金融资产　贷：银行存款",bs:"交易性金融资产↑、货币资金↓",is:"不影响",cf:"投资｜投资支付的现金",t:"投资活动，不是经营活动。"},
+ {c:"投资",n:"期末公允价值变动",e:"借/贷：交易性金融资产　贷/借：公允价值变动损益",bs:"交易性金融资产±",is:"公允价值变动损益±",cf:"不填",t:"账上赚了但一分钱没收到。"},
+ {c:"投资",n:"购入固定资产（含税）",e:"借：固定资产、应交税费—进项　贷：银行存款",bs:"固定资产↑、进项税↑、货币资金↓",is:"不影响",cf:"投资｜购建固定资产、无形资产和其他长期资产支付的现金",t:"含税价必须分离，10÷1.13=8.85。"},
+ {c:"投资",n:"计提折旧",e:"借：管理费用/制造费用/研发费用　贷：累计折旧",bs:"固定资产净值↓",is:"按使用部门进费用",cf:"不填",t:"当月增加当月不提，次月起提；当月减少当月照提。"},
+ {c:"投资",n:"处置固定资产",e:"借：银行存款、累计折旧　贷：固定资产、资产处置损益",bs:"货币资金↑、固定资产净值↓",is:"资产处置损益±",cf:"投资｜处置固定资产收回的现金净额",t:"卖价 − 账面净值 = 处置损益。"},
+ {c:"特殊",n:"捐赠、赞助（视同销售）",e:"借：营业外支出　贷：库存商品、应交税费—销项税",bs:"存货↓、销项税↑",is:"营业外支出↑（成本+销项税）",cf:"不填（没付钱）",t:"会计上不确认收入；税法按公允售价计销项税，营业外支出=成本+销项税。"},
+ {c:"特殊",n:"存货跌价 / 资产减值",e:"借：资产减值损失　贷：存货跌价准备",bs:"存货↓",is:"资产减值损失↑",cf:"不填",t:"计提减值不掏现金。"},
+ {c:"特殊",n:"多部门费用分摊",e:"借：生产成本/管理费用/研发支出/销售费用　贷：原材料、应付职工薪酬",bs:"存货↑（生产部门）、开发支出↑（研发资本化）、负债↑",is:"管理/研发/销售费用↑",cf:"不填（未付款）",t:"生产部门留在存货；研发部分再分研究费用化、开发资本化——这是最常错的一步。"},
+ {c:"摊销",n:"无形资产摊销",e:"借：管理费用　贷：累计摊销",bs:"无形资产↓",is:"管理费用↑",cf:"不填",t:"无形资产当月增加当月起摊，当月减少当月停摊；摊销不掏现金。"},
+ {c:"研发",n:"研发支出（研究/开发）",e:"借：研发支出—费用化/资本化　贷：原材料、应付职工薪酬",bs:"存货↓、应付职工薪酬↑、无形资产↑（资本化转出）",is:"研发费用↑（只含研究阶段）",cf:"不填",t:"研究阶段全部费用化；开发阶段满足条件才资本化，资本化不进当期利润。"},
+ {c:"收入",n:"合同资产、合同负债、履约成本",e:"借：合同资产/合同履约成本　贷：主营业务收入/原材料",bs:"合同资产↑、合同负债↑、合同履约成本↑",is:"营业收入↑、营业成本↑",cf:"收到预收/结算款才有现金",t:"收入按履约进度；没到收款权利记合同资产，先收钱记合同负债。"},
+ {c:"应收",n:"坏账准备、信用减值",e:"借：信用减值损失　贷：坏账准备",bs:"应收账款↓（净额）",is:"信用减值损失↑",cf:"不填",t:"计提不掏现金；核销时冲坏账准备和应收账款，不再进损益。"},
+ {c:"负债",n:"预计负债（质保/诉讼）",e:"借：营业成本/营业外支出　贷：预计负债",bs:"预计负债↑",is:"营业成本↑（质保）、营业外支出↑（诉讼）",cf:"实际支付才流出",t:"质保进营业成本，诉讼进营业外支出；计提不付钱。"},
+ {c:"税费",n:"附加税、留抵、进项转出",e:"借：税金及附加　贷：应交税费",bs:"应交税费↑；留抵挂其他流动资产",is:"税金及附加↑",cf:"缴税时支付其他经营活动现金",t:"附加税=实缴增值税×12%；进项大于销项形成留抵，当期不缴增值税。"},
+ {c:"采购",n:"现金折扣（净额法）",e:"借：原材料（净额）、应交税费—进项　贷：银行存款",bs:"存货↑、进项税↑、货币资金↓",is:"不影响",cf:"购买商品支付的现金",t:"折扣冲存货，不确认财务费用；进项税仍按发票全额。"},
+ {c:"薪酬",n:"外购/自产货物用于福利",e:"外购 借：管理费用　贷：银行存款；自产 视同销售",bs:"外购无存货；自产存货↓、销项税↑",is:"管理费用↑（外购）；收入/成本↑（自产）",cf:"购买商品支付的现金（外购）",t:"外购福利进项不得抵扣，价税合计进费用；自产福利视同销售。"},
+ {c:"投资",n:"在建工程转固",e:"借：固定资产　贷：在建工程",bs:"在建工程↓、固定资产↑",is:"不影响",cf:"归集时购建长期资产支付的现金",t:"归集和转固都不进利润；转固是资产内部转换。"},
+ {c:"采购",n:"预付账款",e:"借：预付账款　贷：银行存款",bs:"货币资金↓、预付账款↑",is:"不影响",cf:"购买商品支付的现金",t:"钱出去货没到，资产总额不变；收货时转存货。"},
+ {c:"往来",n:"押金、保证金",e:"借：其他应收款/银行存款　贷：银行存款/其他应付款",bs:"货币资金±、其他应收款/其他应付款±",is:"不影响",cf:"收到/支付其他经营活动现金",t:"暂收暂付不进损益。"},
+ {c:"结算",n:"应收票据、应付票据",e:"借：应收票据　贷：主营业务收入、销项税",bs:"应收票据↑、存货↓、销项税↑",is:"营业收入↑、营业成本↑",cf:"不填（到期/贴现才有）",t:"票据按价税合计入账；当期不产生现金流。"},
+ {c:"销售",n:"销售退回",e:"借：主营业务收入、销项税　贷：银行存款；借：库存商品　贷：主营业务成本",bs:"存货↑、货币资金↓、应交税费↓",is:"营业收入↓、营业成本↓",cf:"销售商品收到的现金↓",t:"冲减收入、销项税，冲回成本；退款才流出现金。"},
+ {c:"生产",n:"低值易耗品一次摊销",e:"借：制造费用/管理费用　贷：周转材料",bs:"存货↓（车间部分回存货）",is:"管理费用↑（管理用）",cf:"不填",t:"车间用进制造费用再进存货，管理用进管理费用。"},
+ {c:"生产",n:"委托加工物资",e:"借：委托加工物资　贷：原材料；收回 借：库存商品",bs:"存货内部转换，净增加工费",is:"不影响",cf:"支付加工费时购买商品支付的现金",t:"收回成本=材料+加工费+运费；不进利润。"},
+ {c:"投资",n:"专利作价出资",e:"借：长期股权投资　贷：无形资产、资产处置损益",bs:"长期股权投资↑、无形资产↓",is:"资产处置损益±",cf:"不填",t:"公允作价−账面净值=资产处置损益；非货币投资无现金流。"},
+ {c:"筹资",n:"长期借款一年内到期重分类",e:"借：长期借款　贷：一年内到期的非流动负债",bs:"长期借款↓、一年内到期的非流动负债↑",is:"不影响",cf:"不填",t:"只是负债内部重分类，不产生现金流。"},
+ {c:"报表",n:"三表勾稽自检",e:"资产 = 负债 + 所有者权益；期末现金 = 资产负债表货币资金；净利润 = 未分配利润（未提盈余公积时）",bs:"—",is:"—",cf:"—",t:"交卷前 30 秒对这三个数，能救回一半的分。"}
+];
+const KEYWORDS=[
+ ["股东出资","股东出资"],["借款利息","借款"],["采购进项","采购材料"],["折旧","折旧"],
+ ["工资个税","工资"],["完工入库","完工"],["销售结转","销售"],["政府补助","政府补助"],
+ ["捐赠赞助","视同销售"],["股票公允","公允价值"],["坏账","坏账"],["合同资产","合同资产"],
+ ["现金折扣","现金折扣"],["票据","票据"],["销售退回","退回"],["委托加工","委托加工"],
+ ["专利出资","专利出资"],["长期借款","重分类"],["研发","研发"],["摊销","摊销"]
+];
+const GUIDE_CARD={
+ "股东投入现金":"P10","取得银行借款":"S1","计提借款利息":"S1","支付利息":"P9",
+ "采购材料（已付款）":"S2","采购材料（未付款）":"S2","完工入库":"S3","领用材料投产":"S3",
+ "计提生产工人工资":"P3","计提管理部门工资":"P3","发放工资":"P4",
+ "现销（含税）":"S4","赊销":"P2","结转销售成本":"S4","收回应收账款":"P8","预收货款":"P1",
+ "缴纳增值税":"P5","代扣个人所得税":"S7","政府补助（未实施）":"S5","政府补助（补偿已发生费用）":"S5",
+ "购买股票（交易性）":"S6","期末公允价值变动":"S6","购入固定资产（含税）":"S9","计提折旧":"S3",
+ "处置固定资产":"P6","捐赠、赞助（视同销售）":"S8","存货跌价 / 资产减值":"P7","多部门费用分摊":"S10",
+ "无形资产摊销":"T1","研发支出（研究/开发）":"T2","合同资产、合同负债、履约成本":"T3","坏账准备、信用减值":"T4",
+ "预计负债（质保/诉讼）":"T5","附加税、留抵、进项转出":"T6","现金折扣（净额法）":"T7",
+ "外购/自产货物用于福利":"T8","在建工程转固":"T9","预付账款":"T10","押金、保证金":"T11",
+ "应收票据、应付票据":"T12","销售退回":"T13","低值易耗品一次摊销":"T14","委托加工物资":"T15",
+ "专利作价出资":"T16","长期借款一年内到期重分类":"T17"
+};
+const QUIZ=[
+ {kw:"股东投入、注册资本、公允价值",ans:"股东出资",cid:"P10"},
+ {kw:"借款、年利率、到期一次还本付息",ans:"借款与利息",cid:"S1"},
+ {kw:"采购材料、增值税专用发票、进项税额",ans:"采购材料",cid:"S2"},
+ {kw:"完工入库、领料、生产工人工资",ans:"成本归集与完工",cid:"S3"},
+ {kw:"销售、销项税额、结转成本",ans:"销售商品",cid:"S4"},
+ {kw:"专项补贴、尚未实施、递延收益",ans:"政府补助",cid:"S5"},
+ {kw:"股票、收盘价、公允价值变动",ans:"交易性金融资产",cid:"S6"},
+ {kw:"赞助、自产产品、公允售价",ans:"捐赠赞助（视同销售）",cid:"S8"},
+ {kw:"预付、定金、货未到",ans:"预付账款",cid:"T10"},
+ {kw:"银行承兑汇票、票面金额",ans:"应收票据",cid:"T12"},
+ {kw:"销售退回、冲减收入、退回入库",ans:"销售退回",cid:"T13"},
+ {kw:"合同总价、履约进度、合同资产",ans:"合同资产与合同负债",cid:"T3"},
+ {kw:"坏账、计提比例、信用减值",ans:"坏账准备",cid:"T4"},
+ {kw:"现金折扣、10 天内付款",ans:"现金折扣",cid:"T7"},
+ {kw:"专利作价出资、长期股权投资",ans:"专利作价出资",cid:"T16"},
+ {kw:"长期借款、一年内到期",ans:"长期借款重分类",cid:"T17"}
+];
+const QUIZ_ANS=[...new Set(QUIZ.map(q=>q.ans))];
+
+/* =========================================================
+   引擎
+   ========================================================= */
+const S={hp:100,xp:0,combo:0,best:0,screen:"home",deck:[],i:0,sel:null,placed:[],graded:false,stamped:false,
+  mode:"drill",exam:null,tag:"drill",tableMode:false,correct:0,filter:"",numIdx:0,numStreak:0,
+  flags:[],hits:[],cardStates:[],jeOpen:false,t0:0,elapsedBase:0,elapsed:0,hinted:false,
+  mastered:new Set(),xpEarned:new Set(),practiceWrong:new Set(),numSeen:new Set(),quizSeen:new Set(),auditSeen:new Set(),resume:null,allclear:null,audit:null,
+  localAt:0,online:null,cloud:{authed:false,user:"",state:"loading",updatedAt:0},
+  quizI:0,quizStreak:0,quizLocked:false,
+  stats:{S:{runs:0,best:0,ms:0,wrong:[]},N:{runs:0,best:0,ms:0,wrong:[]},Q:{runs:0,best:0,ms:0,wrong:[]}}};
+const byId=id=>CARDS.find(c=>c.id===id);
+const DRILL_IDS=["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10"];
+const LS="acct_sort_v1";
+const CK=LS;
+const num=(v,d)=>Number.isFinite(+v)?+v:d;
+const strArr=v=>Array.isArray(v)?v.filter(x=>typeof x==="string"):[];
+const idxArr=v=>Array.isArray(v)?v.filter(x=>Number.isInteger(x)):[];
+function normStats(raw){
+  const out={};
+  ["S","N","Q"].forEach(k=>{
+    const v=(raw&&raw[k])||{};
+    out[k]={runs:num(v.runs,0),best:num(v.best,0),ms:num(v.ms,0),
+      wrong:Array.isArray(v.wrong)?v.wrong.filter(x=>typeof x==="string"):[],
+      hist:Array.isArray(v.hist)?v.hist.filter(h=>h&&Number.isFinite(+h.ok)).map(h=>({t:num(h.t,0),ok:num(h.ok,0),total:Math.max(1,num(h.total,10)),ms:num(h.ms,0),full:!!h.full})).slice(0,6):[]};
+  });
+  return out;
+}
+function readCookie(){
+  const m=document.cookie.match(new RegExp("(?:^|; )"+CK+"=([^;]*)"));
+  if(!m)return null;
+  try{return JSON.parse(decodeURIComponent(m[1]))}catch(e){return null}
+}
+function writeCookie(obj){
+  try{
+    const data=JSON.parse(JSON.stringify(obj));
+    const enc=()=>encodeURIComponent(JSON.stringify(data));
+    let v=enc();
+    if(v.length>3800){
+      ["S","N","Q"].forEach(k=>{if(data.stats&&data.stats[k])data.stats[k].hist=(data.stats[k].hist||[]).slice(0,3)});
+      v=enc();
+    }
+    if(v.length>3800){
+      ["S","N","Q"].forEach(k=>{if(data.stats&&data.stats[k])data.stats[k].hist=[]});
+      v=enc();
+    }
+    if(v.length>3800&&data.session){
+      data.session=Object.assign({},data.session,{placed:[],pool:null});
+      v=enc();
+    }
+    if(v.length>3800&&data.session){
+      data.session=null;
+      v=enc();
+    }
+    document.cookie=CK+"="+v+";path=/;max-age=15552000;SameSite=Lax";
+  }catch(e){}
+}
+function currentElapsed(){return (S.elapsedBase||0)+(S.mode==="exam"&&S.t0?Date.now()-S.t0:0)}
+function cleanPool(p){
+  if(!Array.isArray(p))return null;
+  const out=p.filter(x=>x&&typeof x.k==="string"&&["bs","is","cf"].includes(x.s))
+    .map(x=>({k:x.k,s:x.s,amt:num(x.amt,0),imp:!!x.imp}));
+  return out.length&&out.length===p.length?out:null;
+}
+function validSession(x){
+  if(!x||!Array.isArray(x.ids)||!x.ids.length)return null;
+  const ids=x.ids.filter(id=>byId(id));
+  if(ids.length!==x.ids.length)return null;
+  return Object.assign({},x,{ids,i:Math.min(Math.max(0,num(x.i,0)),ids.length-1)});
+}
+function snapshotSession(){
+  if(!S.deck.length)return null;
+  const c=S.deck[S.i];
+  return {mode:S.mode,exam:S.exam,tag:S.tag,tableMode:!!S.tableMode,ids:S.deck.map(x=>x.id),i:S.i,
+    pool:c&&c._pool?c._pool.map(x=>({k:x.k,s:x.s,amt:x.amt,imp:x.imp})):null,
+    placed:S.placed.map(p=>({c:p.c,bin:p.bin,sign:p.sign||1,amt:p.amt==null?"":String(p.amt)})),
+    graded:!!S.graded,stamped:!!S.stamped,
+    flags:S.flags.slice(),hits:(S.hits||[]).slice(),
+    elapsedBase:currentElapsed(),at:Date.now()};
+}
+let _boot=null;
+try{
+  const ck=readCookie();
+  let ls=null;try{ls=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){}
+  _boot=ck&&ls?(num(ck.at,0)>=num(ls.at,0)?ck:ls):(ck||ls);
+}catch(e){_boot=null}
+try{
+  const b=_boot||{};
+  S.xp=num(b.xp,0); S.best=num(b.best,0); S.localAt=num(b.at,0); S.stats=normStats(b.stats);
+  S.mastered=new Set(strArr(b.mastered).filter(id=>byId(id)));
+  S.xpEarned=new Set(strArr(b.xpEarned).filter(id=>byId(id)));
+  S.practiceWrong=new Set(strArr(b.practiceWrong).filter(id=>byId(id)));
+  const nb=b.num||{};
+  S.numIdx=Math.max(0,Math.round(num(nb.idx,0)));
+  S.numStreak=Math.max(0,Math.round(num(nb.streak,0)));
+  S.numSeen=new Set(idxArr(nb.seen).filter(i=>i>=0));
+  const qz=b.quiz||{};
+  S.quizI=Math.max(0,Math.round(num(qz.idx,0)));
+  S.quizStreak=Math.max(0,Math.round(num(qz.streak,0)));
+  S.quizSeen=new Set(idxArr(qz.seen).filter(i=>i>=0));
+  S.auditSeen=new Set(strArr(b.auditSeen).filter(x=>["S","N","Q"].includes(x)));
+  S.resume=validSession(b.session);
+}catch(e){S.stats=normStats(null)}
+function save(){
+  S.localAt=Date.now();
+  const data={v:2,xp:S.xp,best:S.best,
+    mastered:[...S.mastered],xpEarned:[...S.xpEarned],practiceWrong:[...S.practiceWrong],
+    stats:S.stats,
+    num:{idx:S.numIdx,streak:S.numStreak||0,seen:[...S.numSeen]},
+    quiz:{idx:S.quizI,streak:S.quizStreak||0,seen:[...S.quizSeen]},
+    auditSeen:[...S.auditSeen],
+    session:S.screen==="play"?snapshotSession():S.resume,
+    at:S.localAt};
+  try{localStorage.setItem(LS,JSON.stringify(data))}catch(e){}
+  writeCookie(data);
+  scheduleCloud();
+}
+function token(){try{return sessionStorage.getItem("mba-id-token")}catch(e){return ""}}
+function decodeName(t){
+  try{const p=JSON.parse(atob(t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));return p.name||p.username||p.preferred_username||""}catch(e){return ""}
+}
+function cloudPayload(){
+  return {v:2,xp:S.xp,best:S.best,
+    mastered:[...S.mastered],xpEarned:[...S.xpEarned],practiceWrong:[...S.practiceWrong],
+    stats:S.stats,
+    num:{idx:S.numIdx,streak:S.numStreak||0,seen:[...S.numSeen]},
+    quiz:{idx:S.quizI,streak:S.quizStreak||0,seen:[...S.quizSeen]},
+    auditSeen:[...S.auditSeen],
+    at:S.localAt||Date.now()};
+}
+function cloudChipHtml(){
+  const c=S.cloud||{};
+  if(c.authed){
+    const label=c.state==="saving"?"同步中…":c.state==="error"?"同步失败，本机已保存":"云同步已开启";
+    const initial=esc((c.user||"R").slice(0,1).toUpperCase());
+    return `<span class="acct-chip ${c.state==="error"?"error":""}" id="cloudChip" title="${esc(label)}${c.user?" · "+esc(c.user):""}">
+      <span class="acct-avatar">${initial}</span>
+      <span class="acct-meta"><b>${esc(c.user||"已登录")}</b><span>${label}</span></span>
+    </span>`;
+  }
+  if(c.state==="loading")return `<span class="acct-chip" id="cloudChip"><span class="acct-avatar">…</span><span class="acct-meta"><b>检查登录</b><span>请稍候</span></span></span>`;
+  return `<a class="acct-chip guest" id="cloudChip" href="/" title="先在课表页登录，进度就会同步到账号">
+    <span class="acct-avatar">登</span><span class="acct-name">课表登录</span>
+  </a>`;
+}
+function paintCloud(){
+  const el=document.getElementById("cloudChip");if(el)el.outerHTML=cloudChipHtml();
+}
+let _cloudTimer=null,_cloudSaving=false,_cloudDirty=false;
+function scheduleCloud(){
+  if(!S.cloud.authed)return;
+  _cloudDirty=true;
+  clearTimeout(_cloudTimer);
+  _cloudTimer=setTimeout(pushCloud,1200);
+}
+async function pushCloud(){
+  if(!S.cloud.authed||_cloudSaving)return;
+  _cloudSaving=true;S.cloud.state="saving";paintCloud();
+  const t=token();
+  if(!t){S.cloud={authed:false,user:"",state:"anon",updatedAt:0};paintCloud();_cloudSaving=false;return}
+  try{
+    const res=await fetch('/api/study/progress',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({data:cloudPayload()})});
+    if(res.status===401){S.cloud.authed=false;S.cloud.state="anon";paintCloud();return}
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const j=await res.json();
+    S.cloud.state="ready";S.cloud.updatedAt=j.updated_at||0;_cloudDirty=false;paintCloud();
+  }catch(e){S.cloud.state="error";paintCloud();}
+  finally{_cloudSaving=false;if(_cloudDirty&&S.cloud.authed&&S.cloud.state!=="error")scheduleCloud();}
+}
+function mergeCloud(c){
+  const cloudAt=num(c.at,0), newer=cloudAt>num(S.localAt,0);
+  S.xp=Math.max(num(S.xp,0),num(c.xp,0));
+  S.best=Math.max(num(S.best,0),num(c.best,0));
+  const un=(a,b)=>{const out=new Set(a);b.forEach(x=>out.add(x));return out};
+  S.mastered=un(S.mastered,strArr(c.mastered).filter(byId));
+  S.xpEarned=un(S.xpEarned,strArr(c.xpEarned).filter(byId));
+  S.numSeen=un(S.numSeen,idxArr(c.num&&c.num.seen).filter(i=>i>=0));
+  S.quizSeen=un(S.quizSeen,idxArr(c.quiz&&c.quiz.seen).filter(i=>i>=0));
+  S.auditSeen=un(S.auditSeen,strArr(c.auditSeen).filter(x=>["S","N","Q"].includes(x)));
+  if(newer)S.practiceWrong=new Set(strArr(c.practiceWrong).filter(byId));
+  const cs=normStats(c.stats);
+  ["S","N","Q"].forEach(k=>{
+    const a=S.stats[k], b=cs[k];
+    a.runs=Math.max(a.runs,b.runs);a.best=Math.max(a.best,b.best);
+    if(b.ms&&(!a.ms||b.ms<a.ms))a.ms=b.ms;
+    if(newer)a.wrong=b.wrong.slice();
+    const hist={};[...a.hist,...b.hist].forEach(h=>{if(h&&!hist[h.t])hist[h.t]=h});
+    a.hist=Object.values(hist).sort((x,y)=>y.t-x.t).slice(0,6);
+  });
+  if(newer){
+    const nb=c.num||{}, qb=c.quiz||{};
+    S.numIdx=Math.max(0,Math.round(num(nb.idx,0)));
+    S.numStreak=Math.max(0,Math.round(num(nb.streak,0)));
+    S.quizI=Math.max(0,Math.round(num(qb.idx,0)));
+    S.quizStreak=Math.max(0,Math.round(num(qb.streak,0)));
+  }
+  S.localAt=Math.max(num(S.localAt,0),cloudAt);
+}
+const VISITOR_KEY="acct_visitor_v1";
+function visitorId(){
+  try{
+    let v=localStorage.getItem(VISITOR_KEY);
+    if(!v){v=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);localStorage.setItem(VISITOR_KEY,v)}
+    return v;
+  }catch(e){return "anon-"+Math.random().toString(16).slice(2)}
+}
+let _onlineTimer=null;
+async function heartbeatOnline(){
+  try{
+    const res=await fetch('/api/study/online?id='+encodeURIComponent(visitorId()),{headers:{Accept:'application/json'}});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const j=await res.json();
+    S.online=j.online||0;
+    const n=document.getElementById('onlineCount');
+    if(n)n.textContent=`${S.online} 人在线`;
+    const chip=document.getElementById('onlineChip');
+    if(chip)chip.classList.toggle('offline',!(S.online>0));
+  }catch(e){
+    S.online=null;
+    const n=document.getElementById('onlineCount');if(n)n.textContent='在线';
+    const chip=document.getElementById('onlineChip');if(chip)chip.classList.add('offline');
+  }
+}
+function initOnline(){
+  heartbeatOnline();
+  clearInterval(_onlineTimer);
+  _onlineTimer=setInterval(heartbeatOnline,60000);
+}
+async function initCloud(){
+  const t=token();
+  if(!t){S.cloud={authed:false,user:"",state:"anon",updatedAt:0};paintCloud();return}
+  S.cloud={authed:false,user:decodeName(t),state:"loading",updatedAt:0};paintCloud();
+  try{
+    const res=await fetch('/api/study/progress',{headers:{Accept:'application/json','Authorization':'Bearer '+t}});
+    if(res.status===401){S.cloud={authed:false,user:"",state:"anon",updatedAt:0};paintCloud();return}
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const j=await res.json();
+    S.cloud={authed:true,user:j.user||decodeName(t)||"已登录",state:"ready",updatedAt:j.updated_at||0};
+    if(j.data&&typeof j.data==="object")mergeCloud(j.data);
+    paintCloud();save();
+  }catch(e){S.cloud={authed:false,user:"",state:"anon",updatedAt:0};paintCloud();}
+}
+const mmss=ms=>{const s=Math.max(0,Math.round(ms/1000));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+let _tick=null;
+function stopTimer(){if(_tick){clearInterval(_tick);_tick=null}}
+function freezeTimer(){const e=currentElapsed();S.elapsedBase=e;S.t0=0;stopTimer();return e}
+function startTimer(){
+  stopTimer(); S.t0=Date.now();
+  let n=0;
+  _tick=setInterval(()=>{const el=document.getElementById("timer");
+    if(el)el.textContent=mmss(currentElapsed());
+    if(++n%10===0)save();},500);
+}
+const $=s=>document.querySelector(s);
+const rnd=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+const fmt=n=>(n>0?"+":"")+n.toFixed(2);
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LOGO=`<svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1A5FD0"/><rect x="7" y="8" width="18" height="3.4" rx="1.7" fill="#fff"/><rect x="7" y="14.3" width="13" height="3.4" rx="1.7" fill="#fff" opacity=".82"/><rect x="7" y="20.6" width="9" height="3.4" rx="1.7" fill="#FFB020"/></svg>`;
+
+function rank(xp){return xp>=800?"财务总监":xp>=500?"总账会计":xp>=250?"会计主管":xp>=100?"主办会计":"见习会计"}
+function relTime(t){if(!t)return"上次";const d=Date.now()-t;if(d<6e4)return"刚刚";if(d<36e5)return Math.floor(d/6e4)+" 分钟前";if(d<864e5)return Math.floor(d/36e5)+" 小时前";if(d<7*864e5)return Math.floor(d/864e5)+" 天前";return new Date(t).toLocaleDateString("zh-CN")}
+function isWrong(id){
+  if(S.practiceWrong.has(id))return true;
+  return ["S","N","Q"].some(k=>S.stats[k]&&(S.stats[k].wrong||[]).includes(id));
+}
+function cleanMastered(id){return S.mastered.has(id)&&!isWrong(id)}
+function practiceNeeded(id){return !S.mastered.has(id)||isWrong(id)}
+function wrongIds(){
+  const set=new Set([...S.practiceWrong]);
+  ["S","N","Q"].forEach(k=>{if(S.stats[k])(S.stats[k].wrong||[]).forEach(id=>set.add(id))});
+  return [...set].filter(id=>byId(id));
+}
+function startPractice(ids,tag,label,count){
+  const need=ids.filter(id=>practiceNeeded(id));
+  if(!need.length){S.allclear={tag,ids,label};S.screen="allclear";save();render();return}
+  startDrill(rnd(need).slice(0,count||18),null,{tag});
+}
+function toast(msg,bad){const t=$("#toast");t.textContent=msg;t.className="toast on"+(bad?" bad":"");clearTimeout(t._t);t._t=setTimeout(()=>t.className="toast",1800)}
+
+function startDrill(ids,exam,opts){
+  opts=opts||{};
+  const deck=ids.map(byId).filter(Boolean);
+  if(!deck.length){toast("没有题目");return}
+  stopTimer();
+  S.mode=exam?"exam":"drill"; S.exam=exam||null; S.tag=opts.tag||(exam?"exam":"drill"); S.tableMode=!!opts.table;
+  S.deck=deck; S.i=0; S.combo=0; S.correct=0;
+  S.hits=S.deck.map(()=>0);
+  S.hit=0; S.totalImp=S.deck.reduce((a,c)=>a+c.imp.length,0);
+  S.flags=S.deck.map(()=>null); S.cardStates=S.deck.map(()=>null); S.elapsed=0; S.elapsedBase=0; S.t0=0;
+  S.resume=null; S.allclear=null; S.screen="play"; buildCard();
+  if(S.mode==="exam")startTimer();
+  save(); render();
+}
+function resumeSession(){
+  const x=S.resume; if(!x)return;
+  S.mode=x.mode==="exam"?"exam":"drill"; S.exam=x.exam||null; S.tag=x.tag||(S.exam?"exam":"drill"); S.tableMode=!!x.tableMode;
+  S.deck=x.ids.map(byId);
+  S.i=x.i;
+  S.flags=Array.isArray(x.flags)?x.flags.slice(0,S.deck.length):S.deck.map(()=>null);
+  while(S.flags.length<S.deck.length)S.flags.push(null);
+  S.hits=Array.isArray(x.hits)?x.hits.slice(0,S.deck.length).map(v=>Math.max(0,Math.round(num(v,0)))):S.deck.map(()=>0);
+  while(S.hits.length<S.deck.length)S.hits.push(0);
+  S.correct=S.flags.filter(v=>v===true).length;
+  S.hit=S.hits.reduce((a,b)=>a+b,0);
+  S.totalImp=S.deck.reduce((a,c)=>a+c.imp.length,0);
+  S.combo=0; S.elapsedBase=Math.max(0,num(x.elapsedBase,0)); S.t0=0; S.elapsed=0;
+  S.screen="play"; S.sel=null; S.jeOpen=false; S.hinted=false; S._justGraded=false;
+  S.cardStates=S.deck.map(()=>null);
+  const c=S.deck[S.i], pool=cleanPool(x.pool);
+  if(pool){
+    c._pool=pool;
+    S.placed=(Array.isArray(x.placed)?x.placed:[])
+      .filter(p=>p&&Number.isInteger(p.c)&&p.c>=0&&p.c<pool.length&&["bs","is","cf"].includes(p.bin))
+      .map(p=>({c:p.c,bin:p.bin,sign:p.sign===-1?-1:1,amt:p.amt==null?"":String(p.amt)}));
+    S.graded=!!x.graded; S.stamped=!!x.stamped;
+  }else{
+    S.placed=[]; S.graded=false; S.stamped=false;
+  }
+  if(pool)S.cardStates[S.i]={pool:c._pool.slice(),placed:S.placed.slice(),graded:S.graded,stamped:S.stamped,jeOpen:false,hinted:false};
+  S.resume=null;
+  if(S.mode==="exam")startTimer(); else stopTimer();
+  save(); render();
+}
+function buildCard(){
+  const c=S.deck[S.i];
+  const pool=c.imp.map((x,ix)=>({k:x[1],s:x[0],amt:x[2],imp:true})) .concat(c.dec.map(x=>({k:x[1],s:x[0],imp:false})));
+  c._pool=rnd(pool);
+  S.placed=[]; S.sel=null; S.graded=false; S.stamped=false; S.jeOpen=false; S.hinted=false;
+}
+function saveCardState(){
+  if(!S.deck.length)return;
+  const c=S.deck[S.i]; if(!c||!c._pool)return;
+  S.cardStates[S.i]={pool:c._pool.slice(),placed:S.placed.slice(),graded:S.graded,stamped:S.stamped,jeOpen:S.jeOpen,hinted:S.hinted};
+}
+function jumpTo(i){
+  if(!S.deck.length)return;
+  i=Math.max(0,Math.min(S.deck.length-1,Math.round(num(i,0))));
+  if(i===S.i)return;
+  saveCardState();
+  const answered=S.flags[i]!==null;
+  if(answered&&!S.cardStates[i]){
+    if(!confirm("这道题之前答过，但刷新后作答明细没保存。重做会重新计分，继续？"))return;
+    S.flags[i]=null; S.hits[i]=0;
+    S.correct=S.flags.filter(v=>v===true).length;
+    S.hit=S.hits.reduce((a,b)=>a+b,0);
+  }
+  S.i=i; S.sel=null; S._justGraded=false;
+  const st=S.cardStates[i];
+  if(st){
+    const c=S.deck[i];
+    c._pool=st.pool;
+    S.placed=st.placed.map(p=>({c:p.c,bin:p.bin,sign:p.sign===-1?-1:1,amt:p.amt==null?"":String(p.amt)}));
+    S.graded=!!st.graded; S.stamped=!!st.stamped; S.jeOpen=!!st.jeOpen; S.hinted=!!st.hinted;
+  }else{
+    buildCard();
+  }
+  save(); render();
+}
+function render(){
+  if(S._last&&(S._last!==S.screen||S._lastIdx!==S.i))window.scrollTo(0,0);
+  S._last=S.screen; S._lastIdx=S.i;
+  const t=document.getElementById("toast");
+  if(t&&S.screen!=="play")t.className="toast";
+  if(S.screen==="home")return renderHome();
+  if(S.screen==="play")return renderPlay();
+  if(S.screen==="bossend")return renderBossEnd();
+  if(S.screen==="result")return renderResult();
+  if(S.screen==="guide")return renderGuide();
+  if(S.screen==="num")return renderNum();
+  if(S.screen==="exam")return renderExamPick();
+  if(S.screen==="quiz")return renderQuiz();
+  if(S.screen==="allclear")return renderAllClear();
+  if(S.screen==="auditpick")return renderAuditPick();
+  if(S.screen==="audit")return renderAudit();
+}
+
+/* ---------- HUD ---------- */
+function curHitCount(){
+  const c=S.deck[S.i]; if(!c)return 0;
+  return c.imp.filter(x=>S.placed.some(p=>{
+    const q=c._pool&&c._pool[p.c];
+    return p.bin===x[0]&&q&&q.imp&&q.k===x[1]&&(!S.tableMode||((p.sign||1)===(x[2]<0?-1:1)&&Math.abs((parseFloat(p.amt)||0)-Math.abs(x[2]))<0.011));
+  })).length;
+}
+function refreshCurHit(){const el=document.getElementById("curHit");if(el)el.textContent=curHitCount()}
+function hud(){
+  const c=S.deck[S.i];
+  const curTotal=c?c.imp.length:0;
+  return `<div class="hud">
+    <div class="k">本题 <b id="curHit">${curHitCount()}</b>/${curTotal}</div>
+    <div class="k">XP <b>${S.xp}</b></div>
+    <div class="k">连击 <b class="combo ${S.combo>1?"hot":""}">${S.combo}</b></div>
+    <div class="k">段位 <b>${rank(S.xp)}</b></div>
+    ${S.mode==="exam"?'<div class="k">用时 <b id="timer">'+mmss(currentElapsed())+'</b></div>':""}
+    <div class="k grow">${S.mode==="exam"?EXAM_LABEL[S.exam]+" · "+(S.i+1)+" / "+S.deck.length:"题 "+(S.i+1)+" / "+S.deck.length}</div>
+  </div>`;
+}
+
+/* ---------- 首页 ---------- */
+function go(sc){
+  stopTimer(); S.screen=sc;
+  const h={exam:"#exam",guide:"#guide",num:"#num",quiz:"#quiz"}[sc]||"";
+  try{history.replaceState(null,"",h||(location.pathname+location.search))}catch(e){}
+  render();
+}
+
+function renderHome(){
+  const numTotal=numBank().length;
+  const cleanCount=CARDS.filter(c=>cleanMastered(c.id)).length;
+  const wrong=wrongIds();
+  const examMastered=["S","N","Q"].flatMap(k=>EXAMS[k].ids).filter(id=>cleanMastered(id)).length;
+  const lv=[
+    ["01","分拣练习","全部题库；随机 10 笔，只练科目 → 三张表","drill","#1A5FD0",cleanCount,CARDS.length],
+    ["02","真题填表","S/N/Q 整套卷；掌握按题累计","exam","#E9508E",examMastered,30],
+    ["03","数字快答",`${numTotal} 道计算坑点`,"num","#B45309",S.numSeen.size,numTotal],
+    ["04","关键词抢答","看题干词，4 选 1 认业务","quiz","#7C5CE0",S.quizSeen.size,QUIZ.length],
+    ["05","报表找错","3 套报表各藏 3 处金额错误","audit","#0E9F9F",S.auditSeen.size,3]
+  ];
+  const rs=S.resume;
+  const rtag=rs?(rs.tag==="exam"?EXAM_LABEL[rs.exam]+"演练":rs.tag==="wrong"?"错题重练":rs.tag==="guide"?"速查练习":"分拣练习"):"";
+  $("#app").innerHTML=`
+   <div class="top">
+     <a class="brand" href="/" title="回课表" style="color:inherit;text-decoration:none">${LOGO}三表分拣台 <em>会计期末</em></a>
+     <div class="nav acct-nav">
+       <span class="online-chip ${S.online===0?"offline":""}" id="onlineChip" title="最近 5 分钟打开过练习页的人数"><i></i><span id="onlineCount">${S.online==null?"在线":`${S.online} 人在线`}</span></span>
+       <span class="acct-wrap">${cloudChipHtml()}</span>
+     </div>
+   </div>
+
+   <section class="hero">
+     <div class="hero-copy">
+       <div class="eyebrow"><span class="eyebrow-dot"></span>MBA 会计 · 开卷考试</div>
+       <h1>一笔业务，<br>判断它动哪张表</h1>
+       <p>给一笔业务，把受影响的科目放进资产负债表、利润表、现金流量表。漏投、错投当场指出。</p>
+       <div class="stats">
+         <div><b>${cleanCount}</b><span>已吃透</span></div>
+         <div><b>${S.xp}</b><span>XP</span></div>
+         <div><b>${S.best}</b><span>最高连击</span></div>
+         <div class="stat-rank"><b>${rank(S.xp)}</b><span>段位</span></div>
+         <div><b>${examMastered}/30</b><span>真题掌握</span></div>
+         <div><b>${wrong.length}</b><span>错题本</span></div>
+       </div>
+       <button id="reset" class="reset-link">清空进度</button>
+     </div>
+     <a class="handbook-card" href="/study/handbook/" target="_blank" rel="noopener">
+       <div class="hc-top"><span class="hc-pill">开卷必备</span><span class="hc-live">持续更新</span></div>
+       <div class="hc-main">
+         <div class="hc-kicker">28 类业务 · 三表影响 · 模拟卷</div>
+         <div class="hc-title">快查手册</div>
+       </div>
+       <div class="hc-foot"><span>按题干词查答案</span><span class="hc-arrow">打开 →</span></div>
+     </a>
+   </section>
+
+   ${rs?`<div class="resume">
+     <div class="ri">▶</div>
+     <div class="rt"><b>继续上次 · ${rtag} 第 ${rs.i+1}/${rs.ids.length} 题</b>
+       <span>${relTime(rs.at)} · 已放 ${(rs.placed||[]).length} 个科目${rs.graded?" · 已交卷":""}</span></div>
+     <div class="ra"><button class="btn primary" id="resumeBtn">继续</button><button class="btn ghost" id="resumeNew">重新开始</button></div>
+   </div>`:""}
+   ${wrong.length?`<div class="wronghome">
+     <b>错题本 ${wrong.length} 笔</b><span>练习和真题答错的题，练对自动移出</span>
+     <button class="btn ghost" id="wrongDrill">只练错题</button>
+   </div>`:""}
+
+   <section class="train">
+     <div class="train-head">
+       <div><span class="kicker">训练</span><h2>从没吃透的题开始</h2></div>
+       <div class="train-actions">
+         <button class="train-link" data-nav="guide">游戏内速查 →</button>
+         <span class="train-note">自动跳过已吃透题</span>
+       </div>
+     </div>
+     <div class="train-list">
+       ${lv.map(([n,t,d,m,c,cur,tot])=>`<button class="trow" data-start="${m}">
+         <span class="tnum" style="color:${c};background:${c}14;border-color:${c}33">${n}</span>
+         <span class="tmain"><b>${t}</b><span>${d}</span></span>
+         <span class="tprog"><span class="tbar"><i style="width:${tot?Math.min(100,Math.round(cur/tot*100)):0}%;background:${c}"></i></span><em>${cur}/${tot}</em></span>
+         <span class="tgo" style="color:${c}">开始 →</span>
+       </button>`).join("")}
+     </div>
+   </section>
+
+   <div class="hintbar">分拣练习自动跳过已吃透的题；真题填表按题累计掌握数，最佳数按整套卷算；报表找错专练三表勾稽。</div>
+
+   <div class="traps">
+     <div class="th">考前 5 条</div>
+     <ol>
+       <li><b>利息按实际月数</b><span>2 月借入跨到年末 = 11 个月，不是 12</span></li>
+       <li><b>含税价先分离</b><span>10 ÷ 1.13 = 8.85 入固定资产</span></li>
+       <li><b>生产部门费用留在存货</b><span>进生产成本，不进当期利润</span></li>
+       <li><b>补助未执行挂递延收益</b><span>当期利润为 0</span></li>
+       <li><b>期末现金 = 货币资金</b><span>交卷前对一次，能救一半的分</span></li>
+     </ol>
+   </div>`;
+  const keyActivate=el=>el.onkeydown=e=>{
+    if(e.key==="Enter"||e.key===" "){e.preventDefault();el.click()}
+  };
+  document.querySelectorAll("[data-start],[data-exam]").forEach(keyActivate);
+  document.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>{
+    const m=b.dataset.start;
+    if(m==="drill")startPractice(CARDS.map(c=>c.id),"drill","分拣练习",10);
+    if(m==="num"){S.screen="num";save();render();}
+    if(m==="exam"){S.screen="exam";render()}
+    if(m==="quiz"){S.screen="quiz";save();render()}
+    if(m==="audit"){S.screen="auditpick";render()}
+  });
+  const rb=$("#resumeBtn");
+  if(rb)rb.onclick=()=>resumeSession();
+  const rn=$("#resumeNew");
+  if(rn)rn.onclick=()=>{const x=S.resume;S.resume=null;startDrill(x.ids,x.exam,{tag:x.tag})};
+  const wd=$("#wrongDrill");
+  if(wd)wd.onclick=()=>startDrill(wrongIds(),null,{tag:"wrong"});
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go(b.dataset.nav));
+  const rs2=document.getElementById("reset");
+  if(rs2)rs2.onclick=()=>{
+    if(!confirm("清空全部练习记录和成绩？此操作不可撤销。"))return;
+    stopTimer();
+    S.xp=0;S.best=0;S.combo=0;S.numStreak=0;S.numIdx=0;S.numSeen=new Set();
+    S.quizI=0;S.quizStreak=0;S.quizSeen=new Set();S.auditSeen=new Set();
+    S.mastered=new Set();S.xpEarned=new Set();S.practiceWrong=new Set();
+    S.resume=null;S.allclear=null;S.audit=null;S.elapsedBase=0;S.t0=0;
+    S.stats={S:{runs:0,best:0,ms:0,wrong:[],hist:[]},N:{runs:0,best:0,ms:0,wrong:[],hist:[]},Q:{runs:0,best:0,ms:0,wrong:[],hist:[]}};
+    save();render()};
+}
+
+/* ---------- 答题页 ---------- */
+function renderPlay(){
+  if(!S.deck.length){S.screen="home";return renderHome()}
+  const c=S.deck[S.i];
+  const table=!!S.tableMode;
+  const bins=[["bs","资产负债表","资产 / 负债 / 权益"],["is","利润表","收入 / 费用 / 损益"],["cf","现金流量表","经营 / 投资 / 筹资"]];
+  const placed=idxs=>S.placed.filter(p=>p.bin===idxs).map(p=>p.c);
+  const goodIn=bin=>S.placed.filter(p=>p.bin===bin&&c._pool[p.c].imp&&c._pool[p.c].s===bin).map(p=>p.c);
+  const wrongPlaced=S.placed.filter(p=>{const q=c._pool[p.c];return !q.imp||q.s!==p.bin});
+  const missIn=bin=>c.imp.filter(x=>x[0]===bin&&!S.placed.some(p=>{
+    const q=c._pool[p.c];return q.imp&&q.k===x[1];
+  }));
+  const expOf=p=>{const q=c._pool[p.c];return q.imp?c.imp.find(x=>x[0]===q.s&&x[1]===q.k):null};
+  const valOk=(p,x)=>!!x&&p.bin===x[0]&&(p.sign||1)===(x[2]<0?-1:1)&&Math.abs((parseFloat(p.amt)||0)-Math.abs(x[2]))<0.011;
+  const rowHtml=(p,graded)=>{
+    const q=c._pool[p.c], x=expOf(p);
+    if(graded){
+      const ok=valOk(p,x);
+      const exp=x?`${x[2]<0?"−":"+"}${Math.abs(x[2]).toFixed(2)}`:"";
+      return `<div class="fillrow ${ok?"ok":"no"}"><span class="fr-k">${esc(q.k)}</span><span class="fr-sign">${(p.sign||1)<0?"−":"+"}</span><span class="fr-amt">${esc(p.amt||"0")}</span><em class="fr-hint">${ok?"✓":(x?`应 ${exp}`:"干扰项")}</em></div>`;
+    }
+    return `<div class="fillrow"><span class="fr-k">${esc(q.k)}</span><button type="button" class="fr-sign ${(p.sign||1)<0?"neg":""}" data-sign="${p.c}" aria-label="切换正负">${(p.sign||1)<0?"−":"+"}</button><input class="fr-amt" data-amt="${p.c}" inputmode="decimal" value="${esc(p.amt||"")}" placeholder="0.00" aria-label="${esc(q.k)}金额（万元）"><span class="fr-unit">万元</span><button type="button" class="fr-x" data-remove="${p.c}" aria-label="移除">×</button></div>`;
+  };
+  const ghostRow=x=>`<div class="fillrow ghost"><span class="fr-k">${esc(x[1])}</span><span class="fr-sign">${x[2]<0?"−":"+"}</span><span class="fr-amt">${Math.abs(x[2]).toFixed(2)}</span><em class="fr-hint">漏</em></div>`;
+  const rowsIn=s=>S.placed.filter(p=>p.bin===s&&(!S.graded||(c._pool[p.c].imp&&c._pool[p.c].s===s)));
+  const selected=S.sel!==null?c._pool[S.sel]:null;
+  const chip=(i,ctx)=>{
+    const p=c._pool[i];
+    let cls="chip", mark="";
+    if(ctx==="tray"){
+      if(S.sel===i){cls+=" sel";mark='<span class="selmark">✓ 已选</span>'}
+      if(S.graded)cls+=" lock";
+    }else if(S.graded){
+      cls+=" good"; mark='<span class="ok">✓</span>';
+    }
+    return `<button class="${cls}" data-chip="${i}" data-ctx="${ctx}" aria-pressed="${S.sel===i}">${p.k}${mark}</button>`;
+  };
+  const tray=c._pool.map((p,i)=>i).filter(i=>!S.placed.some(x=>x.c===i));
+
+  $("#app").innerHTML=`
+   <div class="top">
+     <div class="brand">${LOGO}三表分拣台 <em>${S.mode==="exam"?"真题填表":S.tableMode?"填表练习":"分拣练习"}</em></div>
+     <div class="nav"><a class="navhand" href="/study/handbook/" target="_blank" rel="noopener">手册</a><button data-home>返回</button></div>
+   </div>
+   ${hud()}
+   <div class="railwrap">
+     <div class="rail">${S.deck.map((_,k)=>`<button class="rq ${S.flags[k]===true?"ok":S.flags[k]===false?"no":""} ${k===S.i?"cur":""}" data-jump="${k}" title="第 ${k+1} 题">${k+1}</button>`).join("")}<span>${S.flags.filter(x=>x===true).length} 对 / ${S.flags.filter(x=>x===false).length} 错</span></div>
+     <div class="jumpbox"><span>跳题</span><input id="jumpNum" type="number" min="1" max="${S.deck.length}" value="${S.i+1}" inputmode="numeric" aria-label="跳到第几题"><button id="jumpGo">跳转</button></div>
+   </div>
+   <div class="board">
+     <section class="ticket">
+       <div class="meta"><span class="tag">${c.tag}</span><span>业务票据 · ${c.id}</span></div>
+       <p>${c.prompt}</p>
+       <div class="stamp ${S.stamped?"on":""}" id="stamp">已入账</div>
+     </section>
+     ${S.jeOpen&&!S.graded?`<div class="jepanel"><div class="lab">参考分录（用它反推三张表，再自己分拣）</div><div class="entryline">${JE[c.id]||"—"}</div></div>`:""}
+
+     ${S.graded?"":`<div class="tray-label">${table?"点科目 → 点表 → 填金额":"点科目 → 点表"}</div>
+     <div class="tray" id="tray">${tray.map(i=>chip(i,"tray")).join("")||'<span class="tip">全部已归位，点「交卷核对」</span>'}</div>
+     <div class="selbar ${selected?"on":""}" id="selbar" role="status" aria-live="polite">
+       ${selected
+         ? `<span class="sb-k">已选</span><b>${esc(selected.k)}</b><span class="sb-hint">点下面三张表之一放入${table?"，再选 +/− 并填金额":""}</span><button type="button" class="sb-x" id="selCancel">取消</button>`
+         : `<span class="sb-k">操作</span><span class="sb-hint">先点一个科目，再点它要去的表${table?"，最后填正负和金额":""}</span>`}
+     </div>`}
+
+     ${S.graded&&wrongPlaced.length?`<div class="wrongstrip">
+        <div class="ws-h">放错了 ${wrongPlaced.length} 个 · 这些不属于这里</div>
+        <div class="ws-body">${wrongPlaced.map(p=>{
+          const q=c._pool[p.c];
+          const why=q.imp?`应放 ${STN[q.s]}`:"这笔业务不影响这个科目";
+          return `<span class="chip bad">${q.k}<span class="no">✗</span><em>${why}</em></span>`;
+        }).join("")}</div>
+      </div>`:""}
+
+     <div class="bins ${selected&&!S.graded?"targeting":""}">
+       ${bins.map(([s,t,d])=>`<div class="bin" data-s="${s}">
+          <h3>${t}<span>${table?"科目 · 正负 · 金额":d}${S.graded?"":` · 按 ${s==="bs"?"1":s==="is"?"2":"3"}`}${selected&&!S.graded?" · 点这里放入":""}</span></h3>
+          <div class="drop" data-bin="${s}" tabindex="-1" aria-label="放入${t}">${
+            table
+              ? (S.graded
+                  ? (rowsIn(s).map(p=>rowHtml(p,true)).join("") + missIn(s).map(x=>ghostRow(x)).join("") || '<span class="ph">这一栏没有影响</span>')
+                  : (rowsIn(s).length?rowsIn(s).map(p=>rowHtml(p,false)).join(""):'<span class="ph">拖科目进来，再选 +/− 填金额</span>'))
+              : (S.graded
+                  ? (goodIn(s).map(i=>chip(i,s)).join("") + missIn(s).map(x=>`<span class="chip ghost">${x[1]}<span class="no">漏</span></span>`).join("") || '<span class="ph">这一栏没有影响</span>')
+                  : (placed(s).length?placed(s).map(i=>chip(i,s)).join(""):'<span class="ph">拖 / 点 科目放这里</span>'))
+          }</div>
+        </div>`).join("")}
+     </div>
+
+     <div class="quickbar ${S.sel!==null?"on":""}">
+       <div class="qb-sel">${selected?`已选：<b>${esc(selected.k)}</b> · 点表放入`:"先点一个科目，再点表"}</div>
+       <div class="qb-btns">
+         <button class="qb-bs" data-qb="bs">资产负债表</button>
+         <button class="qb-is" data-qb="is">利润表</button>
+         <button class="qb-cf" data-qb="cf">现金流量表</button>
+         <button class="qb-submit" id="qbSubmit" ${S.graded?"disabled":""}>${S.graded?"已交卷":"交卷"}</button>
+       </div>
+     </div>
+     <div class="actions">
+       <button class="btn primary" id="submit" ${S.graded?"disabled":""}>${S.graded?"已交卷":"交卷核对"}</button>
+       <button class="btn ghost" id="hintBtn" ${S.graded||S.hinted?"disabled":""}>提示</button>
+       <button class="btn ghost" id="jeBtn" ${S.graded||S.jeOpen?"disabled":""}>看分录</button>
+       <div class="spacer"></div>
+       <span class="kbd">${table?"拖科目 · 点 +/− 换号 · 填金额":"空格交卷 · Esc 放回 · 1/2/3 投放"}</span>
+     </div>
+     <div id="fb" aria-live="polite"></div>
+   </div>`;
+
+  document.querySelectorAll("#tray [data-chip]").forEach(el=>{
+    el.onclick=()=>{S.sel=S.sel===+el.dataset.chip?null:+el.dataset.chip;render()};
+    if(!S.graded)el.draggable=true;
+    el.ondragstart=e=>{S.sel=+el.dataset.chip;e.dataTransfer.setData("text/plain",el.dataset.chip)};
+  });
+  document.querySelectorAll('[data-chip]:not([data-ctx="tray"])').forEach(el=>{
+    if(S.graded)return;
+    el.onclick=e=>{e.stopPropagation();const i=+el.dataset.chip;S.placed=S.placed.filter(p=>p.c!==i);S.sel=null;render()};
+  });
+  document.querySelectorAll("[data-sign]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const i=+b.dataset.sign, p=S.placed.find(x=>x.c===i); if(!p)return;
+    p.sign=(p.sign||1)*-1;
+    b.textContent=p.sign<0?"−":"+";
+    b.classList.toggle("neg",p.sign<0);
+    refreshCurHit();save();
+  });
+  document.querySelectorAll("[data-amt]").forEach(inp=>{
+    inp.onclick=e=>e.stopPropagation();
+    inp.oninput=()=>{
+      const i=+inp.dataset.amt, p=S.placed.find(x=>x.c===i); if(!p)return;
+      const v=inp.value.replace(/[^0-9.]/g,"");
+      if(v!==inp.value)inp.value=v;
+      p.amt=v; refreshCurHit();save();
+    };
+  });
+  document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const i=+b.dataset.remove;
+    S.placed=S.placed.filter(p=>p.c!==i); S.sel=null; save(); render();
+  });
+  document.querySelectorAll(".fillrow").forEach(r=>r.onclick=e=>e.stopPropagation());
+  document.querySelectorAll(".bin[data-s]").forEach(b=>{
+    b.onclick=()=>{
+      if(S.graded)return;
+      if(S.sel===null)return toast("先点一个科目");
+      place(S.sel,b.dataset.s);
+    };
+  });
+  document.querySelectorAll("[data-bin]").forEach(bin=>{
+    const drop=e=>{
+      e.preventDefault();bin.classList.remove("armed");
+      let i=S.sel;
+      if(i===null&&e.dataTransfer){i=+e.dataTransfer.getData("text/plain");}
+      if(i===null||isNaN(i))return;
+      place(i,bin.dataset.bin);
+    };
+    bin.ondragover=e=>{e.preventDefault();bin.classList.add("armed")};
+    bin.ondragleave=()=>bin.classList.remove("armed");
+    bin.ondrop=drop;
+    bin.onkeydown=e=>{if(e.target!==bin)return;if((e.key==="Enter"||e.key===" ")&&S.sel!==null){e.preventDefault();e.stopPropagation();place(S.sel,bin.dataset.bin)}};
+  });
+  document.querySelectorAll("[data-qb]").forEach(b=>b.onclick=()=>{
+    if(S.graded)return;
+    if(S.sel===null)return toast("先点一个科目");
+    place(S.sel,b.dataset.qb);
+  });
+  document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>{
+    if(S.mode==="exam")freezeTimer();
+    S.resume=snapshotSession();
+    save(); go("home"); toast("进度已保存，首页可继续");
+  });
+  const qs=$("#qbSubmit");
+  if(qs)qs.onclick=submit;
+  const sc=$("#selCancel");
+  if(sc)sc.onclick=()=>{S.sel=null;render()};
+  const jb=$("#jeBtn");
+  if(jb)jb.onclick=()=>{
+    if(S.graded||S.jeOpen)return;
+    S.jeOpen=true;S.hinted=true;render();
+  };
+  $("#submit").onclick=submit;
+  document.querySelectorAll("[data-jump]").forEach(b=>b.onclick=()=>jumpTo(+b.dataset.jump));
+  const jn=$("#jumpNum"), jg=$("#jumpGo");
+  const doJump=()=>{const v=parseInt(jn.value,10);if(!Number.isFinite(v))return toast("先输入题号");jumpTo(v-1)};
+  if(jg)jg.onclick=doJump;
+  if(jn)jn.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();doJump()}};
+  $("#hintBtn").onclick=()=>{
+    if(S.graded||S.hinted)return;
+    if(S.sel===null)return toast("先选一个科目，再点提示");
+    const p=c._pool[S.sel];
+    S.hinted=true;
+    toast(p.s==="bs"?"资产负债表":p.s==="is"?"利润表":"现金流量表",false);
+    render();
+  };
+  if(S.graded)renderFB();
+}
+function place(i,bin){
+  if(S.graded)return;
+  S.placed=S.placed.filter(p=>p.c!==i);
+  S.placed.push({c:i,bin,sign:1,amt:""}); S.sel=null; render();
+  const b=document.querySelector('[data-bin="'+bin+'"]');
+  if(b&&b.focus)b.focus({preventScroll:true});
+  if(b){b.classList.add("flash");setTimeout(()=>b.classList.remove("flash"),450)}
+  toast(`已放入${STN[bin]}${S.tableMode?" · 选 +/− 填金额":""}`);
+  if(window.matchMedia&&window.matchMedia("(max-width:600px)").matches){
+    const amt=document.querySelector('.fillrow [data-amt="'+i+'"]');
+    if(amt){
+      amt.scrollIntoView({block:"center",behavior:"smooth"});
+      setTimeout(()=>{const el=document.querySelector('.fillrow [data-amt="'+i+'"]');if(el)el.focus({preventScroll:true})},260);
+    }else if(b){
+      b.scrollIntoView({block:"center",behavior:"smooth"});
+    }
+  }
+  const live=document.getElementById("live");
+  if(live)live.textContent="已放入"+(bin==="bs"?"资产负债表":bin==="is"?"利润表":"现金流量表");
+  save();
+}
+function gradeCard(){
+  const c=S.deck[S.i], errs=[];
+  const want=c.imp.map(x=>({b:x[0],k:x[1],sign:x[2]<0?-1:1,amt:Math.abs(x[2])}));
+  const used=want.map(()=>false);
+  S.placed.forEach(p=>{
+    const pool=c._pool[p.c];
+    const hit=want.findIndex((w,ix)=>!used[ix]&&w.k===pool.k&&w.b===p.bin);
+    if(hit>=0){
+      used[hit]=true;
+      if(S.tableMode){
+        const w=want[hit];
+        if((p.sign||1)!==w.sign||Math.abs((parseFloat(p.amt)||0)-w.amt)>=0.011)
+          errs.push(`「${pool.k}」应为 ${fmt(w.sign*w.amt)} 万元`);
+      }
+      return;
+    }
+    const sameLabel=want.findIndex((w,ix)=>!used[ix]&&w.k===pool.k);
+    if(pool.imp&&sameLabel>=0){
+      used[sameLabel]=true;
+      errs.push(`「${pool.k}」放错表了，它属于${STN[pool.s]}`);
+    }else{
+      errs.push(`「${pool.k}」不该出现在这里——它是干扰项，这笔业务不影响这个科目`);
+    }
+  });
+  want.forEach((w,ix)=>{if(!used[ix])errs.push(`漏了「${w.k}」${S.tableMode?`（应为 ${fmt(w.sign*w.amt)} 万元）`:""}`)});
+  return errs;
+}
+function submit(){
+  if(S.graded)return;
+  if(!S.placed.length)return toast("先把科目放进表里，再交卷");
+  const c=S.deck[S.i];
+  const wasMastered=S.mastered.has(c.id);
+  S.graded=true; S.sel=null;
+  const errs=gradeCard();
+  const bad=errs.length;
+  S.flags[S.i]=bad===0;
+  S.correct=S.flags.filter(x=>x===true).length;
+  const matched=c.imp.filter(x=>S.placed.some(p=>{
+    const q=c._pool[p.c];
+    return p.bin===x[0]&&q.imp&&q.k===x[1]&&(!S.tableMode||((p.sign||1)===(x[2]<0?-1:1)&&Math.abs((parseFloat(p.amt)||0)-Math.abs(x[2]))<0.011));
+  })).length;
+  S.hits[S.i]=matched;
+  S.hit=S.hits.reduce((a,b)=>a+b,0);
+  if(!S.xpEarned.has(c.id)){
+    S.xpEarned.add(c.id);
+    S.xp+=matched*4;
+  }
+  if(bad===0){
+    S.mastered.add(c.id);
+    S.practiceWrong.delete(c.id);
+    ["S","N","Q"].forEach(k=>{if(S.stats[k])S.stats[k].wrong=S.stats[k].wrong.filter(x=>x!==c.id)});
+    S.combo++; S.best=Math.max(S.best,S.combo);
+    if(!wasMastered)S.xp+=20*Math.min(S.combo,5);
+    S.stamped=true;
+    toast("连对 "+S.combo);
+  }else{
+    S.combo=0;
+    if(S.mode!=="exam")S.practiceWrong.add(c.id);
+    toast("对 "+matched+" 个 · 错 "+bad+" 处",true);
+  }
+  if(S.mode==="exam"&&S.exam){
+    const st=S.stats[S.exam];
+    if(bad===0)st.wrong=st.wrong.filter(x=>x!==c.id);
+    else if(!st.wrong.includes(c.id))st.wrong.push(c.id);
+  }
+  S._justGraded=true; save();
+  render();
+}
+const STN={bs:"资产负债表",is:"利润表",cf:"现金流量表"};
+function renderFB(){
+  const c=S.deck[S.i];
+  const errors=gradeCard();
+  const perfect=errors.length===0;
+  const matched=c.imp.filter(x=>S.placed.some(p=>{
+    const q=c._pool[p.c];
+    return p.bin===x[0]&&q.imp&&q.k===x[1]&&(!S.tableMode||((p.sign||1)===(x[2]<0?-1:1)&&Math.abs((parseFloat(p.amt)||0)-Math.abs(x[2]))<0.011));
+  })).length;
+  const last=S.i>=S.deck.length-1;
+  const lines=c.imp.map(x=>{
+    const ok=S.placed.some(p=>{const q=c._pool[p.c];return p.bin===x[0]&&q.imp&&q.k===x[1]&&(!S.tableMode||((p.sign||1)===(x[2]<0?-1:1)&&Math.abs((parseFloat(p.amt)||0)-Math.abs(x[2]))<0.011))});
+    return `<li class="${ok?"li-ok":"li-no"}">${ok?"✓":"✗"} <b class="mono">${fmt(x[2])}</b> ${x[1]} <span class="mono" style="color:var(--text3)">${STN[x[0]]}</span></li>`;
+  }).join("");
+  $("#fb").innerHTML=`
+    <div class="fbtop">
+      <div class="fbsum ${perfect?"ok":"no"}">${perfect?"全对":`错 ${errors.length} 处 · 放对 ${matched}/${c.imp.length}`}</div>
+      <button class="btn primary" id="next">${last?(S.mode==="exam"?"生成三张报表":"下一题"):"下一题"}</button>
+      ${last?"":'<button class="btn ghost" id="again">重做本题</button>'}
+    </div>
+    <div class="fb ${perfect?"":"bad"}">
+      <div class="lab" style="margin-top:0">正确答案 · 逐条对照</div>
+      <ul>${lines}</ul>
+      ${errors.length?`<div style="margin-top:10px;color:var(--error);font-size:12.5px">${errors.map(e=>"· "+e).join("<br>")}</div>`:""}
+      <div class="why">${c.why}</div>
+      ${JE[c.id]?`<div class="lab" style="margin-top:10px">分录</div><div class="entryline">${esc(JE[c.id])}</div>`:""}
+    </div>`;
+  const panel=$("#fb");
+  if(panel&&S._justGraded){
+    panel.scrollIntoView({block:"start"});
+    S._justGraded=false;
+    setTimeout(()=>{const nb=$("#next");if(nb)nb.focus({preventScroll:true})},30);
+  }
+  $("#next").onclick=()=>{
+    if(last){
+      if(S.mode==="exam"){
+        const left=S.flags.filter(x=>x===null).length;
+        if(left&&!confirm(`还有 ${left} 题未作答，确定交卷？`))return;
+        finishExam();
+      }
+      else{S.resume=null;S.screen="result";save();render()}
+    }else{jumpTo(S.i+1);}
+  };
+  const ag=$("#again"); if(ag)ag.onclick=()=>{
+    S.cardStates[S.i]=null;S.flags[S.i]=null;S.hits[S.i]=0;
+    S.correct=S.flags.filter(v=>v===true).length;S.hit=S.hits.reduce((a,b)=>a+b,0);
+    buildCard();save();render();
+  };
+}
+
+function finishExam(){
+  S.elapsed=freezeTimer();
+  const st=S.stats[S.exam];
+  const full=S.deck.length===EXAMS[S.exam].ids.length;
+  st.hist=st.hist||[];
+  st.hist.unshift({t:Date.now(),ok:S.correct,total:S.deck.length,ms:S.elapsed,full:full});
+  st.hist=st.hist.slice(0,6);
+  if(full){
+    st.runs++;
+    if(S.correct>st.best)st.best=S.correct;
+    if(S.correct===S.deck.length&&(!st.ms||S.elapsed<st.ms))st.ms=S.elapsed;
+  }
+  S.resume=null;
+  S.screen="bossend";
+  save(); render();
+}
+
+/* ---------- 真题选择 ---------- */
+function renderExamPick(){
+  const card=k=>{
+    const e=EXAMS[k], st=S.stats[k];
+    const mastered=e.ids.filter(id=>cleanMastered(id)).length;
+    return `<div class="excard" role="button" tabindex="0" data-exam="${k}">
+      <div class="n">${{S:"2025 真题",N:"课堂模拟卷",Q:"开卷模拟卷"}[k]}</div>
+      <h3>${e.name}</h3>
+      <p>${e.ids.length} 笔业务 · 拖科目 + 选正负 + 填金额 + 自动出三表</p>
+      <div class="tags">${(()=>{const tags=[...new Set(e.ids.map(id=>byId(id).tag))];
+        const show=tags.slice(0,5), rest=tags.length-show.length;
+        return show.map(t=>`<i>${t}</i>`).join("")+(rest?`<i>+${rest}</i>`:"");})()}</div>
+      <div class="meta"><span>掌握 ${mastered}/${e.ids.length}</span><span>最佳 ${st.best}/${e.ids.length}</span><span>已练 ${st.runs} 次</span></div>
+      <div class="go">${st.runs?"再练一遍":"开始"}</div>
+    </div>`;
+  };
+  const wrongOf=k=>S.stats[k].wrong||[];
+  $("#app").innerHTML=`
+   <div class="top"><div class="brand">${LOGO}真题填表 <em>按真题表 1 作答</em></div>
+     <div class="nav"><button data-nav="home">← 首页</button></div></div>
+   <div class="pagefill">
+   <div class="notice">整套卷固定 10 题，不跳过已掌握题；掌握数按答对的题累计，最佳数只在整套卷做完后更新。每笔要填科目、正负和金额。</div>
+   <div class="exgrid">${["S","N","Q"].map(card).join("")}</div>
+   ${["S","N","Q"].map(k=>wrongOf(k).length?`<div class="wrongbar">
+       <div><b>${EXAM_LABEL[k]}错题</b><span>${wrongOf(k).length} 笔还没吃透</span></div>
+       <button class="btn ghost" data-wrong="${k}">只练这 ${wrongOf(k).length} 题</button>
+     </div>`:"").join("")}
+   ${(()=>{const rows=["S","N","Q"].flatMap(k=>(S.stats[k].hist||[]).map(h=>({k,...h})));
+     if(!rows.length)return "";
+     rows.sort((a,b)=>b.t-a.t);
+     return `<div class="hist"><div class="hh">最近练习</div>
+       <table>${rows.slice(0,5).map(r=>{
+         const tot=r.total||10, rate=r.ok/tot;
+         return `<tr><td>${EXAM_LABEL[r.k]}${r.full===false?"（错题重练）":""}</td>
+         <td class="${rate>=0.8?"ok":rate>=0.6?"mid":"no"}">${r.ok}/${tot}</td>
+         <td>${mmss(r.ms)}</td>
+         <td>${new Date(r.t).toLocaleString("zh-CN",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}</td></tr>`}).join("")}</table></div>`;})()}
+   <div class="steps">
+     <div><b>01 读题</b><span>先判断这笔业务动哪张表</span></div>
+     <div><b>02 填表</b><span>拖科目进表，选 +/−，填金额</span></div>
+     <div><b>03 对表</b><span>交卷后自动出三表并勾稽</span></div>
+   </div>
+   </div>`;
+  document.querySelectorAll("[data-exam]").forEach(b=>b.onclick=()=>startDrill(EXAMS[b.dataset.exam].ids,b.dataset.exam,{tag:"exam",table:true}));
+  document.querySelectorAll("[data-wrong]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.wrong; startDrill(wrongOf(k),k,{tag:"wrong",table:true});
+  });
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go("home"));
+}
+
+/* ---------- 报表找错 ---------- */
+function startAudit(paper){
+  if(!EXAMS[paper])return;
+  S.audit={paper,data:auditData(paper),sel:new Set(),submitted:false,found:[],missed:[],falsePos:[]};
+  S.screen="audit"; save(); render();
+}
+function renderAuditPick(){
+  const cards=["S","N","Q"].map(k=>`<div class="excard" role="button" tabindex="0" data-audit-paper="${k}">
+      <div class="n">${EXAM_LABEL[k]}</div>
+      <h3>${EXAMS[k].name}</h3>
+      <p>三张报表 · 藏了 3 处金额错误</p>
+      <div class="meta"><span>${S.auditSeen.has(k)?"已找全":"未完成"}</span></div>
+      <div class="go">${S.auditSeen.has(k)?"再找一遍":"开始"}</div>
+    </div>`).join("");
+  $("#app").innerHTML=`
+   <div class="top"><div class="brand">${LOGO}报表找错 <em>练勾稽</em></div>
+     <div class="nav"><button data-nav="home">← 首页</button></div></div>
+   <div class="pagefill">
+     <div class="notice">每套三张报表被改了 3 处金额。点你认为错的行，交卷后显示找对、漏掉和误报。可用勾稽关系辅助：资产=负债+权益；期末现金=货币资金；净利润=未分配利润。</div>
+     <div class="exgrid">${cards}</div>
+   </div>`;
+  document.querySelectorAll("[data-audit-paper]").forEach(b=>b.onclick=()=>startAudit(b.dataset.auditPaper));
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go("home"));
+}
+function renderAudit(){
+  const a=S.audit; if(!a)return renderAuditPick();
+  const p=a.paper, e=EXAMS[p], d=a.data;
+  const errs=new Set(AUDIT_ERRORS[p].map(x=>x.key));
+  const cls=key=>{
+    if(!a.submitted)return a.sel.has(key)?"sel":"";
+    if(errs.has(key))return a.sel.has(key)?"found":"missed";
+    return a.sel.has(key)?"false":"";
+  };
+  const row=(key,name,val,extra="")=>`<tr class="auditrow ${cls(key)} ${extra}" data-audit-key="${key}" tabindex="0"><td>${esc(name)}</td><td>${val.toFixed(2)}</td></tr>`;
+  const bsRows=[
+    {g:"资产"},
+    ...d.bs.assets.map((r,i)=>({html:row("bs.assets:"+i,r[0],r[1])})),
+    {t:"资产合计",v:e.bs.total},
+    {g:"负债"},
+    ...d.bs.liab.map((r,i)=>({html:row("bs.liab:"+i,r[0],r[1])})),
+    {t:"负债合计",v:d.bs.liab.reduce((x,r)=>x+r[1],0)},
+    {g:"所有者权益"},
+    ...d.bs.eq.map((r,i)=>({html:row("bs.eq:"+i,r[0],r[1])})),
+    {t:"负债和所有者权益合计",v:e.bs.total}
+  ];
+  const isRows=d.is.map((r,i)=>row("is:"+i,r[0],r[1],["营业利润","利润总额","净利润"].includes(r[0])?"tot":""));
+  const cfRows=d.cf.map((r,i)=>row("cf:"+i,r[0],r[1],/净额|净增加|期末现金/.test(r[0])?"tot":""));
+  const perfect=a.submitted&&!a.missed.length&&!a.falsePos.length;
+  const fb=a.submitted?`<div class="fb ${perfect?"":"bad"}">
+      <h4>${perfect?"3 处全部找对":`找对 ${a.found.length} / 3`}</h4>
+      ${a.missed.length?`<div class="why">漏掉：${a.missed.map(k=>`${auditLabel(p,k)}（正确 ${auditRow(p,k)[1].toFixed(2)}）`).join("；")}</div>`:""}
+      ${a.falsePos.length?`<div class="why">误报：${a.falsePos.map(k=>auditLabel(p,k)).join("；")}</div>`:""}
+      ${perfect?'<div class="why">这套报表的勾稽已经对上了。</div>':""}
+    </div>`:"";
+  $("#app").innerHTML=`
+   <div class="top"><div class="brand">${LOGO}报表找错 <em>${e.name}</em></div>
+     <div class="nav"><button data-nav="auditpick">← 换一套</button><button data-nav="home">首页</button></div></div>
+   <div class="hud">
+     <div class="k">已选 <b id="auditCount">${a.sel.size}</b></div>
+     <div class="k">目标 <b>3</b> 处</div>
+     <div class="k grow">${S.auditSeen.has(p)?"这套已找全":"找对 3 处即算通关"}</div>
+   </div>
+   <div class="notice">点金额所在的行选中；交卷后再点不会改选。金额单位：万元。</div>
+   <div class="sheets">
+     <div class="sheet"><h3>资产负债表 <span>被改过？</span></h3><table>${bsRows.map(r=>r.g?`<tr class="grp"><td colspan="2">${r.g}</td></tr>`:r.t?`<tr class="tot"><td>${r.t}</td><td>${r.v.toFixed(2)}</td></tr>`:r.html).join("")}</table></div>
+     <div class="sheet"><h3>利润表 <span>被改过？</span></h3><table>${isRows.join("")}</table></div>
+     <div class="sheet"><h3>现金流量表 <span>被改过？</span></h3><table>${cfRows.join("")}</table></div>
+   </div>
+   <div class="actions" style="margin-top:14px">
+     <button class="btn primary" id="auditSubmit" ${a.submitted?"disabled":""}>${a.submitted?"已交卷":"交卷"}</button>
+     ${a.submitted?'<button class="btn ghost" id="auditAgain">再找一遍</button>':""}
+     <div class="spacer"></div>
+     <span class="kbd">点行选中 · 再点取消</span>
+   </div>
+   <div id="auditFb" style="margin-top:14px">${fb}</div>`;
+  document.querySelectorAll("[data-audit-key]").forEach(tr=>{
+    const key=tr.dataset.auditKey;
+    const toggle=()=>{
+      if(a.submitted)return;
+      if(a.sel.has(key))a.sel.delete(key); else a.sel.add(key);
+      tr.classList.toggle("sel",a.sel.has(key));
+      const n=$("#auditCount"); if(n)n.textContent=a.sel.size;
+      save();
+    };
+    tr.onclick=toggle;
+    tr.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle()}};
+  });
+  const sb=$("#auditSubmit");
+  if(sb)sb.onclick=()=>{
+    if(a.submitted)return;
+    const found=[...errs].filter(k=>a.sel.has(k));
+    const missed=[...errs].filter(k=>!a.sel.has(k));
+    const falsePos=[...a.sel].filter(k=>!errs.has(k));
+    a.submitted=true;a.found=found;a.missed=missed;a.falsePos=falsePos;
+    if(!missed.length&&!falsePos.length){
+      S.auditSeen.add(p);S.xp+=20;S.combo++;S.best=Math.max(S.best,S.combo);toast("全找对");
+    }else{S.combo=0;S.xp+=found.length*4;toast(`找对 ${found.length}/3`,true)}
+    save(); render();
+  };
+  const ag=$("#auditAgain");if(ag)ag.onclick=()=>startAudit(p);
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go(b.dataset.nav));
+}
+
+/* ---------- 练习全部完成 ---------- */
+function renderAllClear(){
+  const a=S.allclear||{};
+  const wrong=wrongIds();
+  $("#app").innerHTML=`
+   <div class="top"><div class="brand">${LOGO}${esc(a.label||"练习")} · 已完成</div>
+     <div class="nav"><button data-nav="home">← 首页</button></div></div>
+   <div class="numcard" style="max-width:680px;margin-top:8vh">
+     <div class="qn">ALL CLEAR</div>
+     <div class="q" style="font-size:30px">这些题都已吃透</div>
+     <p style="color:var(--text2);font-size:13px;line-height:1.8;margin:0 0 18px">
+       练习模式会自动跳过已答对、且不在错题本里的题。${wrong.length?"错题本里还有 "+wrong.length+" 笔，建议先清掉。":"错题本已经清空。"}
+     </p>
+     <div class="actions">
+       ${wrong.length?`<button class="btn primary" id="acWrong">练错题 ${wrong.length} 笔</button>`:""}
+       <button class="btn ghost" id="acExam">整套真题</button>
+       <button class="btn ghost" id="acReview">随机复习</button>
+     </div>
+   </div>`;
+  const aw=$("#acWrong");if(aw)aw.onclick=()=>startDrill(wrongIds(),null,{tag:"wrong"});
+  $("#acExam").onclick=()=>{S.screen="exam";save();render()};
+  $("#acReview").onclick=()=>{
+    const ids=(a.ids||[]).slice();
+    if(!ids.length)return;
+    startDrill(rnd(ids).slice(0,Math.min(10,ids.length)),null,{tag:a.tag||"drill"});
+  };
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go(b.dataset.nav));
+}
+
+/* ---------- 关卡结算 ---------- */
+function renderResult(){
+  const n=S.deck.length, ok=S.correct, pct=Math.round(ok/n*100);
+  const msg=pct===100?"全对":pct>=80?"错的几题重做一遍":pct>=60?"错题回去过一遍速查页":"先回分拣练习，把三表归属记熟";
+  $("#app").innerHTML=`
+   <div class="top"><div class="brand">${LOGO}本关结束</div><div class="nav"><button data-nav="home">← 首页</button></div></div>
+   <div class="numcard" style="max-width:640px">
+     <div class="qn">${ok} / ${n} 题正确</div>
+     <div class="q" style="font-size:40px;margin-bottom:4px">${pct}<span style="font-size:16px;color:var(--text3)"> 分</span></div>
+     <p style="color:var(--text2);font-size:13px;margin:0 0 18px">${msg}</p>
+     <div class="mono" style="font-size:12px;color:var(--text2);line-height:2">
+       段位 <b style="color:var(--text)">${rank(S.xp)}</b> · XP <b style="color:var(--text)">${S.xp}</b> · 最高连击 <b style="color:var(--text)">${S.best}</b>
+     </div>
+     <div class="actions" style="margin-top:22px">
+       <button class="btn primary" id="again2">再来一遍</button>
+       <button class="btn ghost" id="toboss">去真题填表</button>
+     </div>
+   </div>`;
+  $("#again2").onclick=()=>startDrill(S.deck.map(c=>c.id),null,{tag:S.tag});
+  $("#toboss").onclick=()=>{S.screen="exam";render()};
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go("home"));
+}
+
+/* ---------- BOSS 结算 ---------- */
+function renderBossEnd(){
+  const e=EXAMS[S.exam];
+  const bsRows=[["资产","","g"],
+    ...e.bs.assets.map(r=>[r[0],r[1],"a"]),["资产合计",e.bs.total,"t"],
+    ["负债","","g"],...e.bs.liab.map(r=>[r[0],r[1],"l"]),["负债合计",e.bs.liab.reduce((a,b)=>a+b[1],0),"t"],
+    ["所有者权益","","g"],...e.bs.eq.map(r=>[r[0],r[1],"e"]),["负债和所有者权益合计",e.bs.total,"t"]];
+  $("#app").innerHTML=`
+   <div class="top"><div class="brand">${LOGO}${e.name}</div>
+     <div class="nav"><button data-nav="home">← 返回首页</button></div></div>
+   <div class="hud">
+     <div class="k">全对 <b>${S.correct}/${S.deck.length}</b></div>
+     <div class="k">放对 <b>${S.hit}/${S.totalImp}</b></div>
+     ${S.mode==="exam"?`<div class="k">用时 <b>${mmss(S.elapsed||0)}</b></div>`:""}
+     ${S.mode==="exam"&&(S.stats[S.exam].wrong||[]).length?`<div class="k">错题 <b>${S.stats[S.exam].wrong.length}</b></div>`:""}
+     <div class="k">XP <b>${S.xp}</b></div>
+     <div class="k grow">段位 <b>${rank(S.xp)}</b></div>
+   </div>
+   ${S.mode==="exam"&&S.deck.length!==EXAMS[S.exam].ids.length?`<div class="notice">本次只练了 ${S.deck.length} 笔错题；下面仍是整套卷的标准三表，不是本次作答的汇总。</div>`:""}
+   <div class="sheets" id="sheets">
+     <div class="sheet">
+       <h3>资产负债表 <span>2025-12-31</span></h3>
+       <table>${bsRows.map(([n,v,t])=>t==="g"?`<tr class="grp"><td colspan="2">${n}</td></tr>`:`<tr class="${t==="t"?"tot":t==="s"?"sub":""}"><td>${n}</td><td>${v.toFixed(2)}</td></tr>`).join("")}</table>
+       <div class="foot">资产 = 负债 + 所有者权益；所有者权益 = 实收资本 + 资本公积 + 未分配利润。</div>
+     </div>
+     <div class="sheet">
+       <h3>利润表 <span>2025 年度</span></h3>
+       <table>${e.is.map(([n,v])=>`<tr class="${["营业利润","利润总额","净利润"].includes(n)?"tot":""}"><td>${n}</td><td>${v.toFixed(2)}</td></tr>`).join("")}</table>
+       <div class="foot">营业利润 = 收入 − 成本 − 期间费用 + 公允价值变动；利润总额 = 营业利润 − 营业外支出；净利润 = 利润总额 × 75%。</div>
+     </div>
+     <div class="sheet">
+       <h3>现金流量表 <span>2025 年度</span></h3>
+       <table>${e.cf.map(([n,v])=>`<tr class="${/净额|净增加|期末现金/.test(n)?"tot":""}"><td>${n}</td><td>${v.toFixed(2)}</td></tr>`).join("")}</table>
+     </div>
+     <div class="sheet tinted">
+       <h3>勾稽自检</h3>
+       <div class="mono" style="font-size:13px;line-height:2.2;color:var(--text)">
+         资产合计 <b>${e.bs.total.toFixed(2)}</b> = 负债和权益 <b>${e.bs.total.toFixed(2)}</b> <span class="check">✓</span><br>
+         期末现金 <b>${e.cf[e.cf.length-1][1].toFixed(2)}</b> = 货币资金 <b>${e.bs.assets[0][1].toFixed(2)}</b> <span class="check">✓</span><br>
+         净利润 <b>${e.is[e.is.length-1][1].toFixed(2)}</b> = 未分配利润 <b>${e.bs.eq[e.bs.eq.length-1][1].toFixed(2)}</b> <span class="check">✓</span>
+       </div>
+       <div class="foot">${e.note}</div>
+     </div>
+   </div>
+   <div class="actions" style="margin-top:16px">
+     ${S.mode==="exam"&&(S.stats[S.exam].wrong||[]).length?`<button class="btn primary" id="reWrong">重练错题 ${(S.stats[S.exam].wrong||[]).length} 笔</button>`:""}
+     <button class="btn ${S.mode==="exam"&&S.stats[S.exam].wrong.length?"ghost":"primary"}" id="reExam">再练一遍</button>
+     <button class="btn ghost" data-nav="guide">开卷速查</button>
+     <div class="spacer"></div>
+     <button class="btn ghost" data-nav="exam">真题列表</button>
+   </div>`;
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go(b.dataset.nav));
+  const rw=$("#reWrong");
+  if(rw)rw.onclick=()=>startDrill(S.stats[S.exam].wrong.slice(),S.exam,{tag:"wrong",table:true});
+  $("#reExam").onclick=()=>startDrill(EXAMS[S.exam].ids,S.exam,{tag:"exam",table:true});
+}
+
+/* ---------- 开卷速查 ---------- */
+function renderGuide(){
+  $("#app").innerHTML=`
+   <div class="top"><div class="brand">${LOGO}开卷速查</div>
+     <div class="nav"><button data-nav="home">← 答题</button><button data-nav="num">数字快答</button><button id="printGuide">打印</button></div></div>
+   <div class="kwchips" id="kwchips">${KEYWORDS.map(([label,q])=>`<button data-kw="${esc(q)}">${esc(label)}</button>`).join("")}</div>
+   <div class="searchbar"><input id="q" type="search" aria-label="搜索科目或业务" placeholder="搜题干词：折旧 / 补助 / 预收 / 个税 / 视同销售"></div>
+   <div class="guide" id="glist"></div>`;
+  const inp=$("#q");
+  inp.value=S.filter||"";
+  const paint=()=>{
+    const k=inp.value.trim().toLowerCase();
+    const list=GUIDE.filter(g=>!k||[g.n,g.c,g.e,g.bs,g.is,g.cf,g.t].join(" ").toLowerCase().includes(k));
+    $("#glist").innerHTML=list.map(g=>`<div class="g">
+       <div class="gh"><b>${esc(g.n)}</b><span>${esc(g.c)}</span></div>
+       <div class="entry">${esc(g.e)}</div>
+       <div class="rows">
+         <div class="b1"><b>资产负债表</b>${esc(g.bs)}</div>
+         <div class="b2"><b>利润表</b>${esc(g.is)}</div>
+         <div class="b3"><b>现金流量表</b>${esc(g.cf)}</div>
+       </div>
+       <div class="tip2">${esc(g.t)}</div>
+       ${GUIDE_CARD[g.n]?`<button class="gbtn" data-card="${GUIDE_CARD[g.n]}">用这道练 →</button>`:""}
+     </div>`).join("")||'<div class="g"><div class="gh"><b>没搜到</b><span>换个词</span></div><div class="entry">试试：折旧 · 补助 · 预收 · 个税 · 视同销售</div></div>';
+    document.querySelectorAll("[data-card]").forEach(b=>b.onclick=()=>startDrill([b.dataset.card],null,{tag:"guide"}));
+  };
+  inp.addEventListener("input",()=>{S.filter=inp.value;paint()});
+  document.querySelectorAll("[data-kw]").forEach(b=>b.onclick=()=>{
+    inp.value=b.dataset.kw;S.filter=inp.value;paint();inp.focus();
+  });
+  const pb=$("#printGuide");if(pb)pb.onclick=()=>window.print();
+  paint();
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go(b.dataset.nav));
+}
+
+/* ---------- 关键词抢答 ---------- */
+function renderQuiz(){
+  const total=QUIZ.length;
+  const q=QUIZ[S.quizI%total];
+  const card=byId(q.cid);
+  const opts=rnd([q.ans,...rnd(QUIZ_ANS.filter(a=>a!==q.ans)).slice(0,3)]);
+  $("#app").innerHTML=`
+   <div class="top"><div class="brand">${LOGO}关键词抢答</div>
+     <div class="nav"><button data-nav="home">← 答题</button><button data-nav="guide">开卷速查</button></div></div>
+   <div class="numbar">
+   <div class="hud" style="margin-bottom:16px">
+     <div class="k">答对 <b id="qdone">${S.quizSeen.size}/${total}</b></div>
+     <div class="k">连对 <b id="qstreak">${S.quizStreak||0}</b></div>
+     <div class="k">XP <b id="qxp">${S.xp}</b></div>
+     <div class="k grow">第 ${(S.quizI%total)+1} / ${total} 题</div>
+   </div>
+   <div class="numcard" style="margin-top:0">
+     <div class="qn">看题干词 · 认业务类型</div>
+     <div class="kwprompt">${esc(q.kw)}</div>
+     <p class="quizask">这笔业务属于哪一类？</p>
+     <div class="quizopts" id="qopts">${opts.map((a,i)=>`<button data-opt="${i}" data-ans="${esc(a)}"><span class="qnum">${i+1}</span>${esc(a)}</button>`).join("")}</div>
+     <div id="qfb" aria-live="polite"></div>
+     <div class="actions" style="margin-top:16px">
+       <button class="btn primary" id="qnext" disabled>下一题</button>
+       <button class="btn ghost" id="qtrain" disabled>去练这道</button>
+     </div>
+   </div>
+   </div>`;
+  let locked=false;
+  const qi=S.quizI%total;
+  const choose=(ans)=>{
+    if(locked)return; locked=true;
+    const ok=ans===q.ans;
+    if(ok){
+      if(!S.quizSeen.has(qi)){S.quizSeen.add(qi);S.xp+=8}
+      S.quizStreak=(S.quizStreak||0)+1;S.combo++;S.best=Math.max(S.best,S.combo);
+      toast("对 · 连对 "+S.quizStreak);
+    }else{S.quizStreak=0;S.combo=0;toast("答案是 "+q.ans,true)}
+    save();
+    $("#qdone").textContent=S.quizSeen.size+"/"+total;
+    $("#qstreak").textContent=S.quizStreak||0;
+    $("#qxp").textContent=S.xp;
+    document.querySelectorAll("[data-opt]").forEach(b=>{
+      b.disabled=true;
+      if(b.dataset.ans===q.ans)b.classList.add("ok");
+      else if(b.dataset.ans===ans)b.classList.add("no");
+    });
+    const rows=card?card.imp.map(x=>`<li>${STN[x[0]]} · ${esc(x[1])} <b class="mono">${fmt(x[2])}</b></li>`).join(""):"";
+    $("#qfb").innerHTML=`<div class="fb ${ok?"":"bad"}"><h4>${ok?"答对了":"答案是："+esc(q.ans)}</h4>
+      ${rows?`<ul>${rows}</ul>`:""}<div class="why">${card?esc(card.why):""}</div></div>`;
+    $("#qnext").disabled=false; $("#qtrain").disabled=!card;
+    $("#qnext").focus();
+  };
+  document.querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>choose(b.dataset.ans));
+  $("#qnext").onclick=()=>{S.quizI++;save();renderQuiz()};
+  $("#qtrain").onclick=()=>{if(card)startDrill([card.id],null,{tag:"guide"})};
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go(b.dataset.nav));
+}
+
+/* ---------- 数字快答 ---------- */
+function numBank(){
+  const list=CARDS.filter(c=>c.num).map(c=>[c.num[0],c.num[1],c.num[2],c.prompt]);
+  return list.concat(NUMEXTRA.map(x=>[x[0],x[1],x[2]]));
+}
+function renderNum(){
+  const bank=numBank(); const q=bank[S.numIdx%bank.length];
+  const [text,ans,hint,src]=q;
+  const unit=/元\/件/.test(text)?"元/件":"万元";
+  $("#app").innerHTML=`
+   <div class="top"><div class="brand">${LOGO}数字快答</div>
+     <div class="nav"><button data-nav="home">← 答题</button><button data-nav="guide">速查</button></div></div>
+   <div class="numbar">
+   <div class="hud" style="margin-bottom:16px">
+     <div class="k">答对 <b id="numdone">${S.numSeen.size}</b></div>
+     <div class="k">连对 <b id="numstreak">${S.numStreak||0}</b></div>
+     <div class="k">XP <b id="numxp">${S.xp}</b></div>
+     <div class="k grow">第 ${(S.numIdx%bank.length)+1} / ${bank.length} 题</div>
+   </div>
+   <div class="numcard" style="margin-top:0">
+     <div class="qn">Q${String((S.numIdx%bank.length)+1).padStart(2,"0")} / ${bank.length}</div>
+     ${src?`<div class="mono" style="font-size:11.5px;color:var(--text3);line-height:1.75;margin-bottom:16px;padding-left:12px;border-left:2px solid rgba(201,162,74,.45)">${esc(src)}</div>`:""}
+     <div class="q">${esc(text)}</div>
+     <div class="answer">
+       <input id="ans" inputmode="decimal" aria-label="答案" placeholder="0.00" autocomplete="off">
+       <span class="u">${unit}</span>
+       <button class="btn primary" id="ok">对答案</button>
+       <button class="btn ghost" id="nt" disabled>下一题</button>
+     </div>
+     <div class="streakbar">${[0,1,2,3,4].map(i=>`<i class="${i<(S.numStreak||0)?"on":""}"></i>`).join("")}</div>
+     <div id="fb" style="margin-top:14px" aria-live="polite"></div>
+   </div>
+   </div>`;
+  const inp=$("#ans"), okBtn=$("#ok"), ntBtn=$("#nt");
+  const qi=S.numIdx%bank.length;
+  let locked=false;
+  const check=()=>{
+    if(locked)return;
+    const v=parseFloat(String(inp.value).replace(/[,，\s]/g,""));
+    if(isNaN(v))return toast("先填个数字");
+    locked=true;
+    const ok=Math.abs(v-ans)<0.011;
+    if(ok){
+      if(!S.numSeen.has(qi)){S.numSeen.add(qi);S.xp+=8}
+      S.numStreak=(S.numStreak||0)+1;S.combo++;S.best=Math.max(S.best,S.combo);
+      toast("对 · 连对 "+S.numStreak);
+    }else{S.numStreak=0;S.combo=0;toast("答案是 "+ans,true)}
+    save();
+    $("#numdone").textContent=S.numSeen.size;
+    $("#numstreak").textContent=S.numStreak||0;
+    $("#numxp").textContent=S.xp;
+    inp.disabled=true; okBtn.disabled=true; ntBtn.disabled=false;
+    $("#fb").innerHTML=`<div class="fb ${ok?"":"bad"}"><h4>${ok?"正确":"答案 "+ans+" "+unit}</h4><div class="why">${esc(hint)}</div></div>`;
+    setTimeout(()=>ntBtn.focus(),30);
+  };
+  okBtn.onclick=check;
+  inp.onkeydown=e=>{if(e.key==="Enter")check()};
+  ntBtn.onclick=()=>{S.numIdx++;save();renderNum()};
+  document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go(b.dataset.nav));
+  setTimeout(()=>inp.focus(),50);
+}
+
+/* ---------- 快捷键 ---------- */
+document.addEventListener("keydown",e=>{
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea"||tag==="select"||e.target.isContentEditable)return;
+  if(S.screen!=="play")return;
+  const interactive=!!(e.target.closest&&e.target.closest('button,a,input,textarea,select,[role="button"],[data-bin],[data-chip]'));
+  if(e.key===" "){
+    if(interactive)return;
+    e.preventDefault();
+    if(!S.graded)submit();else{const b=$("#next");if(b)b.click()}
+  }
+  if(e.key==="Escape"){
+    if(S.sel!==null){S.sel=null}
+    else if(S.placed.length&&!S.graded){S.placed.pop()}
+    render();
+  }
+  if(["1","2","3"].includes(e.key)&&S.sel!==null&&!S.graded){
+    place(S.sel,["bs","is","cf"][+e.key-1]);
+  }
+});
+
+render();
+function bootHash(){
+  const h=location.hash.replace('#','');
+  if(S.screen==='play')return;
+  if(S.resume&&(h==='drill'||h==='boss')){S.screen='home';render();return}
+  stopTimer();
+  if(h==='drill')startPractice(CARDS.map(c=>c.id),"drill","分拣练习",10);
+  else if(h==='boss')startDrill(EXAMS.S.ids,"S",{tag:"exam",table:true});
+  else if(h==='exam'){S.screen='exam';render()}
+  else if(h==='guide'){S.screen='guide';render()}
+  else if(h==='num'){S.screen='num';render()}
+  else if(h==='quiz'){S.screen='quiz';render()}
+  else {S.screen='home';render()}
+}
+bootHash();
+window.addEventListener('hashchange',bootHash);
+window.addEventListener("pagehide",()=>{if(S.screen==="play")save()});
+initCloud();
+initOnline();
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&S.screen==="play")save()});
+</script>
+</body>
+</html>

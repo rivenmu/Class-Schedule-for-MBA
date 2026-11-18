@@ -62,6 +62,9 @@ header{position:sticky;top:0;z-index:100;background:rgba(232,238,244,.82);backdr
 .class-select:hover{background:var(--ink);border-color:var(--ink)}
 .class-select:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
 .class-select option{background:var(--surface);color:var(--ink)}
+.study-entry{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(135deg,rgba(26,95,208,.10),rgba(74,159,239,.05));color:var(--ink);text-decoration:none;font-size:13px;font-weight:700;transition:all .16s}
+.study-entry span{color:var(--ink-2);font-weight:500;font-size:12px}
+.study-entry:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(26,95,208,.12)}
 .header-actions{display:flex;gap:8px}
 .ht-btn{appearance:none;border:1px solid var(--line);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:all .16s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .ht-btn.ht-export{background:var(--ink);color:#fff;border-color:var(--ink)}
@@ -418,6 +421,8 @@ button:focus-visible{outline-offset:1px}
   .header-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
   .class-select{flex:1;min-width:0;max-width:none;min-height:38px}
   .ht-btn{justify-content:center;padding:10px 8px;font-size:12.5px;min-height:40px}
+  /* 底部固定条盖住列表末尾: 留出滚动余量, 最后一项也能滚到按钮上方 */
+  .sidebar{padding-bottom:calc(64px + env(safe-area-inset-bottom))}
 
   .cal-card-head{flex-direction:column;align-items:stretch;gap:8px}
   .cal-month-nav{justify-content:space-between}
@@ -511,7 +516,7 @@ button:focus-visible{outline-offset:1px}
 <div class="header-inner">
 <div class="brand">
 <h1 id="brandTitle">26级MBA课程预选表—全集班</h1>
-<span class="badge">v0.8.7</span>
+<span class="badge">v0.8.8</span>
 </div>
 <div class="header-tools">
 <div class="class-switch" aria-label="班级切换">
@@ -543,6 +548,7 @@ button:focus-visible{outline-offset:1px}
 
 <main>
 <aside class="sidebar" id="sidebar">
+<a class="study-entry" id="studyLink" href="/study/">会计练习 · 三表分拣<span>打开 →</span></a>
 <div class="panel" id="progressPanel">
 <div class="panel-head"><span>选课进度展示区</span><span class="eyebrow">Credit ledger</span></div>
 <div class="panel-body" id="progressBody"></div>
@@ -607,7 +613,7 @@ button:focus-visible{outline-offset:1px}
 </div>
 </main>
 
-<footer style="max-width:1600px;margin:0 auto;padding:14px 20px 18px;text-align:center;font-size:11px;color:var(--ink-3);border-top:1px solid var(--line);background:rgba(232,238,244,.7);backdrop-filter:blur(10px)">创作者：<b style="color:var(--ink-2);font-weight:700">Riven-26全集班</b> · <span id="footerTitle">26级MBA课程预选表—全集班</span> · <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-3);border:1px solid var(--line);padding:2px 6px;border-radius:999px;background:var(--surface)">v0.8.7</span></footer>
+<footer style="max-width:1600px;margin:0 auto;padding:14px 20px 18px;text-align:center;font-size:11px;color:var(--ink-3);border-top:1px solid var(--line);background:rgba(232,238,244,.7);backdrop-filter:blur(10px)">创作者：<b style="color:var(--ink-2);font-weight:700">Riven-26全集班</b> · <span id="footerTitle">26级MBA课程预选表—全集班</span> · <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-3);border:1px solid var(--line);padding:2px 6px;border-radius:999px;background:var(--surface)">v0.8.8</span></footer>
 <div class="mobile-toggle" id="mobileToggle" role="button" tabindex="0">
 <span>选课面板</span>
 <span class="arrow" id="mobileArrow">▴</span>
@@ -672,7 +678,7 @@ button:focus-visible{outline-offset:1px}
 </div>
 
 <script id="app">
-const VERSION = "v0.8.7";
+const VERSION = "v0.8.8";
 // ========== DATA ==========
 const CLASSES = {
   quanji: {
@@ -1941,6 +1947,7 @@ function saveState() {
   // 重置瞬态 UI
   var toast = clone.querySelector('#toast'); if(toast) toast.className = 'toast';
   // 云登录态不进导出文件: 重置登录按钮与方案面板, 令导出文件打开时为未登录干净态
+  var sl = clone.querySelector('#studyLink'); if(sl) sl.remove();
   var lg = clone.querySelector('#loginBtn'); if(lg) lg.textContent = '登录';
   var chip = clone.querySelector('#userChip'); if(chip) chip.hidden = true;
   var sch = clone.querySelector('#schemeBody'); if(sch) sch.innerHTML = '';
@@ -2254,7 +2261,7 @@ async function login(){
   sessionStorage.setItem("mba-pkce-v", v);
   var d = await endpoints();
   location.href = d.authorization_endpoint + "?response_type=code&client_id=" + encodeURIComponent(LOGTO.clientId)
-    + "&redirect_uri=" + encodeURIComponent(LOGTO.redirectUri) + "&scope=" + encodeURIComponent("openid profile")
+    + "&redirect_uri=" + encodeURIComponent(LOGTO.redirectUri) + "&scope=" + encodeURIComponent("openid profile urn:logto:scope:organizations")
     + "&code_challenge=" + ch + "&code_challenge_method=S256";
 }
 async function exchange(code){

@@ -1,14 +1,16 @@
 {
   "name": "mba-schedule-api",
-  "version": "0.8.4",
+  "version": "0.8.8",
   "private": true,
   "description": "MBA 选课云方案小 API: 验 Logto ID Token, 存每用户 3 份命名方案",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node --test schemes.test.js"
+    "test": "node --test"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "express": "^4.21.2",
     "jose": "^5.9.6",

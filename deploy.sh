@@ -15,12 +15,19 @@ if [ -d .git ]; then git pull --ff-only; fi
 mkdir -p web
 sed "s|https://login.你的域名/oidc|$LOGTO_ISSUER|g; s|PASTE_LOGTO_APP_ID|$LOGTO_CLIENT_ID|g" \
   MBA-Schedule.html > web/MBA-Schedule.html
+# 根路径给 index.html, 否则 nginx 根会 404; 两份内容一致, 兼容两种已登记回调。
+cp web/MBA-Schedule.html web/index.html
+
+# 会计练习页: 静态文件进 web/study/, 由同一 nginx 直接服务。
+mkdir -p web/study
+cp study/index.html web/study/index.html
 
 # compose 真值: 同步 ~/.mba-deploy.env 到仓库根 .env (git 忽略, compose 插值用)
 {
-  echo "PGURL=${PGURL:?先填 PGURL, 如 postgres://mba:密码@host.docker.internal:5432/mba}"
+  echo "PGURL=${PGURL:?先填 PGURL, 如 postgres://mba_user:密码@iqair_db:5432/mba}"
   echo "LOGTO_ISSUER=${LOGTO_ISSUER}"
   echo "LOGTO_CLIENT_ID=${LOGTO_CLIENT_ID}"
+  echo "LOGTO_ORG_ID=${LOGTO_ORG_ID:?先填 LOGTO_ORG_ID, UCAS 组织 ID}"
 } > .env
 chmod 600 .env
 

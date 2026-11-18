@@ -33,3 +33,6 @@ test-results/
 
 # compose 真值 (deploy.sh 生成, 含数据库密码)
 .env
+
+# 本地工具配置
+.qoder/

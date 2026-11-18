@@ -3,13 +3,13 @@
 > opencode / codex / Muse 等 agent 启动时默认读取本文件。
 
 ## 项目
-26级MBA课程预选表 — 单文件可视化日历 `MBA-Schedule.html`，七班合一（全集/综合/非集/人工智能/数字化/脱产/金融），双学期，日历+选课+冲突+进度+打印。
+26级MBA 学习站 —— 单文件课表 `MBA-Schedule.html`（七班合一、双学期、日历+选课+冲突+进度+打印）+ 会计练习页 `study/` + 开卷手册 + 选课云方案 API。线上 `https://mba.rivenmu.cn:20001`。
 
 ## 当前版本
-`v0.8.7` — 展示于 `MBA-Schedule.html` 标题徽章与页脚，代码内 `const VERSION = "v0.8.7"`，`README` 标题区同步。
+`v0.8.8` — 展示于 `MBA-Schedule.html` 标题徽章与页脚，代码内 `const VERSION = "v0.8.8"`，`README` 标题区同步。
 
 ## 发版规则（强制）
-- 每次更新自动升 **小版本**：`v0.8.7` → `v0.8.8` … 以此类推，无需询问。
+- 每次更新自动升 **小版本**：`v0.8.8` → `v0.8.9` … 以此类推，无需询问。
 - 较重大的 bug 修复或功能更新：可升 **次版本**：`v0.8.x` → `v0.9.0`。
 - **禁止**自行升至 `1.0.0`，需用户明确通知后方可升级。
 - 版本号需同步更新三处：`MBA-Schedule.html` 内 `VERSION` 常量与标题/页脚徽标、`README`、`AGENTS.md`/`CLAUDE.md` 本段。
@@ -42,6 +42,18 @@
 
 > 本节与 `../../platform/AGENTS.md` 同名小节保持一致，冲突时以 platform 为准。
 
+## 学习页与 API
+- `/study/`：MBA 会计三表练习，单文件 `study/index.html`，公开可看，进度默认只存浏览器。
+- 云同步：登录态取自课表的 `sessionStorage["mba-id-token"]`（同源同标签页），调 `/api/study/progress` 与 `/api/study/online`；不自己做 OIDC。
+- API（`api/`，Express）：先验 Logto ID Token，再校验 `organizations` 含 UCAS（`LOGTO_ORG_ID`），否则 403；`schemes`、`study` 都走同一道校验。
+- 数据库：`mba` 库，`db/001-schemes.sql`、`db/002-study.sql`，复用 `iqair_db` 实例。
+- 手册：源文件在 `../会计期末考试资料/开卷考试极速快查手册.html`，用 `scripts/publish_handbook.sh` 原子发布。
+
+## 部署
+- 全部走 `docker-compose.yml`（web nginx `7899` + mba-api 内网），`bash deploy.sh` 注入 Logto 真值并重建。
+- 真值在服务器 `~/.mba-deploy.env`（600，不进 git）；Lucky 把 `mba.rivenmu.cn` 指向 `10.0.0.2:7899`。
+- 回滚：Lucky 指回 `7900` 静态站（文件保留一周）。
+
 ## 约定
-- 单文件交付，直接双击可用；测试 `cd tests && npx playwright test` 保持 `72` 项通过。
+- 单文件交付，直接双击可用；测试 `cd tests && npx playwright test` 保持 `102` 项通过。
 - 原始 PDF 已加入 `.gitignore`，不提交。
