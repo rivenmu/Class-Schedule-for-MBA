@@ -9,7 +9,11 @@ if [ -f "$HOME/.mba-deploy.env" ]; then set -a; . "$HOME/.mba-deploy.env"; set +
 LOGTO_ISSUER="${LOGTO_ISSUER:?先填 LOGTO_ISSUER, 如 https://login.rivenmu.cn:20001/oidc}"
 LOGTO_CLIENT_ID="${LOGTO_CLIENT_ID:?先填 LOGTO_CLIENT_ID}"
 
-if [ -d .git ]; then git pull --ff-only; fi
+# 先拉代码再重新执行本脚本：否则 git pull 改的是“正在跑的文件”，后半段会按旧内容执行。
+if [ -d .git ] && [ "${1:-}" != "--no-pull" ]; then
+  git pull --ff-only
+  exec bash "$0" --no-pull
+fi
 
 # 前端: 注入真值到 ./web (volume 挂进 nginx, 改完即生效, 不用 rebuild)
 mkdir -p web
