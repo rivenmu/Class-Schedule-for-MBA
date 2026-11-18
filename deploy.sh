@@ -22,6 +22,9 @@ cp web/MBA-Schedule.html web/index.html
 mkdir -p web/study
 cp study/index.html web/study/index.html
 
+# 站点图标: 门户健康探针会拉 /favicon.svg
+cp favicon.svg web/favicon.svg
+
 # compose 真值: 同步 ~/.mba-deploy.env 到仓库根 .env (git 忽略, compose 插值用)
 {
   echo "PGURL=${PGURL:?先填 PGURL, 如 postgres://mba_user:密码@iqair_db:5432/mba}"
