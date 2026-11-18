@@ -2254,50 +2254,130 @@ async function endpoints(){
   if(!disc) disc = await (await fetch(LOGTO.issuer.replace(/\/$/, "") + "/.well-known/openid-configuration")).json();
   return disc;
 }
-async function login(){
-  if(!configured()){ showToast("需先在 1Panel 装 Logto 并填配置 (docs/deploy.md)"); return; }
-  var v = b64url(crypto.getRandomValues(new Uint8Array(32)));
-  var ch = b64url(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(v)));
-  sessionStorage.setItem("mba-pkce-v", v);
-  var d = await endpoints();
-  location.href = d.authorization_endpoint + "?response_type=code&client_id=" + encodeURIComponent(LOGTO.clientId)
-    + "&redirect_uri=" + encodeURIComponent(LOGTO.redirectUri) + "&scope=" + encodeURIComponent("openid profile urn:logto:scope:organizations")
-    + "&code_challenge=" + ch + "&code_challenge_method=S256";
-}
-async function exchange(code){
+// —— 令牌存储（与学习页共用；localStorage 让新标签页/关浏览器都保持登录）——
+var MTOK = "mba-id-token", MRFT = "mba-refresh-token";
+function lsGet(k){ try{ return localStorage.getItem(k) || ""; }catch(e){ return ""; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+var SILENT_RETRY_MS = 60000;
+function silentFailedRecently(){ var at = Number(lsGet("mba-silent-failed")||0); return at>0 && Date.now()-at < SILENT_RETRY_MS; }
+
+function returnPath(){
   try{
+    var from = new URLSearchParams(location.search).get("from");
+    if(from === "/accounting_study" || from === "/schedule" || from === "/") return from;
+  }catch(e){}
+  if(location.pathname === "/accounting_study" || location.pathname === "/schedule" || location.pathname === "/") return location.pathname;
+  return "/schedule";
+}
+async function login(opts){
+  opts = opts || {};
+  if(!configured()){ showToast("需先在 1Panel 装 Logto 并填配置 (docs/deploy.md)"); return; }
+  if(!window.isSecureContext || !window.crypto || !crypto.subtle){
+    showToast("登录需要 https 访问：https://mba.rivenmu.cn:20001"); return;
+  }
+  try{
+    if(!opts.silent) lsSet("mba-return", returnPath());
+    var v = b64url(crypto.getRandomValues(new Uint8Array(32)));
+    var ch = b64url(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(v)));
+    var st = b64url(crypto.getRandomValues(new Uint8Array(16)));
+    lsSet("mba-pkce-v", v); lsSet("mba-pkce-st", st);
+    if(opts.silent){ lsSet("mba-silent", "1"); lsSet("mba-silent-at", String(Date.now())); }
+    else{ lsDel("mba-silent"); }
+    var d = await endpoints();
+    location.href = d.authorization_endpoint + "?response_type=code&client_id=" + encodeURIComponent(LOGTO.clientId)
+      + "&redirect_uri=" + encodeURIComponent(LOGTO.redirectUri)
+      + "&scope=" + encodeURIComponent("openid profile offline_access urn:logto:scope:organizations")
+      + "&state=" + encodeURIComponent(st)
+      + "&code_challenge=" + ch + "&code_challenge_method=S256"
+      + (opts.silent ? "&prompt=none" : "");
+  }catch(e){ showToast("无法连接统一登录，请检查网络后重试"); }
+}
+async function exchange(code, state){
+  var silent = lsGet("mba-silent") === "1";
+  try{
+    var savedSt = lsGet("mba-pkce-st");
+    if(!code || !state || !savedSt || state !== savedSt) throw new Error("state");
     var d = await endpoints();
     var r = await fetch(d.token_endpoint, { method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: "grant_type=authorization_code&code=" + encodeURIComponent(code)
         + "&redirect_uri=" + encodeURIComponent(LOGTO.redirectUri)
         + "&client_id=" + encodeURIComponent(LOGTO.clientId)
-        + "&code_verifier=" + sessionStorage.getItem("mba-pkce-v") });
-    if(!r.ok){ showToast("登录失败, 请重试"); return; }
+        + "&code_verifier=" + encodeURIComponent(lsGet("mba-pkce-v")) });
+    if(!r.ok) throw new Error("token");
     var t = await r.json();
-    sessionStorage.setItem("mba-id-token", t.id_token);
-    history.replaceState(null, "", LOGTO.redirectUri);
+    if(!t.id_token) throw new Error("token");
+    lsSet(MTOK, t.id_token);
+    if(t.refresh_token) lsSet(MRFT, t.refresh_token);
+    lsSet("mba-seen", "1");
+    lsDel("mba-silent"); lsDel("mba-silent-at"); lsDel("mba-silent-failed");
+    lsDel("mba-pkce-v"); lsDel("mba-pkce-st");
+    var back = lsGet("mba-return") || LOGTO.redirectUri;
+    lsDel("mba-return");
+    history.replaceState(null, "", back);
     onLogin();
-  }catch(e){ showToast("登录失败, 请检查网络后重试"); }
+  }catch(e){
+    lsDel("mba-silent");
+    history.replaceState(null, "", location.pathname);
+    if(silent){ lsSet("mba-silent-failed", String(Date.now())); setLoggedOut(); return; }
+    showToast(e && e.message === "state" ? "登录会话已失效，请重新点登录" : "登录未完成，请重试");
+  }
+}
+// 用 refresh token 续期：true=成功 / "auth"=凭证失效 / "network"=稍后再试（保留凭证）
+async function refreshIdToken(){
+  var rt = lsGet(MRFT);
+  if(!rt) return "auth";
+  try{
+    var d = await endpoints();
+    var r = await fetch(d.token_endpoint, { method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "grant_type=refresh_token&refresh_token=" + encodeURIComponent(rt)
+        + "&client_id=" + encodeURIComponent(LOGTO.clientId) });
+    if(r.status === 400 || r.status === 401){ lsDel(MRFT); return "auth"; }
+    if(!r.ok) return "network";
+    var t = await r.json();
+    if(!t.id_token) return "network";
+    lsSet(MTOK, t.id_token);
+    if(t.refresh_token) lsSet(MRFT, t.refresh_token);
+    return true;
+  }catch(e){ return "network"; }
 }
 function idSub(){
   try{
-    var t = sessionStorage.getItem("mba-id-token");
+    var t = lsGet(MTOK);
     if(!t) return null;
-    return JSON.parse(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).sub || "已登录";
+    var p = JSON.parse(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    if(p.exp && p.exp * 1000 < Date.now()) return "已登录";
+    return p.username || p.name || p.sub || "已登录";
   }catch(e){ return null; }
 }
 
 // ---------- API ----------
 async function api(path, opts){
   opts = opts || {};
-  var h = {};
-  var t = sessionStorage.getItem("mba-id-token");
-  if(t) h.Authorization = "Bearer " + t;
-  var body;
-  if(opts.body !== undefined){ h["Content-Type"] = "application/json"; body = JSON.stringify(opts.body); }
-  var r = await fetch("/api" + path, { method: opts.method || "GET", headers: h, body: body });
-  if(r.status === 401){ setLoggedOut(); showToast("登录已过期, 请重新登录"); var e401 = new Error("api"); e401.status = 401; throw e401; }
+  var send = function(){
+    var h = {};
+    var t = lsGet(MTOK);
+    if(t) h.Authorization = "Bearer " + t;
+    var body;
+    if(opts.body !== undefined){ h["Content-Type"] = "application/json"; body = JSON.stringify(opts.body); }
+    return fetch("/api" + path, { method: opts.method || "GET", headers: h, body: body });
+  };
+  var r = await send();
+  if(r.status === 401){
+    var renewed = await refreshIdToken();
+    if(renewed === true) r = await send();
+    if(renewed === "network"){
+      showToast("网络异常，稍后重试（登录状态已保留）");
+      var enet = new Error("network"); enet.status = 0; throw enet;
+    }
+    if(r.status === 401){
+      setLoggedOut();
+      if(Date.now() - (window.__authToastAt || 0) > 3000){ window.__authToastAt = Date.now(); showToast("登录已过期，请重新登录"); }
+      var e401 = new Error("api"); e401.status = 401; throw e401;
+    }
+  }
   if(!r.ok){ var e = new Error("api"); e.status = r.status; try{ e.body = await r.json(); }catch(_){ e.body = {}; } throw e; }
   return r.json();
 }
@@ -2374,7 +2454,7 @@ renderAll = function(){ _renderAll(); queueDraftSave(); };
 function setMeta(t){ if(schemeMeta) schemeMeta.textContent = t; }
 async function renderSchemes(){
   if(!schemeBody) return;
-  if(!sessionStorage.getItem("mba-id-token")){
+  if(!lsGet(MTOK)){
     setMeta("3 槽");
     schemeBody.innerHTML = '<div class="sch-hint">登录后可存 3 份云端命名方案, 换设备同步。<br>未登录时勾选自动存本机 Cookie (一年有效)。</div>';
     return;
@@ -2463,7 +2543,7 @@ function pickOverwrite(body, slots){
 
 // ---------- 登录态 ----------
 function setLoggedOut(){
-  sessionStorage.removeItem("mba-id-token");
+  lsDel(MTOK);
   loginBtn.textContent = "登录"; chip.hidden = true;
   renderSchemes();
 }
@@ -2486,8 +2566,18 @@ function maybeMerge(){
   document.getElementById("mLater").onclick = closeCloud;
   document.getElementById("mSave").onclick = function(){ closeCloud(); saveFlow("本机暂存"); };
 }
+function logout(){
+  lsDel(MTOK); lsDel(MRFT); lsDel("mba-seen");
+  lsSet("mba-silent-failed", String(Date.now()));
+  setLoggedOut();
+  showToast("已登出");
+  // 结束统一会话，否则下次打开会被静默登回
+  if(configured()){
+    location.href = LOGTO.issuer.replace(/\/$/, "") + "/session/end?post_logout_redirect_uri=" + encodeURIComponent(LOGTO.redirectUri);
+  }
+}
 loginBtn.onclick = function(){
-  if(sessionStorage.getItem("mba-id-token")){ setLoggedOut(); showToast("已登出"); }
+  if(lsGet(MTOK)){ logout(); }
   else login();
 };
 
@@ -2513,10 +2603,28 @@ loginBtn.onclick = function(){
       showToast("本机暂存已损坏, 已从空白开始");
     }
   }
-  var m = location.search.match(/[?&]code=([^&]+)/);
-  if(m && configured()){ exchange(decodeURIComponent(m[1])); }
-  else if(sessionStorage.getItem("mba-id-token")){ setLoggedIn(); }
-  else{ setLoggedOut(); }
+  var q = new URLSearchParams(location.search);
+  var oidcErr = q.get("error");
+  if(oidcErr){
+    history.replaceState(null, "", location.pathname);
+    showToast(oidcErr === "access_denied" ? "你已取消登录" : oidcErr === "login_required" ? "登录已过期，请重新登录" : "登录未完成，请重试");
+  }
+  var code = q.get("code"), st = q.get("state");
+  if(code && configured()){ exchange(code, st); return; }
+  if(lsGet(MTOK)){ setLoggedIn(); return; }
+  if(lsGet(MRFT)){
+    refreshIdToken().then(function(r){
+      if(r === true && lsGet(MTOK)){ setLoggedIn(); }
+      else if(r === "auth" && lsGet("mba-seen") === "1" && !silentFailedRecently()){ login({ silent: true }); }
+      else{ setLoggedOut(); }
+    });
+    return;
+  }
+  if(lsGet("mba-seen") === "1" && !silentFailedRecently()){
+    var at = Number(lsGet("mba-silent-at") || 0);
+    if(!(at > 0 && Date.now() - at < SILENT_RETRY_MS)){ login({ silent: true }); return; }
+  }
+  setLoggedOut();
 })();
 })();
 </script>

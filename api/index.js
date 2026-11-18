@@ -14,6 +14,10 @@ const app = express();
 app.use(express.json({ limit: '256kb' })); // stateData 约几十 KB, 256k 够且防滥用
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
+// 公开配置：门户/学习页续期只需要 issuer 与 client_id（都是公开值，不含密钥）
+app.get('/api/auth/config', (req, res) =>
+  res.json({ issuer: process.env.LOGTO_ISSUER, clientId: process.env.LOGTO_CLIENT_ID })
+);
 app.get('/api/me', requireUser, (req, res) => res.json({ sub: req.userSub, name: req.userName }));
 app.use('/api/schemes', requireUser, makeSchemesRouter(pool));
 app.use('/api/study/online', makePresenceRouter(pool)); // 公开心跳, 必须挂在 requireUser 之前

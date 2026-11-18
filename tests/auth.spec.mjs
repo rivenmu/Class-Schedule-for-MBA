@@ -21,10 +21,29 @@ test.describe('cloud login glue', () => {
     await expect(page.locator('#toast.show')).toContainText('Logto');
   });
 
+  test('登录态存 localStorage，新标签页仍是已登录', async ({ page }) => {
+    const jwt = fakeJwt();
+    await page.addInitScript((t) => {
+      try { sessionStorage.setItem('mba-disclaimer-seen', '1'); localStorage.setItem('mba-id-token', t); } catch (e) {}
+    }, jwt);
+    await page.route('**/api/schemes*', (r) => r.fulfill({ json: [] }));
+    await page.goto(await appUrl(), { waitUntil: 'networkidle' });
+    await expect(page.locator('#loginBtn')).toHaveText('登出');
+
+    const page2 = await page.context().newPage();
+    await page2.addInitScript(() => {
+      try { sessionStorage.setItem('mba-disclaimer-seen', '1'); } catch (e) {}
+    });
+    await page2.route('**/api/schemes*', (r) => r.fulfill({ json: [] }));
+    await page2.goto(await appUrl(), { waitUntil: 'networkidle' });
+    await expect(page2.locator('#loginBtn')).toHaveText('登出');
+    await page2.close();
+  });
+
   test('preset token shows logout state and scheme save entry', async ({ page }) => {
     const jwt = fakeJwt();
     await page.addInitScript((t) => {
-      try { sessionStorage.setItem('mba-disclaimer-seen', '1'); sessionStorage.setItem('mba-id-token', t); } catch (e) {}
+      try { sessionStorage.setItem('mba-disclaimer-seen', '1'); localStorage.setItem('mba-id-token', t); } catch (e) {}
     }, jwt);
     await page.route('**/api/schemes', (r) => r.fulfill({ json: [] }));
     await page.goto(await appUrl(), { waitUntil: 'networkidle' });
@@ -37,7 +56,7 @@ test.describe('cloud login glue', () => {
   test('logout falls back to guest hint', async ({ page }) => {
     const jwt = fakeJwt();
     await page.addInitScript((t) => {
-      try { sessionStorage.setItem('mba-disclaimer-seen', '1'); sessionStorage.setItem('mba-id-token', t); } catch (e) {}
+      try { sessionStorage.setItem('mba-disclaimer-seen', '1'); localStorage.setItem('mba-id-token', t); } catch (e) {}
     }, jwt);
     await page.route('**/api/schemes', (r) => r.fulfill({ json: [] }));
     await page.goto(await appUrl(), { waitUntil: 'networkidle' });

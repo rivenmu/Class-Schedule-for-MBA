@@ -1185,7 +1185,47 @@ function save(){
   writeCookie(data);
   scheduleCloud();
 }
-function token(){try{return sessionStorage.getItem("mba-id-token")}catch(e){return ""}}
+function token(){try{return localStorage.getItem("mba-id-token")||""}catch(e){return ""}}
+// 令牌续期：与课表页共用 localStorage 里的 refresh token；配置从公开接口取（避免两处硬编码）
+let _authCfg=null;
+async function authConfig(){
+  if(_authCfg)return _authCfg;
+  const r=await fetch('/api/auth/config',{headers:{Accept:'application/json'}});
+  if(!r.ok)throw new Error('config');
+  _authCfg=await r.json();
+  return _authCfg;
+}
+async function refreshIdToken(){
+  let rt="";try{rt=localStorage.getItem("mba-refresh-token")||""}catch(e){}
+  if(!rt)return false;
+  try{
+    const cfg=await authConfig();
+    const body=new URLSearchParams({grant_type:'refresh_token',refresh_token:rt,client_id:cfg.clientId});
+    const r=await fetch(cfg.issuer.replace(/\/$/,'')+'/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+    if(r.status===400||r.status===401){try{localStorage.removeItem('mba-refresh-token')}catch(e){}return false}
+    if(!r.ok)return false;
+    const t=await r.json();
+    if(!t.id_token)return false;
+    try{localStorage.setItem('mba-id-token',t.id_token);if(t.refresh_token)localStorage.setItem('mba-refresh-token',t.refresh_token)}catch(e){}
+    return true;
+  }catch(e){return false}
+}
+// 401 时先续期再重试一次，续不上才退回未登录
+async function authFetch(url,opts){
+  opts=opts||{};
+  const send=function(){
+    const h=Object.assign({},opts.headers||{});
+    const t=token();
+    if(t)h.Authorization='Bearer '+t;
+    return fetch(url,Object.assign({},opts,{headers:h}));
+  };
+  let r=await send();
+  if(r.status===401){
+    const ok=await refreshIdToken();
+    if(ok)r=await send();
+  }
+  return r;
+}
 function decodeName(t){
   try{const p=JSON.parse(atob(t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));return p.name||p.username||p.preferred_username||""}catch(e){return ""}
 }
@@ -1229,7 +1269,7 @@ async function pushCloud(){
   const t=token();
   if(!t){S.cloud={authed:false,user:"",state:"anon",updatedAt:0};paintCloud();_cloudSaving=false;return}
   try{
-    const res=await fetch('/api/study/progress',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({data:cloudPayload()})});
+    const res=await authFetch('/api/study/progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:cloudPayload()})});
     if(res.status===401){S.cloud.authed=false;S.cloud.state="anon";paintCloud();return}
     if(!res.ok)throw new Error('HTTP '+res.status);
     const j=await res.json();
@@ -1301,7 +1341,7 @@ async function initCloud(){
   if(!t){S.cloud={authed:false,user:"",state:"anon",updatedAt:0};paintCloud();return}
   S.cloud={authed:false,user:decodeName(t),state:"loading",updatedAt:0};paintCloud();
   try{
-    const res=await fetch('/api/study/progress',{headers:{Accept:'application/json','Authorization':'Bearer '+t}});
+    const res=await authFetch('/api/study/progress',{headers:{Accept:'application/json'}});
     if(res.status===401){S.cloud={authed:false,user:"",state:"anon",updatedAt:0};paintCloud();return}
     if(!res.ok)throw new Error('HTTP '+res.status);
     const j=await res.json();

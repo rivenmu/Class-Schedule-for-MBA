@@ -11,7 +11,7 @@ const fakeJwt = () => `${b64({ alg: 'none' })}.${b64({ sub: 'tester01' })}.x`;
 async function gotoLoggedIn(page, routes) {
   const jwt = fakeJwt();
   await page.addInitScript((t) => {
-    try { sessionStorage.setItem('mba-disclaimer-seen', '1'); sessionStorage.setItem('mba-id-token', t); } catch (e) {}
+    try { sessionStorage.setItem('mba-disclaimer-seen', '1'); localStorage.setItem('mba-id-token', t); } catch (e) {}
   }, jwt);
   await page.route('**/api/schemes*', routes);
   await page.goto(await appUrl(), { waitUntil: 'networkidle' });
