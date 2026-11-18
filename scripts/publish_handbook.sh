@@ -11,4 +11,4 @@ if [ ! -f "$SRC" ]; then echo "找不到手册: $SRC" >&2; exit 1; fi
 ssh "$HOST" "mkdir -p $DIR"
 scp "$SRC" "$HOST:$DIR/.index.html.tmp"
 ssh "$HOST" "mv $DIR/.index.html.tmp $DIR/index.html"
-echo "手册已发布: https://mba.rivenmu.cn:20001/study/handbook/"
+echo "手册已发布: https://mba.rivenmu.cn:20001/accounting_study/handbook/"
